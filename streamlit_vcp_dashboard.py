@@ -164,14 +164,9 @@ def dashboard_tab(combined: pd.DataFrame, daily: pd.DataFrame, weekly: pd.DataFr
 
 st.title("VCP Screener Dashboard")
 
-# with st.sidebar:
-#     st.header("Data source")
-#     outdir = st.text_input("Output folder", value="outputs")
-#     st.caption("This app reads the latest scheduled scan outputs.")
-
 with st.sidebar:
     st.header("Run scan")
-    universe_path = "nifty500.csv"
+    universe_path = st.text_input("Universe CSV path", value="nifty500.csv")
     outdir = st.text_input("Output folder", value="outputs")
     top_charts = st.number_input("Top charts to export", min_value=3, max_value=50, value=10, step=1)
     run_scan = st.button("Run / Refresh scan", use_container_width=True)
