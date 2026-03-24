@@ -26,6 +26,14 @@ def resolve_chart_path(charts_dir: str, ticker: str, suffix: str) -> Optional[Pa
     return path if path.exists() else None
 
 
+def get_last_updated(file_path: str) -> str:
+    p = Path(file_path)
+    if not p.exists():
+        return "Not available"
+    ts = pd.Timestamp(p.stat().st_mtime, unit="s").tz_localize("UTC").tz_convert("Asia/Kolkata")
+    return ts.strftime("%d %b %Y, %I:%M %p IST")
+
+
 def add_safe_labels(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
 
@@ -53,6 +61,15 @@ def add_safe_labels(df: pd.DataFrame) -> pd.DataFrame:
             "watchlist": "Watchlist",
         }).fillna(out["combined_bucket"])
 
+    score_cols = [
+        "daily_score", "weekly_score", "combined_score",
+        "final_daily_score", "final_weekly_score", "final_combined_score",
+        "rs_3m_pct", "rs_6m_pct", "industry_boost"
+    ]
+    for col in score_cols:
+        if col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors="coerce").round(1)
+
     return out
 
 
@@ -62,9 +79,9 @@ def filter_table(
     industries: list[str],
     stages: list[str],
     min_score: float,
-    bucket_col: str,
-    buckets: list[str],
     score_col: str,
+    label_col: str,
+    labels: list[str],
 ) -> pd.DataFrame:
     out = df.copy()
 
@@ -81,8 +98,8 @@ def filter_table(
     if stages and "stage" in out.columns:
         out = out[out["stage"].isin(stages)]
 
-    if buckets and bucket_col in out.columns:
-        out = out[out[bucket_col].isin(buckets)]
+    if labels and label_col in out.columns:
+        out = out[out[label_col].isin(labels)]
 
     if score_col in out.columns:
         out = out[out[score_col].fillna(0) >= min_score]
@@ -90,42 +107,18 @@ def filter_table(
     return out.reset_index(drop=True)
 
 
-def metric_row(
-    combined: pd.DataFrame,
-    daily: pd.DataFrame,
-    weekly: pd.DataFrame,
-    industry: pd.DataFrame,
-    regime: pd.DataFrame,
-) -> None:
-    c1, c2, c3, c4, c5 = st.columns(5)
-
+def metric_row(combined: pd.DataFrame, daily: pd.DataFrame, weekly: pd.DataFrame, industry: pd.DataFrame, regime: pd.DataFrame, last_updated: str) -> None:
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
     risk = regime.iloc[0]["regime_label"] if not regime.empty and "regime_label" in regime.columns else "n/a"
     c1.metric("Market regime", risk)
     c2.metric("Overall candidates", len(combined))
-    c3.metric(
-        "Daily analytical events",
-        int(daily["daily_setup_bucket"].isin(["breakout_today", "near_pivot"]).sum())
-        if "daily_setup_bucket" in daily.columns else 0,
-    )
-    c4.metric(
-        "Weekly analytical events",
-        int(weekly["weekly_setup_bucket"].isin(["weekly_breakout", "weekly_near_pivot"]).sum())
-        if "weekly_setup_bucket" in weekly.columns else 0,
-    )
+    c3.metric("Daily analytical events", int(daily["daily_setup_bucket"].isin(["breakout_today", "near_pivot"]).sum()) if "daily_setup_bucket" in daily.columns else 0)
+    c4.metric("Weekly analytical events", int(weekly["weekly_setup_bucket"].isin(["weekly_breakout", "weekly_near_pivot"]).sum()) if "weekly_setup_bucket" in weekly.columns else 0)
     c5.metric("Industries tracked", len(industry))
+    c6.metric("Last updated", last_updated)
 
 
-def score_badge(val: float) -> str:
-    if pd.isna(val):
-        return "n/a"
-    if val >= 80:
-        return "Strong"
-    if val >= 65:
-        return "Moderate"
-    return "Watch"
-
-
-def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_charts_dir: str) -> None:
+def stock_detail_tab(combined: pd.DataFrame, weekly_charts_dir: str, monthly_charts_dir: str) -> None:
     st.subheader("Stock detail")
 
     if combined.empty:
@@ -158,36 +151,31 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         "Overall score": row.get("final_combined_score", row.get("combined_score")),
         "3M relative strength": row.get("rs_3m_pct"),
         "6M relative strength": row.get("rs_6m_pct"),
-        "Average turnover": row.get("avg_turnover_inr"),
         "Interpretation": row.get("notes"),
     }
     st.json(summary)
-
-    st.markdown("### Interpretation guide")
-    score_value = row.get("final_combined_score", row.get("combined_score"))
-    st.write(f"Overall analytical strength: **{score_badge(score_value)}**")
-    st.write("This is a rule-based screening output. It is not investment advice, a recommendation, or a buy/sell call.")
+    st.caption("Scores are rule-based analytical outputs shown to one decimal place.")
 
     c1, c2 = st.columns(2)
-    dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
     wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
+    mpath = resolve_chart_path(monthly_charts_dir, ticker, "_monthly.png")
 
     with c1:
-        st.markdown("**Daily chart**")
-        if dpath:
-            st.image(str(dpath), use_container_width=True)
-        else:
-            st.info("No daily chart exported for this ticker in current top set.")
-
-    with c2:
         st.markdown("**Weekly chart**")
         if wpath:
             st.image(str(wpath), use_container_width=True)
         else:
-            st.info("No weekly chart exported for this ticker in current top set.")
+            st.info("Weekly chart not available yet for this ticker.")
+
+    with c2:
+        st.markdown("**Monthly chart**")
+        if mpath:
+            st.image(str(mpath), use_container_width=True)
+        else:
+            st.info("Monthly chart not available yet for this ticker.")
 
 
-def ranked_tab(title: str, df: pd.DataFrame, bucket_col: str, score_col: str, label_col: str) -> None:
+def ranked_tab(title: str, df: pd.DataFrame, score_col: str, label_col: str) -> None:
     st.subheader(title)
 
     if df.empty:
@@ -198,57 +186,46 @@ def ranked_tab(title: str, df: pd.DataFrame, bucket_col: str, score_col: str, la
 
     c1, c2, c3, c4 = st.columns(4)
     search = c1.text_input(f"Search in {title}", key=f"{key_prefix}_search")
-    industries = c2.multiselect(
-        "Industry",
-        sorted(df["Industry"].dropna().unique().tolist()) if "Industry" in df.columns else [],
-        key=f"{key_prefix}_industry",
-    )
-    stages = c3.multiselect(
-        "Stage",
-        sorted(df["stage"].dropna().unique().tolist()) if "stage" in df.columns else [],
-        key=f"{key_prefix}_stage",
-    )
-    buckets = c4.multiselect(
-        "Setup label",
-        sorted(df[label_col].dropna().unique().tolist()) if label_col in df.columns else [],
-        key=f"{key_prefix}_bucket",
-    )
-    min_score = c1.slider(
-        f"Min {score_col}",
-        0.0,
-        100.0,
-        60.0,
-        1.0,
-        key=f"{key_prefix}_min_score",
-    )
+    industries = c2.multiselect("Industry", sorted(df["Industry"].dropna().unique().tolist()) if "Industry" in df.columns else [], key=f"{key_prefix}_industry")
+    stages = c3.multiselect("Stage", sorted(df["stage"].dropna().unique().tolist()) if "stage" in df.columns else [], key=f"{key_prefix}_stage")
+    labels = c4.multiselect("Setup label", sorted(df[label_col].dropna().unique().tolist()) if label_col in df.columns else [], key=f"{key_prefix}_label")
+    min_score = st.slider(f"Min {score_col}", 0.0, 100.0, 60.0, 0.1, key=f"{key_prefix}_min_score")
 
-    working = df.copy()
-    if buckets and label_col in working.columns:
-        working = working[working[label_col].isin(buckets)]
+    filtered = filter_table(df, search, industries, stages, min_score, score_col, label_col, labels)
 
-    filtered = filter_table(working, search, industries, stages, min_score, bucket_col, [], score_col)
-
-    preferred_cols = [
-        "ticker", "Company Name", "Industry", "stage", label_col,
-        score_col, "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "notes"
-    ]
+    preferred_cols = ["ticker", "Company Name", "Industry", "stage", label_col, score_col, "rs_3m_pct", "rs_6m_pct", "notes"]
     preferred_cols = [c for c in preferred_cols if c in filtered.columns]
     st.dataframe(filtered[preferred_cols], use_container_width=True, height=520)
 
 
 def industry_tab(industry: pd.DataFrame) -> None:
     st.subheader("Industry strength")
-
     if industry.empty:
         st.info("No scan outputs found yet.")
         return
+    display_cols = [c for c in ["Industry", "avg_combined_score", "rs_rank", "strong_combined", "actionable_daily", "actionable_weekly"] if c in industry.columns]
+    temp = industry.copy()
+    for col in ["avg_combined_score", "rs_rank"]:
+        if col in temp.columns:
+            temp[col] = pd.to_numeric(temp[col], errors="coerce").round(1)
+    st.dataframe(temp[display_cols], use_container_width=True, height=520)
 
-    st.dataframe(industry, use_container_width=True, height=520)
+
+def stage_by_industry_tab(combined: pd.DataFrame) -> None:
+    st.subheader("Stage count by industry")
+    if combined.empty or "Industry" not in combined.columns or "stage" not in combined.columns:
+        st.info("No stage data found yet.")
+        return
+
+    pivot = combined.pivot_table(index="Industry", columns="stage", values="ticker", aggfunc="count", fill_value=0).reset_index()
+    stage_cols = [c for c in pivot.columns if c != "Industry"]
+    pivot["Total"] = pivot[stage_cols].sum(axis=1)
+    pivot = pivot.sort_values(["Total", "Industry"], ascending=[False, True]).reset_index(drop=True)
+    st.dataframe(pivot, use_container_width=True, height=540)
 
 
 def help_tab() -> None:
     st.subheader("How to interpret the dashboard")
-
     st.markdown(
         '''
 **Important**  
@@ -269,36 +246,18 @@ Combined priority score using daily, weekly, and industry-strength inputs.
 - Stage 3: topping / mixed structure
 - Stage 4: downtrend
 
-**Daily setup label**
-- Breakout setup detected
-- Near pivot zone
-- Setup forming
-- Watchlist
-
-**Weekly setup label**
-- Weekly breakout structure
-- Weekly near pivot zone
-- Weekly structure forming
-- Weekly watchlist
-
-**Industry rank / boost**  
-Higher means the stock belongs to a relatively stronger industry group in this model.
-
 **Charts**
-- Daily chart: short-term structure
 - Weekly chart: higher-timeframe structure
+- Monthly chart: long-term structure
+
+**Last updated**
+Shows when the latest output files were last generated.
 '''
     )
 
 
-def dashboard_tab(
-    combined: pd.DataFrame,
-    daily: pd.DataFrame,
-    weekly: pd.DataFrame,
-    industry: pd.DataFrame,
-    regime: pd.DataFrame,
-) -> None:
-    metric_row(combined, daily, weekly, industry, regime)
+def dashboard_tab(combined: pd.DataFrame, daily: pd.DataFrame, weekly: pd.DataFrame, industry: pd.DataFrame, regime: pd.DataFrame, last_updated: str) -> None:
+    metric_row(combined, daily, weekly, industry, regime, last_updated)
     st.divider()
 
     c1, c2 = st.columns(2)
@@ -334,8 +293,8 @@ outputs = {
     "combined": str(Path(outdir) / "vcp_combined_ranked.csv"),
     "industry": str(Path(outdir) / "industry_strength.csv"),
     "regime": str(Path(outdir) / "market_regime.csv"),
-    "daily_charts_dir": str(Path(outdir) / "charts" / "daily"),
     "weekly_charts_dir": str(Path(outdir) / "charts" / "weekly"),
+    "monthly_charts_dir": str(Path(outdir) / "charts" / "monthly"),
 }
 
 daily_df = add_safe_labels(safe_read(outputs["daily"]))
@@ -343,29 +302,33 @@ weekly_df = add_safe_labels(safe_read(outputs["weekly"]))
 combined_df = add_safe_labels(safe_read(outputs["combined"]))
 industry_df = safe_read(outputs["industry"])
 regime_df = safe_read(outputs["regime"])
+last_updated = get_last_updated(outputs["combined"])
 
 if combined_df.empty and daily_df.empty and weekly_df.empty:
     st.warning("No output files found yet. Wait for the scheduled GitHub Action to generate the latest scan.")
 
-tabs = st.tabs(["Dashboard", "Overall", "Daily", "Weekly", "Industries", "Stock detail", "Help"])
+tabs = st.tabs(["Dashboard", "Overall", "Daily", "Weekly", "Industries", "Stage by Industry", "Stock detail", "Help"])
 
 with tabs[0]:
-    dashboard_tab(combined_df, daily_df, weekly_df, industry_df, regime_df)
+    dashboard_tab(combined_df, daily_df, weekly_df, industry_df, regime_df, last_updated)
 
 with tabs[1]:
-    ranked_tab("Overall candidates", combined_df, "combined_bucket", "final_combined_score", "overall_setup_label")
+    ranked_tab("Overall candidates", combined_df, "final_combined_score", "overall_setup_label")
 
 with tabs[2]:
-    ranked_tab("Daily candidates", daily_df, "daily_setup_bucket", "final_daily_score", "daily_setup_label")
+    ranked_tab("Daily candidates", daily_df, "final_daily_score", "daily_setup_label")
 
 with tabs[3]:
-    ranked_tab("Weekly candidates", weekly_df, "weekly_setup_bucket", "final_weekly_score", "weekly_setup_label")
+    ranked_tab("Weekly candidates", weekly_df, "final_weekly_score", "weekly_setup_label")
 
 with tabs[4]:
     industry_tab(industry_df)
 
 with tabs[5]:
-    stock_detail_tab(combined_df, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
+    stage_by_industry_tab(combined_df)
 
 with tabs[6]:
+    stock_detail_tab(combined_df, outputs["weekly_charts_dir"], outputs["monthly_charts_dir"])
+
+with tabs[7]:
     help_tab()
