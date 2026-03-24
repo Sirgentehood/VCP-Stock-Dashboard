@@ -149,6 +149,7 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         st.info("Ticker not found.")
         return
     row = row.iloc[0]
+
     summary = {
         "Ticker": row.get("ticker"),
         "Company": row.get("Company Name"),
@@ -170,12 +171,20 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
     c1, c2 = st.columns(2)
     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
     wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
+
     with c1:
         st.markdown("**Daily chart**")
-        st.image(str(dpath), use_container_width=True) if dpath else st.info("Daily chart not available yet for this ticker.")
+        if dpath:
+            st.image(str(dpath), use_container_width=True)
+        else:
+            st.info("Daily chart not available yet for this ticker.")
+
     with c2:
         st.markdown("**Weekly chart**")
-        st.image(str(wpath), use_container_width=True) if wpath else st.info("Weekly chart not available yet for this ticker.")
+        if wpath:
+            st.image(str(wpath), use_container_width=True)
+        else:
+            st.info("Weekly chart not available yet for this ticker.")
 
 
 def help_tab() -> None:
