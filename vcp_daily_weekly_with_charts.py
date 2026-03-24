@@ -660,7 +660,7 @@ def export_top_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataF
     return {"daily_charts_dir": str(daily_dir), "weekly_charts_dir": str(weekly_dir)}
 
 
-def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, top_n_charts: int = 10) -> Dict[str, str]:
+def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, top_n_charts: int = 500) -> Dict[str, str]:
     cfg = {**DEFAULT_CONFIG, **(config or {})}
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
