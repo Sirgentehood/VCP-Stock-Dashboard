@@ -612,7 +612,7 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     plt.close(fig)
 
 
-def export_top_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path, top_n: int = 10) -> Dict[str, str]:
+def export_top_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path, top_n: int = 500) -> Dict[str, str]:
     charts_root = outdir / "charts"
     daily_dir = charts_root / "daily"
     weekly_dir = charts_root / "weekly"
