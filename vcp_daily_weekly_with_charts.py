@@ -612,55 +612,50 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     plt.close(fig)
 
 
-def export_top_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path, top_n: int = 500) -> Dict[str, str]:
+def export_all_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path) -> Dict[str, str]:
     charts_root = outdir / "charts"
     daily_dir = charts_root / "daily"
     weekly_dir = charts_root / "weekly"
     daily_dir.mkdir(parents=True, exist_ok=True)
     weekly_dir.mkdir(parents=True, exist_ok=True)
 
-    daily_top = final_report.sort_values(["final_daily_score", "daily_score"], ascending=[False, False]).head(top_n)
-    weekly_top = final_report.sort_values(["final_weekly_score", "weekly_score"], ascending=[False, False]).head(top_n)
+    score_map = final_report.set_index("ticker").to_dict(orient="index")
 
-    for _, row in daily_top.iterrows():
-        ticker = row["ticker"]
-        if ticker not in price_data:
+    for ticker, df in price_data.items():
+        if ticker == DEFAULT_CONFIG["market_index"] or df is None or df.empty:
             continue
-        df = price_data[ticker]
+
+        row = score_map.get(ticker, {})
         export_chart(
             df=df,
             symbol=ticker,
             title="Daily VCP",
             outfile=daily_dir / f"{sanitize_filename(ticker)}_daily.png",
             pivot=row.get("daily_pivot"),
-            setup_bucket=row.get("daily_setup_bucket", ""),
-            score=float(row.get("final_daily_score", row.get("daily_score", 0))),
+            setup_bucket=row.get("daily_setup_bucket", "watchlist"),
+            score=float(row.get("final_daily_score", row.get("daily_score", 0)) or 0),
             stage=row.get("stage", ""),
             is_weekly=False,
         )
 
-    for _, row in weekly_top.iterrows():
-        ticker = row["ticker"]
-        if ticker not in price_data:
-            continue
-        df = price_data[ticker]
         weekly_df = resample_weekly(df)
-        export_chart(
-            df=weekly_df,
-            symbol=ticker,
-            title="Weekly VCP",
-            outfile=weekly_dir / f"{sanitize_filename(ticker)}_weekly.png",
-            pivot=row.get("weekly_pivot"),
-            setup_bucket=row.get("weekly_setup_bucket", ""),
-            score=float(row.get("final_weekly_score", row.get("weekly_score", 0))),
-            stage=row.get("stage", ""),
-            is_weekly=True,
-        )
+        if not weekly_df.empty:
+            export_chart(
+                df=weekly_df,
+                symbol=ticker,
+                title="Weekly VCP",
+                outfile=weekly_dir / f"{sanitize_filename(ticker)}_weekly.png",
+                pivot=row.get("weekly_pivot"),
+                setup_bucket=row.get("weekly_setup_bucket", "weekly_watchlist"),
+                score=float(row.get("final_weekly_score", row.get("weekly_score", 0)) or 0),
+                stage=row.get("stage", ""),
+                is_weekly=True,
+            )
 
     return {"daily_charts_dir": str(daily_dir), "weekly_charts_dir": str(weekly_dir)}
 
 
-def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, top_n_charts: int = 500) -> Dict[str, str]:
+def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, export_all_ticker_charts: bool = True) -> Dict[str, str]:
     cfg = {**DEFAULT_CONFIG, **(config or {})}
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -716,7 +711,7 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     industry_df.to_csv(industry_file, index=False)
     pd.DataFrame([asdict(regime)]).to_csv(regime_file, index=False)
 
-    chart_paths = export_top_charts(final_report, price_data, out_path, top_n=top_n_charts)
+    chart_paths = export_all_charts(final_report, price_data, out_path) if export_all_ticker_charts else {"daily_charts_dir": str(out_path / "charts" / "daily"), "weekly_charts_dir": str(out_path / "charts" / "weekly")}
 
     return {
         "daily": str(daily_file),
@@ -732,13 +727,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Daily + Weekly VCP Screener with chart export")
     parser.add_argument("--universe", required=True, help="Path to Nifty 500 CSV/TSV file")
     parser.add_argument("--outdir", default="outputs", help="Output directory")
-    parser.add_argument("--top_charts", type=int, default=10, help="Top N daily and weekly charts to export")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    outputs = build_outputs(args.universe, args.outdir, top_n_charts=args.top_charts)
+    outputs = build_outputs(args.universe, args.outdir, export_all_ticker_charts=True)
     print("Saved files:")
     for key, value in outputs.items():
         print(f"- {key}: {value}")
