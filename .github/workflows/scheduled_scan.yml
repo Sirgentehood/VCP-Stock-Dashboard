@@ -35,7 +35,7 @@ jobs:
           outputs = build_outputs(
               universe_path="nifty500.csv",
               outdir="outputs",
-              top_n_charts=10
+              export_all_ticker_charts=True
           )
           print(outputs)
           PY
