@@ -282,6 +282,88 @@ def stage_by_industry_tab(combined: pd.DataFrame) -> None:
     st.dataframe(pivot, use_container_width=True, hide_index=True, height=540)
 
 
+# def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_charts_dir: str) -> None:
+#     st.subheader("Stock Detail")
+
+#     if combined.empty:
+#         st.info("No scan outputs found yet.")
+#         return
+
+#     st.markdown("### Filters")
+#     c1, c2 = st.columns(2)
+
+#     stage_options = ["All", "Stage 1", "Stage 2", "Stage 3", "Stage 4"]
+#     available_stages = combined["stage"].dropna().unique().tolist() if "stage" in combined.columns else []
+#     stage_options = [s for s in stage_options if s == "All" or s in available_stages]
+#     selected_stage = c1.selectbox("Stage", stage_options, key="stock_detail_stage_filter")
+
+#     industry_options = ["All"] + sorted(combined["Industry"].dropna().unique().tolist()) if "Industry" in combined.columns else ["All"]
+#     selected_industry = c2.selectbox("Industry", industry_options, key="stock_detail_industry_filter")
+
+#     filtered_df = combined.copy()
+#     if selected_stage != "All":
+#         filtered_df = filtered_df[filtered_df["stage"] == selected_stage]
+#     if selected_industry != "All":
+#         filtered_df = filtered_df[filtered_df["Industry"] == selected_industry]
+
+#     if filtered_df.empty:
+#         st.warning("No stocks match selected filters")
+#         return
+  
+#     ticker_list = filtered_df["ticker"].dropna().tolist()
+    
+#     default_ticker = st.session_state.get("selected_ticker")
+#     default_index = ticker_list.index(default_ticker) if default_ticker in ticker_list else 0
+    
+#     ticker = st.selectbox(
+#         "Ticker",
+#         ticker_list,
+#         index=default_index,
+#         key="stock_detail_ticker"
+#     )
+#     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
+
+#     st.markdown("### Summary")
+#     c1, c2, c3 = st.columns(3)
+#     c1.metric("Stage", row.get("stage"))
+#     c2.metric("Overall Score", row.get("final_combined_score"))
+#     c3.metric("Industry", row.get("Industry"))
+
+#     st.divider()
+
+#     st.markdown("### Analytical View")
+#     summary = {
+#         "Daily setup": row.get("daily_setup_label", row.get("daily_setup_bucket")),
+#         "Weekly setup": row.get("weekly_setup_label", row.get("weekly_setup_bucket")),
+#         "Overall setup": row.get("overall_setup_label", row.get("combined_bucket")),
+#         "Daily score": row.get("daily_score"),
+#         "Weekly score": row.get("weekly_score"),
+#         "3M RS": row.get("rs_3m_pct"),
+#         "6M RS": row.get("rs_6m_pct"),
+#         "Notes": row.get("notes"),
+#     }
+#     st.json(summary)
+#     st.caption("All values are rule-based analytical outputs (not recommendations).")
+
+#     st.markdown("### Charts")
+#     c1, c2 = st.columns(2)
+#     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
+#     wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
+
+#     with c1:
+#         st.markdown("**Daily Chart**")
+#         if dpath:
+#             st.image(str(dpath), use_container_width=True)
+#         else:
+#             st.info("Daily chart not available")
+
+#     with c2:
+#         st.markdown("**Weekly Chart**")
+#         if wpath:
+#             st.image(str(wpath), use_container_width=True)
+#         else:
+#             st.info("Weekly chart not available")
+
 def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_charts_dir: str) -> None:
     st.subheader("Stock Detail")
 
@@ -289,16 +371,16 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         st.info("No scan outputs found yet.")
         return
 
-    st.markdown("### Filters")
-    c1, c2 = st.columns(2)
+    # ===== FILTER BAR =====
+    f1, f2, f3 = st.columns([1, 1, 2])
 
     stage_options = ["All", "Stage 1", "Stage 2", "Stage 3", "Stage 4"]
     available_stages = combined["stage"].dropna().unique().tolist() if "stage" in combined.columns else []
     stage_options = [s for s in stage_options if s == "All" or s in available_stages]
-    selected_stage = c1.selectbox("Stage", stage_options, key="stock_detail_stage_filter")
+    selected_stage = f1.selectbox("Stage", stage_options, key="stock_detail_stage_filter")
 
     industry_options = ["All"] + sorted(combined["Industry"].dropna().unique().tolist()) if "Industry" in combined.columns else ["All"]
-    selected_industry = c2.selectbox("Industry", industry_options, key="stock_detail_industry_filter")
+    selected_industry = f2.selectbox("Industry", industry_options, key="stock_detail_industry_filter")
 
     filtered_df = combined.copy()
     if selected_stage != "All":
@@ -307,65 +389,58 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         filtered_df = filtered_df[filtered_df["Industry"] == selected_industry]
 
     if filtered_df.empty:
-        st.warning("No stocks match selected filters")
+        st.warning("No stocks match selected filters.")
         return
 
-    # st.markdown("### Top Stocks")
-    # preview_cols = [c for c in ["ticker", "stage", "final_combined_score"] if c in filtered_df.columns]
-    # preview_df = filtered_df.sort_values("final_combined_score", ascending=False)[preview_cols].head(10).reset_index(drop=True)
-
-    # event = st.dataframe(
-    #     preview_df,
-    #     use_container_width=True,
-    #     hide_index=True,
-    #     on_select="rerun",
-    #     selection_mode="single-row",
-    #     key="stock_detail_preview_table",
-    # )
-
-    # selected_rows = event.selection.rows if event and hasattr(event, "selection") else []
-    # if selected_rows:
-    #     st.session_state["selected_ticker"] = preview_df.iloc[selected_rows[0]]["ticker"]
-
-    # st.markdown("### 📌 Select Stock")
-    
     ticker_list = filtered_df["ticker"].dropna().tolist()
-    
     default_ticker = st.session_state.get("selected_ticker")
     default_index = ticker_list.index(default_ticker) if default_ticker in ticker_list else 0
-    
-    ticker = st.selectbox(
-        "Ticker",
+
+    ticker = f3.selectbox(
+        "Stock",
         ticker_list,
         index=default_index,
         key="stock_detail_ticker"
     )
+    st.session_state["selected_ticker"] = ticker
+
     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
 
-    st.markdown("### Summary")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Stage", row.get("stage"))
-    c2.metric("Overall Score", row.get("final_combined_score"))
-    c3.metric("Industry", row.get("Industry"))
+    # ===== QUICK NAV =====
+    n1, n2, n3 = st.columns([1, 2, 1])
+    current_idx = ticker_list.index(ticker)
 
-    st.divider()
+    with n1:
+        if st.button("⬅ Previous", use_container_width=True, disabled=(current_idx == 0), key="stock_prev_btn"):
+            st.session_state["selected_ticker"] = ticker_list[current_idx - 1]
+            st.rerun()
 
-    st.markdown("### Analytical View")
-    summary = {
-        "Daily setup": row.get("daily_setup_label", row.get("daily_setup_bucket")),
-        "Weekly setup": row.get("weekly_setup_label", row.get("weekly_setup_bucket")),
-        "Overall setup": row.get("overall_setup_label", row.get("combined_bucket")),
-        "Daily score": row.get("daily_score"),
-        "Weekly score": row.get("weekly_score"),
-        "3M RS": row.get("rs_3m_pct"),
-        "6M RS": row.get("rs_6m_pct"),
-        "Notes": row.get("notes"),
-    }
-    st.json(summary)
-    st.caption("All values are rule-based analytical outputs (not recommendations).")
+    with n2:
+        st.caption(f"{current_idx + 1} of {len(ticker_list)} stocks in current filter")
 
+    with n3:
+        if st.button("Next ➡", use_container_width=True, disabled=(current_idx == len(ticker_list) - 1), key="stock_next_btn"):
+            st.session_state["selected_ticker"] = ticker_list[current_idx + 1]
+            st.rerun()
+
+    # ===== DECISION HEADER =====
+    st.markdown("### Snapshot")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Stage", row.get("stage", "n/a"))
+    m2.metric("Overall Score", row.get("final_combined_score", row.get("combined_score", "n/a")))
+    m3.metric("Daily Score", row.get("daily_score", "n/a"))
+    m4.metric("Weekly Score", row.get("weekly_score", "n/a"))
+
+    # ===== ONE-LINE CONTEXT =====
+    company = row.get("Company Name", ticker)
+    industry = row.get("Industry", "n/a")
+    overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
+    st.caption(f"{company} • {industry} • {overall_setup}")
+
+    # ===== CHARTS FIRST =====
     st.markdown("### Charts")
     c1, c2 = st.columns(2)
+
     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
     wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
 
@@ -374,15 +449,38 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         if dpath:
             st.image(str(dpath), use_container_width=True)
         else:
-            st.info("Daily chart not available")
+            st.info("Daily chart not available.")
 
     with c2:
         st.markdown("**Weekly Chart**")
         if wpath:
             st.image(str(wpath), use_container_width=True)
         else:
-            st.info("Weekly chart not available")
+            st.info("Weekly chart not available.")
 
+    # ===== INTERPRETATION + NUMBERS =====
+    st.markdown("### Interpretation")
+    i1, i2 = st.columns([1.2, 1])
+
+    with i1:
+        setup_summary = {
+            "Daily setup": row.get("daily_setup_label", row.get("daily_setup_bucket")),
+            "Weekly setup": row.get("weekly_setup_label", row.get("weekly_setup_bucket")),
+            "Overall setup": row.get("overall_setup_label", row.get("combined_bucket")),
+            "Notes": row.get("notes"),
+        }
+        st.json(setup_summary)
+
+    with i2:
+        stats_summary = {
+            "3M RS": row.get("rs_3m_pct"),
+            "6M RS": row.get("rs_6m_pct"),
+            "Daily breakout distance %": row.get("daily_breakout_distance_pct"),
+            "Weekly breakout distance %": row.get("weekly_breakout_distance_pct"),
+        }
+        st.json(stats_summary)
+
+    st.caption("All values are rule-based analytical outputs and are not recommendations.")
 
 def help_tab() -> None:
     st.subheader("How to interpret the dashboard")
