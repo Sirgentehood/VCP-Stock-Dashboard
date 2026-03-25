@@ -128,23 +128,130 @@ def stage_by_industry_tab(combined: pd.DataFrame) -> None:
 
 def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_charts_dir: str) -> None:
     st.subheader("Stock detail")
-    if combined.empty: st.info("No scan outputs found yet."); return
-    ticker = st.selectbox("Select ticker", combined["ticker"].dropna().tolist(), key="stock_detail_ticker")
-    row = combined[combined["ticker"] == ticker].head(1)
-    if row.empty: st.info("Ticker not found."); return
-    row = row.iloc[0]
-    summary = {"Ticker": row.get("ticker"), "Company": row.get("Company Name"), "Industry": row.get("Industry"), "Stage": row.get("stage"), "Daily setup": row.get("daily_setup_label", row.get("daily_setup_bucket")), "Weekly setup": row.get("weekly_setup_label", row.get("weekly_setup_bucket")), "Overall setup": row.get("overall_setup_label", row.get("combined_bucket")), "Daily score": row.get("daily_score"), "Weekly score": row.get("weekly_score"), "Overall score": row.get("final_combined_score", row.get("combined_score")), "3M relative strength": row.get("rs_3m_pct"), "6M relative strength": row.get("rs_6m_pct"), "Interpretation": row.get("notes")}
-    st.json(summary); st.caption("Scores are rule-based analytical outputs shown to one decimal place.")
+
+    if combined.empty:
+        st.info("No scan outputs found yet.")
+        return
+
+    # ===== FILTER SECTION =====
+    st.markdown("### Filters")
+
     c1, c2 = st.columns(2)
-    dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png"); wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
+
+    # Stage filter
+    stage_options = ["All"] + sorted(combined["stage"].dropna().unique().tolist())
+    selected_stage = c1.selectbox("Stage", stage_options)
+
+    # Industry filter
+    industry_options = ["All"] + sorted(combined["Industry"].dropna().unique().tolist())
+    selected_industry = c2.selectbox("Industry", industry_options)
+
+    # Apply filters
+    filtered_df = combined.copy()
+
+    if selected_stage != "All":
+        filtered_df = filtered_df[filtered_df["stage"] == selected_stage]
+
+    if selected_industry != "All":
+        filtered_df = filtered_df[filtered_df["Industry"] == selected_industry]
+
+    if filtered_df.empty:
+        st.warning("No stocks match the selected filters.")
+        return
+    
+    st.markdown("### Top Stocks in Filter")
+    
+    preview_df = filtered_df.sort_values("final_combined_score", ascending=False)[preview_cols].head(10).reset_index(drop=True)
+    
+    event = st.dataframe(
+        preview_df,
+        use_container_width=True,
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
+        key="top_stock_table"
+    )
+    
+    # Handle selection
+    selected_rows = event.selection.rows if event and hasattr(event, "selection") else []
+    
+    if selected_rows:
+        selected_ticker = preview_df.iloc[selected_rows[0]]["ticker"]
+    
+        # Save to session state
+        st.session_state["stock_detail_ticker"] = selected_ticker
+    
+        st.success(f"Selected: {selected_ticker}")
+
+    
+    # ===== STOCK SELECT =====
+    st.markdown("### 📌 Select Stock")
+
+    ticker_list = filtered_df["ticker"].dropna().tolist()
+    
+    default_ticker = st.session_state.get("stock_detail_ticker")
+    
+    default_index = ticker_list.index(default_ticker) if default_ticker in ticker_list else 0
+    
+    ticker = st.selectbox(
+        "Ticker",
+        ticker_list,
+        index=default_index,
+        key="stock_detail_ticker"
+    )
+
+    row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
+
+    # ===== SUMMARY CARD =====
+    st.markdown("### 📊 Summary")
+
+    c1, c2, c3 = st.columns(3)
+
+    c1.metric("Stage", row.get("stage"))
+    c2.metric("Overall Score", row.get("final_combined_score"))
+    c3.metric("Industry", row.get("Industry"))
+
+    st.markdown("---")
+
+    # ===== DETAILS =====
+    st.markdown("### 🧠 Analytical View")
+
+    summary = {
+        "Daily setup": row.get("daily_setup_label", row.get("daily_setup_bucket")),
+        "Weekly setup": row.get("weekly_setup_label", row.get("weekly_setup_bucket")),
+        "Overall setup": row.get("overall_setup_label", row.get("combined_bucket")),
+        "Daily score": row.get("daily_score"),
+        "Weekly score": row.get("weekly_score"),
+        "3M relative strength": row.get("rs_3m_pct"),
+        "6M relative strength": row.get("rs_6m_pct"),
+        "Interpretation": row.get("notes"),
+    }
+
+    st.json(summary)
+
+    st.caption("Scores are rule-based analytical outputs (not recommendations).")
+
+    # ===== CHARTS =====
+    st.markdown("### 📈 Charts")
+
+    c1, c2 = st.columns(2)
+
+    dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
+    wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
+
     with c1:
-        st.markdown("**Daily chart**")
-        if dpath: st.image(str(dpath), use_container_width=True)
-        else: st.info("Daily chart not available yet for this ticker.")
+        st.markdown("**Daily Chart**")
+        if dpath:
+            st.image(str(dpath), use_container_width=True)
+        else:
+            st.info("Daily chart not available")
+
     with c2:
-        st.markdown("**Weekly chart**")
-        if wpath: st.image(str(wpath), use_container_width=True)
-        else: st.info("Weekly chart not available yet for this ticker.")
+        st.markdown("**Weekly Chart**")
+        if wpath:
+            st.image(str(wpath), use_container_width=True)
+        else:
+            st.info("Weekly chart not available")
 
 def help_tab() -> None:
     st.subheader("How to interpret the dashboard")
