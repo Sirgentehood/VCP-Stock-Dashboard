@@ -327,7 +327,7 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
     # if selected_rows:
     #     st.session_state["selected_ticker"] = preview_df.iloc[selected_rows[0]]["ticker"]
 
-    st.markdown("### 📌 Select Stock")
+    # st.markdown("### 📌 Select Stock")
     
     ticker_list = filtered_df["ticker"].dropna().tolist()
     
