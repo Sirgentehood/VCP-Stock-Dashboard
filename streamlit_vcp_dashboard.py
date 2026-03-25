@@ -314,14 +314,14 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
     # preview_cols = [c for c in ["ticker", "stage", "final_combined_score"] if c in filtered_df.columns]
     # preview_df = filtered_df.sort_values("final_combined_score", ascending=False)[preview_cols].head(10).reset_index(drop=True)
 
-    # event = st.dataframe(
-    #     preview_df,
-    #     use_container_width=True,
-    #     hide_index=True,
-    #     on_select="rerun",
-    #     selection_mode="single-row",
-    #     key="stock_detail_preview_table",
-    # )
+    event = st.dataframe(
+        preview_df,
+        use_container_width=True,
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
+        key="stock_detail_preview_table",
+    )
 
     selected_rows = event.selection.rows if event and hasattr(event, "selection") else []
     if selected_rows:
