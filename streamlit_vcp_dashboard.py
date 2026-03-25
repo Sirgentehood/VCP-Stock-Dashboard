@@ -393,25 +393,35 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         return
 
     ticker_list = filtered_df["ticker"].dropna().tolist()
-    default_ticker = st.session_state.get("selected_ticker")
-    default_index = ticker_list.index(default_ticker) if default_ticker in ticker_list else 0
 
-    ticker = f3.selectbox(
+    # Initialize selected ticker safely
+    if "selected_ticker" not in st.session_state or st.session_state["selected_ticker"] not in ticker_list:
+        st.session_state["selected_ticker"] = ticker_list[0]
+
+    current_idx = ticker_list.index(st.session_state["selected_ticker"])
+
+    # ===== STOCK SELECTOR =====
+    selected_ticker = f3.selectbox(
         "Stock",
         ticker_list,
-        index=default_index,
-        key="stock_detail_ticker"
+        index=current_idx,
+        key="stock_detail_ticker_selectbox",
     )
-    st.session_state["selected_ticker"] = ticker
 
-    row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
+    # Sync selectbox -> session state
+    st.session_state["selected_ticker"] = selected_ticker
+    current_idx = ticker_list.index(st.session_state["selected_ticker"])
 
     # ===== QUICK NAV =====
     n1, n2, n3 = st.columns([1, 2, 1])
-    current_idx = ticker_list.index(ticker)
 
     with n1:
-        if st.button("⬅ Previous", use_container_width=True, disabled=(current_idx == 0), key="stock_prev_btn"):
+        if st.button(
+            "⬅ Previous",
+            use_container_width=True,
+            disabled=(current_idx == 0),
+            key="stock_prev_btn",
+        ):
             st.session_state["selected_ticker"] = ticker_list[current_idx - 1]
             st.rerun()
 
@@ -419,11 +429,20 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         st.caption(f"{current_idx + 1} of {len(ticker_list)} stocks in current filter")
 
     with n3:
-        if st.button("Next ➡", use_container_width=True, disabled=(current_idx == len(ticker_list) - 1), key="stock_next_btn"):
+        if st.button(
+            "Next ➡",
+            use_container_width=True,
+            disabled=(current_idx == len(ticker_list) - 1),
+            key="stock_next_btn",
+        ):
             st.session_state["selected_ticker"] = ticker_list[current_idx + 1]
             st.rerun()
 
-    # ===== DECISION HEADER =====
+    # Re-read after buttons
+    ticker = st.session_state["selected_ticker"]
+    row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
+
+    # ===== SNAPSHOT =====
     st.markdown("### Snapshot")
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Stage", row.get("stage", "n/a"))
@@ -431,13 +450,12 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
     m3.metric("Daily Score", row.get("daily_score", "n/a"))
     m4.metric("Weekly Score", row.get("weekly_score", "n/a"))
 
-    # ===== ONE-LINE CONTEXT =====
     company = row.get("Company Name", ticker)
     industry = row.get("Industry", "n/a")
     overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
     st.caption(f"{company} • {industry} • {overall_setup}")
 
-    # ===== CHARTS FIRST =====
+    # ===== CHARTS =====
     st.markdown("### Charts")
     c1, c2 = st.columns(2)
 
@@ -458,27 +476,25 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         else:
             st.info("Weekly chart not available.")
 
-    # ===== INTERPRETATION + NUMBERS =====
+    # ===== DETAILS =====
     st.markdown("### Interpretation")
     i1, i2 = st.columns([1.2, 1])
 
     with i1:
-        setup_summary = {
+        st.json({
             "Daily setup": row.get("daily_setup_label", row.get("daily_setup_bucket")),
             "Weekly setup": row.get("weekly_setup_label", row.get("weekly_setup_bucket")),
             "Overall setup": row.get("overall_setup_label", row.get("combined_bucket")),
             "Notes": row.get("notes"),
-        }
-        st.json(setup_summary)
+        })
 
     with i2:
-        stats_summary = {
+        st.json({
             "3M RS": row.get("rs_3m_pct"),
             "6M RS": row.get("rs_6m_pct"),
             "Daily breakout distance %": row.get("daily_breakout_distance_pct"),
             "Weekly breakout distance %": row.get("weekly_breakout_distance_pct"),
-        }
-        st.json(stats_summary)
+        })
 
     st.caption("All values are rule-based analytical outputs and are not recommendations.")
 
