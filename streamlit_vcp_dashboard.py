@@ -310,9 +310,9 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         st.warning("No stocks match selected filters")
         return
 
-    # st.markdown("### Top Stocks")
-    # preview_cols = [c for c in ["ticker", "stage", "final_combined_score"] if c in filtered_df.columns]
-    # preview_df = filtered_df.sort_values("final_combined_score", ascending=False)[preview_cols].head(10).reset_index(drop=True)
+    st.markdown("### Top Stocks")
+    preview_cols = [c for c in ["ticker", "stage", "final_combined_score"] if c in filtered_df.columns]
+    preview_df = filtered_df.sort_values("final_combined_score", ascending=False)[preview_cols].head(10).reset_index(drop=True)
 
     event = st.dataframe(
         preview_df,
