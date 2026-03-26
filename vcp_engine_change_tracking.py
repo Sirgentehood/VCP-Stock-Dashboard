@@ -323,20 +323,83 @@ def export_all_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataF
             export_chart(df=weekly_df, symbol=ticker, title="Weekly VCP", outfile=weekly_dir / f"{sanitize_filename(ticker)}_weekly.png", pivot=row.get("weekly_pivot"), setup_bucket=row.get("weekly_setup_bucket","weekly_watchlist"), score=float(row.get("final_weekly_score", row.get("weekly_score", 0)) or 0), stage=row.get("stage",""), is_weekly=True)
     return {"daily_charts_dir": str(daily_dir), "weekly_charts_dir": str(weekly_dir)}
 
-def build_stock_changes(current_df: pd.DataFrame, previous_df: Optional[pd.DataFrame]) -> pd.DataFrame:
-    df = current_df.copy().sort_values("final_combined_score", ascending=False).reset_index(drop=True); df["current_rank"] = range(1, len(df)+1)
+def build_stock_changes(current_df, previous_df):
+    import numpy as np
+
+    df = current_df.copy().sort_values("final_combined_score", ascending=False).reset_index(drop=True)
+    df["current_rank"] = range(1, len(df) + 1)
+
     if previous_df is None or previous_df.empty:
-        for col in ["prev_rank","rank_change","daily_score_change","weekly_score_change","combined_score_change"]: df[col] = np.nan
-        for col in ["new_daily_breakout","new_weekly_breakout","entered_stage_2","new_top_10","new_top_20"]: df[col] = False
+        df["rank_change"] = np.nan
+        df["combined_score_change"] = np.nan
+        df["new_daily_breakout"] = False
+        df["new_weekly_breakout"] = False
+        df["entered_stage_2"] = False
         return df
-    prev = previous_df.copy().sort_values("final_combined_score", ascending=False).reset_index(drop=True); prev["prev_rank"] = range(1, len(prev)+1)
-    prev = prev[["ticker","stage","daily_setup_bucket","weekly_setup_bucket","final_daily_score","final_weekly_score","final_combined_score","prev_rank"]].rename(columns={"stage":"prev_stage","daily_setup_bucket":"prev_daily_setup_bucket","weekly_setup_bucket":"prev_weekly_setup_bucket","final_daily_score":"prev_final_daily_score","final_weekly_score":"prev_final_weekly_score","final_combined_score":"prev_final_combined_score"})
-    df = df.merge(prev, on="ticker", how="left")
-    df["daily_score_change"] = (df["final_daily_score"] - df["prev_final_daily_score"]).round(1); df["weekly_score_change"] = (df["final_weekly_score"] - df["prev_final_weekly_score"]).round(1); df["combined_score_change"] = (df["final_combined_score"] - df["prev_final_combined_score"]).round(1); df["rank_change"] = (df["prev_rank"] - df["current_rank"]).round(1)
-    df["new_daily_breakout"] = (df["daily_setup_bucket"] == "breakout_today") & (df["prev_daily_setup_bucket"] != "breakout_today")
-    df["new_weekly_breakout"] = (df["weekly_setup_bucket"] == "weekly_breakout") & (df["prev_weekly_setup_bucket"] != "weekly_breakout")
-    df["entered_stage_2"] = (df["stage"] == "Stage 2") & (df["prev_stage"] != "Stage 2")
-    df["new_top_10"] = (df["current_rank"] <= 10) & (df["prev_rank"].fillna(999) > 10); df["new_top_20"] = (df["current_rank"] <= 20) & (df["prev_rank"].fillna(999) > 20)
+
+    prev = previous_df.copy()
+
+    # ===== HARDENING FIX =====
+    if "final_daily_score" not in prev.columns:
+        prev["final_daily_score"] = prev.get("daily_score", np.nan)
+
+    if "final_weekly_score" not in prev.columns:
+        prev["final_weekly_score"] = prev.get("weekly_score", np.nan)
+
+    if "final_combined_score" not in prev.columns:
+        prev["final_combined_score"] = prev.get("combined_score", np.nan)
+
+    if "daily_setup_bucket" not in prev.columns:
+        prev["daily_setup_bucket"] = None
+
+    if "weekly_setup_bucket" not in prev.columns:
+        prev["weekly_setup_bucket"] = None
+
+    if "stage" not in prev.columns:
+        prev["stage"] = None
+    # =========================
+
+    prev = prev.sort_values("final_combined_score", ascending=False).reset_index(drop=True)
+    prev["prev_rank"] = range(1, len(prev) + 1)
+
+    prev = prev.rename(columns={
+        "stage": "prev_stage",
+        "daily_setup_bucket": "prev_daily_setup_bucket",
+        "weekly_setup_bucket": "prev_weekly_setup_bucket",
+        "final_combined_score": "prev_score"
+    })
+
+    df = df.merge(
+        prev[[
+            "ticker",
+            "prev_rank",
+            "prev_stage",
+            "prev_daily_setup_bucket",
+            "prev_weekly_setup_bucket",
+            "prev_score"
+        ]],
+        on="ticker",
+        how="left"
+    )
+
+    df["rank_change"] = df["prev_rank"] - df["current_rank"]
+    df["combined_score_change"] = df["final_combined_score"] - df["prev_score"]
+
+    df["new_daily_breakout"] = (
+        (df["daily_setup_bucket"] == "breakout_today") &
+        (df["prev_daily_setup_bucket"] != "breakout_today")
+    )
+
+    df["new_weekly_breakout"] = (
+        (df["weekly_setup_bucket"] == "weekly_breakout") &
+        (df["prev_weekly_setup_bucket"] != "weekly_breakout")
+    )
+
+    df["entered_stage_2"] = (
+        (df["stage"] == "Stage 2") &
+        (df["prev_stage"] != "Stage 2")
+    )
+
     return df
 
 def build_industry_changes(current_df: pd.DataFrame, previous_df: Optional[pd.DataFrame]) -> pd.DataFrame:
