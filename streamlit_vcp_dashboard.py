@@ -227,6 +227,10 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     if combined.empty:
         st.info("No scan outputs found yet.")
         return
+
+    if "stock_nav_version" not in st.session_state:
+        st.session_state["stock_nav_version"] = 0
+
     with st.expander("Filters", expanded=True):
         f1, f2, f3 = st.columns([1, 1, 2])
         stage_options = ["All", "Stage 1", "Stage 2", "Stage 3", "Stage 4"]
@@ -235,6 +239,7 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
         selected_stage = f1.selectbox("Stage", stage_options, key="stock_detail_stage_filter")
         industry_options = ["All"] + sorted(combined["Industry"].dropna().unique().tolist()) if "Industry" in combined.columns else ["All"]
         selected_industry = f2.selectbox("Industry", industry_options, key="stock_detail_industry_filter")
+
         filtered_df = combined.copy()
         if selected_stage != "All":
             filtered_df = filtered_df[filtered_df["stage"] == selected_stage]
@@ -243,24 +248,36 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
         if filtered_df.empty:
             st.warning("No stocks match selected filters.")
             return
+
         ticker_list = filtered_df["ticker"].dropna().tolist()
         if "selected_ticker" not in st.session_state or st.session_state["selected_ticker"] not in ticker_list:
             st.session_state["selected_ticker"] = ticker_list[0]
+
         current_idx = ticker_list.index(st.session_state["selected_ticker"])
-        selected_ticker = f3.selectbox("Stock", ticker_list, index=current_idx, key="stock_detail_ticker_selectbox")
-        st.session_state["selected_ticker"] = selected_ticker
+        manual_ticker = f3.selectbox(
+            "Stock",
+            ticker_list,
+            index=current_idx,
+            key=f"stock_detail_ticker_selectbox_{st.session_state['stock_nav_version']}",
+        )
+        if manual_ticker != st.session_state["selected_ticker"]:
+            st.session_state["selected_ticker"] = manual_ticker
+            st.rerun()
 
     current_idx = ticker_list.index(st.session_state["selected_ticker"])
+
     nav1, nav2, nav3 = st.columns([1, 2, 1])
     with nav1:
         if st.button("⬅ Previous", use_container_width=True, disabled=(current_idx == 0), key="stock_prev_btn"):
             st.session_state["selected_ticker"] = ticker_list[current_idx - 1]
+            st.session_state["stock_nav_version"] += 1
             st.rerun()
     with nav2:
         st.caption(f"{st.session_state['selected_ticker']} • {current_idx + 1} of {len(ticker_list)}")
     with nav3:
         if st.button("Next ➡", use_container_width=True, disabled=(current_idx == len(ticker_list) - 1), key="stock_next_btn"):
             st.session_state["selected_ticker"] = ticker_list[current_idx + 1]
+            st.session_state["stock_nav_version"] += 1
             st.rerun()
 
     ticker = st.session_state["selected_ticker"]
