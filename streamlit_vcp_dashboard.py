@@ -339,40 +339,52 @@ def normalize_portfolio_ticker(x: str) -> str:
 
 def portfolio_tab(combined):
     st.subheader("My Portfolio")
-    st.caption("Upload a holdings CSV and choose the column that contains your stock tickers. The app will match those holdings with the current dashboard analytics.")
+    st.caption("Add up to 20 tickers to view current stage, score, setup label, and relative strength for your holdings.")
 
-    uploaded_file = st.file_uploader("Upload portfolio CSV", type=["csv"], key="portfolio_upload")
-    if uploaded_file is None:
-        st.info("Upload a CSV file to view stage, score, and setup information for your holdings.")
+    if "portfolio_tickers" not in st.session_state:
+        st.session_state["portfolio_tickers"] = [""]
+
+    add_c1, add_c2 = st.columns([1, 4])
+    with add_c1:
+        if st.button("＋ Add", key="portfolio_add_ticker_btn", use_container_width=True):
+            if len(st.session_state["portfolio_tickers"]) < 20:
+                st.session_state["portfolio_tickers"].append("")
+                st.rerun()
+    with add_c2:
+        st.caption(f"{len(st.session_state['portfolio_tickers'])} of 20 ticker slots used")
+
+    tickers = []
+    remove_index = None
+
+    for i, current in enumerate(st.session_state["portfolio_tickers"]):
+        c1, c2 = st.columns([5, 1])
+        value = c1.text_input(
+            f"Ticker {i+1}",
+            value=current,
+            key=f"portfolio_ticker_input_{i}",
+            placeholder="Example: RELIANCE or RELIANCE.NS",
+        )
+        st.session_state["portfolio_tickers"][i] = value
+        if c2.button("✕", key=f"portfolio_remove_{i}", use_container_width=True):
+            remove_index = i
+        norm = normalize_portfolio_ticker(value)
+        if norm:
+            tickers.append(norm)
+
+    if remove_index is not None:
+        st.session_state["portfolio_tickers"].pop(remove_index)
+        if not st.session_state["portfolio_tickers"]:
+            st.session_state["portfolio_tickers"] = [""]
+        st.rerun()
+
+    unique_tickers = list(dict.fromkeys([t for t in tickers if t]))
+
+    if not unique_tickers:
+        st.info("Add one or more tickers to view portfolio analytics.")
         return
 
-    try:
-        portfolio_raw = pd.read_csv(uploaded_file)
-    except Exception as e:
-        st.error(f"Could not read the uploaded CSV: {e}")
-        return
-
-    if portfolio_raw.empty:
-        st.warning("The uploaded file is empty.")
-        return
-
-    st.markdown("### Choose the ticker column")
-    ticker_col = st.selectbox(
-        "Ticker column",
-        portfolio_raw.columns.tolist(),
-        key="portfolio_ticker_column",
-        help="Choose the column in your uploaded file that contains stock tickers or symbols.",
-    )
-
-    portfolio = portfolio_raw.copy()
-    portfolio["ticker"] = portfolio[ticker_col].apply(normalize_portfolio_ticker)
-    portfolio = portfolio[portfolio["ticker"] != ""].copy()
-
-    if portfolio.empty:
-        st.warning("No valid tickers were found in the selected column.")
-        return
-
-    merged = portfolio.merge(combined, on="ticker", how="left", suffixes=("", "_dashboard"))
+    portfolio = pd.DataFrame({"ticker": unique_tickers})
+    merged = portfolio.merge(combined, on="ticker", how="left")
 
     matched = int(merged["stage"].notna().sum()) if "stage" in merged.columns else 0
     total = len(merged)
@@ -380,17 +392,16 @@ def portfolio_tab(combined):
     avg_score = round(float(merged["final_combined_score"].dropna().mean()), 1) if "final_combined_score" in merged.columns and merged["final_combined_score"].notna().any() else "n/a"
 
     compact_metric_grid([
-        ("Holdings", total),
+        ("Tickers", total),
         ("Matched", matched),
         ("Stage 2", stage2),
         ("Avg Final Score", avg_score),
     ])
 
-    st.markdown("### Holdings view")
+    st.markdown("### Portfolio view")
     preferred_cols = [
-        ticker_col, "ticker", "Quantity", "Qty", "Buy Price", "Average Price",
-        "stage", "final_combined_score", "daily_score", "weekly_score",
-        "overall_setup_label", "rs_3m_pct", "rs_6m_pct",
+        "ticker", "stage", "final_combined_score", "daily_score", "weekly_score",
+        "overall_setup_label", "rs_3m_pct", "rs_6m_pct", "Industry", "Company Name"
     ]
     present = [c for c in preferred_cols if c in merged.columns]
     st.dataframe(pretty_columns(merged[present]), use_container_width=True, hide_index=True, height=430)
@@ -399,9 +410,7 @@ def portfolio_tab(combined):
         unmatched = merged[merged["stage"].isna()].copy()
         if not unmatched.empty:
             with st.expander("Unmatched tickers", expanded=False):
-                cols = [c for c in [ticker_col, "ticker"] if c in unmatched.columns]
-                st.dataframe(unmatched[cols], use_container_width=True, hide_index=True, height=220)
-
+                st.dataframe(unmatched[["ticker"]], use_container_width=True, hide_index=True, height=180)
 
 def help_tab():
     st.subheader("How to read the dashboard")
