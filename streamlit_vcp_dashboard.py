@@ -7,7 +7,7 @@ import streamlit as st
 st.set_page_config(page_title="VCP Dashboard", layout="wide")
 
 st.markdown(
-    '''
+    """
 <style>
 .block-container {padding-top: 0.8rem; padding-bottom: 1.5rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 [data-testid="stMetric"] {background: rgba(255,255,255,0.02); border: 1px solid rgba(128,128,128,0.18); padding: 0.45rem 0.65rem; border-radius: 0.75rem;}
@@ -25,17 +25,18 @@ st.markdown(
 }
 pre {white-space: pre-wrap !important; word-break: break-word !important;}
 </style>
-''',
+""",
     unsafe_allow_html=True,
 )
 
 @st.cache_data(show_spinner=False)
-def load_csv(path: str) -> pd.DataFrame:
+def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
+    # mtime_ns is included only to invalidate Streamlit cache when the CSV is overwritten
     return pd.read_csv(path)
 
 def safe_read(path: str) -> pd.DataFrame:
     p = Path(path)
-    return load_csv(str(p)) if p.exists() else pd.DataFrame()
+    return load_csv(str(p), p.stat().st_mtime_ns) if p.exists() else pd.DataFrame()
 
 def resolve_chart_path(charts_dir: str, ticker: str, suffix: str) -> Optional[Path]:
     filename = ticker.replace(".", "_") + suffix
@@ -49,8 +50,27 @@ def get_last_updated(file_path: str) -> str:
     ts = pd.Timestamp(p.stat().st_mtime, unit="s").tz_localize("UTC").tz_convert("Asia/Kolkata")
     return ts.strftime("%d %b %Y, %I:%M %p IST")
 
-def add_safe_labels(df: pd.DataFrame) -> pd.DataFrame:
+def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return df
     out = df.copy()
+    if "Company Name" not in out.columns:
+        for col in ["Company Name_x", "Company Name_y"]:
+            if col in out.columns:
+                out["Company Name"] = out[col]
+                break
+    if "Industry" not in out.columns:
+        for col in ["Industry_x", "Industry_y"]:
+            if col in out.columns:
+                out["Industry"] = out[col]
+                break
+    drop_cols = [c for c in ["Company Name_x", "Company Name_y", "Industry_x", "Industry_y", "Ticker"] if c in out.columns]
+    if drop_cols:
+        out = out.drop(columns=drop_cols)
+    return out
+
+def add_safe_labels(df: pd.DataFrame) -> pd.DataFrame:
+    out = normalize_columns(df)
     if "daily_setup_bucket" in out.columns:
         out["daily_setup_label"] = out["daily_setup_bucket"].map({
             "breakout_today": "Breakout setup detected",
@@ -73,9 +93,10 @@ def add_safe_labels(df: pd.DataFrame) -> pd.DataFrame:
             "watchlist": "Watchlist",
         }).fillna(out["combined_bucket"])
     numeric_cols = [
-        "daily_score","weekly_score","combined_score","final_daily_score","final_weekly_score",
-        "final_combined_score","rs_3m_pct","rs_6m_pct","industry_boost","combined_score_change",
-        "daily_score_change","weekly_score_change","rank_change","rs_rank","avg_combined_score",
+        "daily_score", "weekly_score", "combined_score", "final_daily_score", "final_weekly_score",
+        "final_combined_score", "rs_3m_pct", "rs_6m_pct", "industry_boost", "combined_score_change",
+        "daily_score_change", "weekly_score_change", "rank_change", "rs_rank", "avg_combined_score",
+        "strong_combined_change", "actionable_daily_change", "actionable_weekly_change", "current_rank", "prev_rank",
     ]
     for col in numeric_cols:
         if col in out.columns:
@@ -104,10 +125,16 @@ def pretty_columns(df: pd.DataFrame) -> pd.DataFrame:
         "combined_score_change": "Score Change",
         "rank_change": "Rank Change",
         "strong_combined": "Strong Setups",
+        "strong_combined_change": "Strong Setups Change",
         "actionable_daily": "Daily Actionable",
         "actionable_weekly": "Weekly Actionable",
+        "actionable_daily_change": "Daily Actionable Change",
+        "actionable_weekly_change": "Weekly Actionable Change",
         "new_top_10": "New Top 10",
         "new_top_20": "New Top 20",
+        "current_rank": "Current Rank",
+        "prev_rank": "Previous Rank",
+        "new_cluster": "New Cluster",
     }
     return df.rename(columns={c: rename_map.get(c, c) for c in df.columns})
 
@@ -167,144 +194,66 @@ def ranked_tab(title, df, score_col, label_col, show_search=True):
     st.caption(f"{len(filtered)} results")
     st.dataframe(pretty_columns(filtered[cols]), use_container_width=True, hide_index=True, height=430)
 
-# def changes_tab(stock_changes, top_movers):
-#     st.subheader("What changed")
-#     st.caption(f"DEBUG → stock_changes rows: {len(stock_changes)} | top_movers rows: {len(top_movers)}")
-#     if stock_changes.empty:
-#         st.info("No change data found yet.")
-#         return
-#     sections = [
-#         ("New daily breakouts", stock_changes[stock_changes["new_daily_breakout"]], ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
-#         ("New weekly breakouts", stock_changes[stock_changes["new_weekly_breakout"]], ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
-#         ("Entered Stage 2", stock_changes[stock_changes["entered_stage_2"]], ["ticker", "Industry", "final_combined_score", "combined_score_change"]),
-#     ]
-#     for title, data, cols in sections:
-#         with st.expander(title, expanded=False):
-#             present = [c for c in cols if c in data.columns]
-#             st.dataframe(pretty_columns(data[present]), use_container_width=True, hide_index=True, height=220)
-#     st.markdown("### Biggest score jumps")
-#     cols = [c for c in ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change", "new_top_10", "new_top_20"] if c in top_movers.columns]
-#     movers = top_movers[top_movers["combined_score_change"].fillna(0) >= 5].sort_values(["combined_score_change", "rank_change"], ascending=[False, False]).head(30)
-#     st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=300)
-
 def changes_tab(stock_changes, top_movers):
     st.subheader("What changed")
-
-    st.caption(
-        "DEBUG sample → "
-        f"entered_stage_2 sum: {int(stock_changes['entered_stage_2'].sum()) if 'entered_stage_2' in stock_changes.columns else 'missing'} | "
-        f"combined_score_change>=5: {int((top_movers['combined_score_change'].fillna(0) >= 5).sum()) if 'combined_score_change' in top_movers.columns else 'missing'}"
-    )
-
-    if "ticker" in top_movers.columns and "combined_score_change" in top_movers.columns:
-        st.caption(
-            "DEBUG top movers sample → " +
-            ", ".join(
-                top_movers.sort_values("combined_score_change", ascending=False)
-                .head(5)
-                .apply(lambda r: f"{r['ticker']} ({r['combined_score_change']})", axis=1)
-                .tolist()
-            )
-        )
-
     if stock_changes.empty:
         st.info("No change data found yet.")
         return
-
-    daily_breakouts = stock_changes[stock_changes["new_daily_breakout"]]
-    weekly_breakouts = stock_changes[stock_changes["new_weekly_breakout"]]
-    entered_stage2 = stock_changes[stock_changes["entered_stage_2"]]
-    movers = top_movers[top_movers["combined_score_change"].fillna(0) >= 5].sort_values(
-        ["combined_score_change", "rank_change"], ascending=[False, False]
-    ).head(30)
-
-    st.caption(
-        f"Visible rows → daily breakouts: {len(daily_breakouts)} | "
-        f"weekly breakouts: {len(weekly_breakouts)} | "
-        f"entered Stage 2: {len(entered_stage2)} | "
-        f"big movers: {len(movers)}"
-    )
-
+    compact_metric_grid([
+        ("New daily breakouts", int(stock_changes["new_daily_breakout"].fillna(False).sum()) if "new_daily_breakout" in stock_changes.columns else 0),
+        ("New weekly breakouts", int(stock_changes["new_weekly_breakout"].fillna(False).sum()) if "new_weekly_breakout" in stock_changes.columns else 0),
+        ("Entered Stage 2", int(stock_changes["entered_stage_2"].fillna(False).sum()) if "entered_stage_2" in stock_changes.columns else 0),
+        ("New Top 10", int(stock_changes["new_top_10"].fillna(False).sum()) if "new_top_10" in stock_changes.columns else 0),
+        ("New Top 20", int(stock_changes["new_top_20"].fillna(False).sum()) if "new_top_20" in stock_changes.columns else 0),
+    ])
     sections = [
-        ("New daily breakouts", daily_breakouts, ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
-        ("New weekly breakouts", weekly_breakouts, ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
-        ("Entered Stage 2", entered_stage2, ["ticker", "Industry", "final_combined_score", "combined_score_change"]),
+        ("New daily breakouts", stock_changes[stock_changes["new_daily_breakout"]], ["ticker", "Company Name", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change"]),
+        ("New weekly breakouts", stock_changes[stock_changes["new_weekly_breakout"]], ["ticker", "Company Name", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change"]),
+        ("Entered Stage 2", stock_changes[stock_changes["entered_stage_2"]], ["ticker", "Company Name", "Industry", "final_combined_score", "combined_score_change", "rank_change"]),
+        ("Fresh entrants into Top 10", stock_changes[stock_changes["new_top_10"]], ["ticker", "Company Name", "Industry", "stage", "current_rank", "prev_rank", "rank_change", "final_combined_score"]),
+        ("Fresh entrants into Top 20", stock_changes[stock_changes["new_top_20"]], ["ticker", "Company Name", "Industry", "stage", "current_rank", "prev_rank", "rank_change", "final_combined_score"]),
     ]
-
     for title, data, cols in sections:
-        with st.expander(title, expanded=True):
-            present = [c for c in cols if c in data.columns]
+        with st.expander(title, expanded=False):
             if data.empty:
-                st.caption("0 rows")
+                st.caption("None in this run.")
             else:
+                present = [c for c in cols if c in data.columns]
                 st.dataframe(pretty_columns(data[present]), use_container_width=True, hide_index=True, height=220)
-
-    st.markdown("### Biggest score jumps")
-    cols = [c for c in ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change", "new_top_10", "new_top_20"] if c in movers.columns]
-    if movers.empty:
-        st.caption("0 rows")
-    else:
-        st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=300)
-        
-# def industry_rotation_tab(industry_changes):
-#     st.subheader("Industry rotation")
-#     st.caption(f"DEBUG → industry_changes rows: {len(industry_changes)}")
-#     if industry_changes.empty:
-#         st.info("No industry rotation data found yet.")
-#         return
-#     with st.expander("Rising industries", expanded=True):
-#         cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in industry_changes.columns]
-#         rising = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(20)
-#         st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=220)
-#     with st.expander("Falling industries", expanded=False):
-#         cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in industry_changes.columns]
-#         falling = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(20)
-#         st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=220)
+    st.markdown("### Biggest movers")
+    cols = [c for c in ["ticker", "Company Name", "Industry", "stage", "current_rank", "prev_rank", "rank_change", "final_combined_score", "combined_score_change", "new_top_10", "new_top_20"] if c in top_movers.columns]
+    movers = top_movers.copy()
+    if "rank_change" in movers.columns:
+        movers = movers[(movers["rank_change"].fillna(0) > 0) | (movers["combined_score_change"].fillna(0) > 0)]
+    movers = movers.sort_values(["new_top_10", "new_top_20", "rank_change", "combined_score_change"], ascending=[False, False, False, False]).head(30)
+    st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=320)
 
 def industry_rotation_tab(industry_changes):
     st.subheader("Industry rotation")
-
-    st.caption(f"DEBUG → industry_changes rows: {len(industry_changes)}")
-
     if industry_changes.empty:
         st.info("No industry rotation data found yet.")
         return
-
-    rising = industry_changes.sort_values(
-        ["rank_change", "combined_score_change"], ascending=[False, False]
-    ).head(20)
-
-    falling = industry_changes.sort_values(
-        ["rank_change", "combined_score_change"], ascending=[True, True]
-    ).head(20)
-
-    clusters = industry_changes[industry_changes["new_cluster"] == True] if "new_cluster" in industry_changes.columns else industry_changes.iloc[0:0]
-
-    st.caption(
-        f"Visible rows → rising: {len(rising)} | falling: {len(falling)} | new clusters: {len(clusters)}"
-    )
-
+    compact_metric_grid([
+        ("New clusters", int(industry_changes["new_cluster"].fillna(False).sum()) if "new_cluster" in industry_changes.columns else 0),
+        ("Industries rising", int((industry_changes["rank_change"].fillna(0) > 0).sum()) if "rank_change" in industry_changes.columns else 0),
+        ("Industries falling", int((industry_changes["rank_change"].fillna(0) < 0).sum()) if "rank_change" in industry_changes.columns else 0),
+        ("Daily breadth change", int(industry_changes["actionable_daily_change"].fillna(0).sum()) if "actionable_daily_change" in industry_changes.columns else 0),
+        ("Weekly breadth change", int(industry_changes["actionable_weekly_change"].fillna(0).sum()) if "actionable_weekly_change" in industry_changes.columns else 0),
+    ])
+    cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change", "avg_combined_score", "combined_score_change", "strong_combined", "strong_combined_change", "actionable_daily", "actionable_daily_change", "actionable_weekly", "actionable_weekly_change", "new_cluster"] if c in industry_changes.columns]
+    rising = industry_changes.copy().sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(20)
+    falling = industry_changes.copy().sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(20)
     with st.expander("Rising industries", expanded=True):
-        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in rising.columns]
-        if rising.empty:
-            st.caption("0 rows")
-        else:
-            st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=220)
-
-    with st.expander("Falling industries", expanded=True):
-        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in falling.columns]
-        if falling.empty:
-            st.caption("0 rows")
-        else:
-            st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=220)
-
-    with st.expander("New clusters", expanded=True):
-        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in clusters.columns]
+        st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=240)
+    with st.expander("Falling industries", expanded=False):
+        st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=240)
+    with st.expander("New clusters", expanded=False):
+        clusters = industry_changes[industry_changes["new_cluster"].fillna(False)]
         if clusters.empty:
-            st.caption("0 rows")
+            st.caption("No new clusters in this run.")
         else:
-            st.dataframe(pretty_columns(clusters[cols]), use_container_width=True, hide_index=True, height=220)
-
+            ccols = [c for c in ["Industry", "current_rank", "prev_rank", "strong_combined", "strong_combined_change", "actionable_daily", "actionable_weekly", "combined_score_change"] if c in clusters.columns]
+            st.dataframe(pretty_columns(clusters[ccols]), use_container_width=True, hide_index=True, height=220)
 
 def industry_tab(industry):
     st.subheader("Industry strength")
@@ -333,10 +282,8 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     if combined.empty:
         st.info("No scan outputs found yet.")
         return
-
     if "stock_nav_version" not in st.session_state:
         st.session_state["stock_nav_version"] = 0
-
     with st.expander("Filters", expanded=True):
         f1, f2, f3 = st.columns([1, 1, 2])
         stage_options = ["All", "Stage 1", "Stage 2", "Stage 3", "Stage 4"]
@@ -345,7 +292,6 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
         selected_stage = f1.selectbox("Stage", stage_options, key="stock_detail_stage_filter")
         industry_options = ["All"] + sorted(combined["Industry"].dropna().unique().tolist()) if "Industry" in combined.columns else ["All"]
         selected_industry = f2.selectbox("Industry", industry_options, key="stock_detail_industry_filter")
-
         filtered_df = combined.copy()
         if selected_stage != "All":
             filtered_df = filtered_df[filtered_df["stage"] == selected_stage]
@@ -354,24 +300,15 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
         if filtered_df.empty:
             st.warning("No stocks match selected filters.")
             return
-
         ticker_list = filtered_df["ticker"].dropna().tolist()
         if "selected_ticker" not in st.session_state or st.session_state["selected_ticker"] not in ticker_list:
             st.session_state["selected_ticker"] = ticker_list[0]
-
         current_idx = ticker_list.index(st.session_state["selected_ticker"])
-        manual_ticker = f3.selectbox(
-            "Stock",
-            ticker_list,
-            index=current_idx,
-            key=f"stock_detail_ticker_selectbox_{st.session_state['stock_nav_version']}",
-        )
+        manual_ticker = f3.selectbox("Stock", ticker_list, index=current_idx, key=f"stock_detail_ticker_selectbox_{st.session_state['stock_nav_version']}")
         if manual_ticker != st.session_state["selected_ticker"]:
             st.session_state["selected_ticker"] = manual_ticker
             st.rerun()
-
     current_idx = ticker_list.index(st.session_state["selected_ticker"])
-
     nav1, nav2, nav3 = st.columns([1, 2, 1])
     with nav1:
         if st.button("⬅ Previous", use_container_width=True, disabled=(current_idx == 0), key="stock_prev_btn"):
@@ -385,23 +322,19 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
             st.session_state["selected_ticker"] = ticker_list[current_idx + 1]
             st.session_state["stock_nav_version"] += 1
             st.rerun()
-
     ticker = st.session_state["selected_ticker"]
     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
-
     st.markdown("### Snapshot")
     compact_metric_grid([
         ("Stage", row.get("stage", "n/a")),
         ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
-        ("Daily", row.get("daily_score", "n/a")),
-        ("Weekly", row.get("weekly_score", "n/a")),
+        ("Daily", row.get("final_daily_score", row.get("daily_score", "n/a"))),
+        ("Weekly", row.get("final_weekly_score", row.get("weekly_score", "n/a"))),
     ])
-
     company = row.get("Company Name", ticker)
     industry = row.get("Industry", "n/a")
     overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
     st.caption(f"{company} • {industry} • {overall_setup}")
-
     st.markdown("### Charts")
     c1, c2 = st.columns(2)
     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
@@ -418,7 +351,6 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
             st.image(str(wpath), use_container_width=True)
         else:
             st.info("Weekly chart not available.")
-
     with st.expander("Interpretation", expanded=True):
         i1, i2 = st.columns(2)
         with i1:
@@ -429,12 +361,8 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
                 "Notes": row.get("notes"),
             })
         with i2:
-            st.json({
-                "RS 3M": row.get("rs_3m_pct"),
-                "RS 6M": row.get("rs_6m_pct"),
-            })
+            st.json({"RS 3M": row.get("rs_3m_pct"), "RS 6M": row.get("rs_6m_pct")})
     st.caption("This view highlights technical structure, relative strength, and recent setup status. It is an informational analytics view and not a recommendation.")
-
 
 def normalize_portfolio_ticker(x: str) -> str:
     x = str(x).strip().upper()
@@ -442,59 +370,34 @@ def normalize_portfolio_ticker(x: str) -> str:
         return ""
     return x if x.endswith(".NS") else f"{x}.NS"
 
-
 def portfolio_tab(combined):
     st.subheader("My Portfolio")
     st.caption("Add up to 20 tickers. This is an informational analytics view only.")
-
     if combined.empty:
         st.info("No scan outputs found yet.")
         return
-
-    all_tickers = sorted(combined["ticker"].dropna().unique().tolist())
-
     if "portfolio_tickers" not in st.session_state:
         st.session_state["portfolio_tickers"] = []
-
     st.markdown("### Add Tickers")
-
-    input_text = st.text_input(
-        "Enter tickers (comma separated)",
-        placeholder="Example: RELIANCE, TCS, INFY",
-        key="portfolio_input_text",
-    )
-
+    input_text = st.text_input("Enter tickers (comma separated)", placeholder="Example: RELIANCE, TCS, INFY", key="portfolio_input_text")
     c1, c2 = st.columns([4, 1])
     with c2:
-        if st.button("Add", use_container_width=True, key="portfolio_add_btn"):
-            if input_text:
-                raw = [x.strip() for x in input_text.split(",")]
-                normalized = [normalize_portfolio_ticker(x) for x in raw]
-
-                for t in normalized:
-                    if t and t not in st.session_state["portfolio_tickers"]:
-                        if len(st.session_state["portfolio_tickers"]) < 20:
-                            st.session_state["portfolio_tickers"].append(t)
-                st.rerun()
-
+        if st.button("Add", use_container_width=True, key="portfolio_add_btn") and input_text:
+            raw = [x.strip() for x in input_text.split(",")]
+            normalized = [normalize_portfolio_ticker(x) for x in raw]
+            for t in normalized:
+                if t and t not in st.session_state["portfolio_tickers"] and len(st.session_state["portfolio_tickers"]) < 20:
+                    st.session_state["portfolio_tickers"].append(t)
+            st.rerun()
     st.caption(f"{len(st.session_state['portfolio_tickers'])}/20 tickers")
-
     if not st.session_state["portfolio_tickers"]:
         st.info("Add tickers to see portfolio analytics.")
         return
-
     portfolio = pd.DataFrame({"ticker": st.session_state["portfolio_tickers"]})
     merged = portfolio.merge(combined, on="ticker", how="left")
-
-    st.markdown("### Snapshot")
-
     stage_counts = merged["stage"].value_counts() if "stage" in merged.columns else pd.Series(dtype=int)
-    avg_score = (
-        round(float(merged["final_combined_score"].dropna().mean()), 1)
-        if "final_combined_score" in merged.columns and merged["final_combined_score"].notna().any()
-        else "n/a"
-    )
-
+    avg_score = round(float(merged["final_combined_score"].dropna().mean()), 1) if "final_combined_score" in merged.columns and merged["final_combined_score"].notna().any() else "n/a"
+    st.markdown("### Snapshot")
     compact_metric_grid([
         ("Stage 1", int(stage_counts.get("Stage 1", 0))),
         ("Stage 2", int(stage_counts.get("Stage 2", 0))),
@@ -502,54 +405,24 @@ def portfolio_tab(combined):
         ("Stage 4", int(stage_counts.get("Stage 4", 0))),
         ("Avg Score", avg_score),
     ])
-
     st.markdown("### Portfolio View")
-
     display = merged.copy()
     display["Ticker"] = display["ticker"].astype(str).str.replace(".NS", "", regex=False)
-
-    display = display.rename(columns={
-        "stage": "Stage",
-        "final_combined_score": "Final Score",
-        "overall_setup_label": "Setup",
-    })
-
-    cols = ["Ticker", "Industry", "Stage", "Final Score", "Setup"]
-    cols = [c for c in cols if c in display.columns]
-
+    display = display.rename(columns={"stage": "Stage", "final_combined_score": "Final Score", "overall_setup_label": "Setup"})
+    cols = [c for c in ["Ticker", "Industry", "Stage", "Final Score", "Setup"] if c in display.columns]
     table_df = display[cols].reset_index(drop=True)
-
-    st.dataframe(
-        table_df,
-        use_container_width=True,
-        hide_index=True,
-        height=320,
-    )
-
+    st.dataframe(table_df, use_container_width=True, hide_index=True, height=320)
     st.markdown("### Remove Tickers")
-    remove_choice = st.selectbox(
-        "Select ticker to remove",
-        [""] + table_df["Ticker"].tolist(),
-        key="portfolio_remove_select",
-    )
-
-    if st.button("Remove Selected Ticker", key="portfolio_remove_btn", use_container_width=True):
-        if remove_choice:
-            full_ticker = normalize_portfolio_ticker(remove_choice)
-            st.session_state["portfolio_tickers"] = [
-                t for t in st.session_state["portfolio_tickers"] if t != full_ticker
-            ]
-            st.rerun()
-
-    # if delete_idx is not None:
-    #     st.session_state["portfolio_tickers"].pop(delete_idx)
-    #     st.rerun()
-
+    remove_choice = st.selectbox("Select ticker to remove", [""] + table_df["Ticker"].tolist(), key="portfolio_remove_select")
+    if st.button("Remove Selected Ticker", key="portfolio_remove_btn", use_container_width=True) and remove_choice:
+        full_ticker = normalize_portfolio_ticker(remove_choice)
+        st.session_state["portfolio_tickers"] = [t for t in st.session_state["portfolio_tickers"] if t != full_ticker]
+        st.rerun()
 
 def help_tab():
     st.subheader("How to read the dashboard")
     st.markdown(
-        '''
+        """
 **Purpose**  
 This dashboard organizes rule-based market analytics so you can review technical structure, setup quality, relative strength, and industry participation in one place. It is for informational and educational use.
 
@@ -559,31 +432,16 @@ This dashboard organizes rule-based market analytics so you can review technical
 - **Weekly Score**: higher-timeframe setup strength on the weekly chart.
 - **RS 3M / RS 6M**: relative strength over 3 and 6 months versus the benchmark. Higher values generally mean stronger relative performance.
 
-**Setup labels**
-- **Daily Setup Label**: short-term setup state.
-- **Weekly Setup Label**: higher-timeframe setup state.
-- **Overall Setup Label**: combined interpretation of daily and weekly structure.
-
 **Changes tab**
-Highlights new daily or weekly breakout conditions, new Stage 2 names, and the largest score moves versus the prior saved run.
+Highlights new daily or weekly breakout conditions, fresh Stage 2 entries, new Top 10 and Top 20 entrants, plus the biggest score and rank movers versus the prior saved run.
 
 **Rotation tab**
-Shows industries improving or weakening in score/rank terms. This helps identify where leadership is broadening or narrowing.
-
-**Stages tab**
-Shows how many stocks in each industry sit in each stage, plus the percentage of that industry total in brackets.
-
-**Portfolio tab**
-Lets you track only the tickers you add manually. It summarizes how many of your selected names are in each stage and shows the same dashboard analytics for those holdings.
-
-**Stock tab**
-Best used for one-name review after filtering by stage and industry.
-Use Daily and Weekly charts together: daily for timing context, weekly for broader structure.
+Shows industries improving or weakening based on actual industry rank movement, score changes, and breadth changes in actionable setups.
 
 **Careful interpretation**
 A higher score does not guarantee future performance.
 Use this dashboard as a structured review aid, not as a buy/sell instruction.
-'''
+"""
     )
 
 def dashboard_tab(combined, daily, weekly, industry, regime, last_updated):
@@ -616,6 +474,7 @@ outputs = {
     "daily_charts_dir": str(Path(outdir) / "charts" / "daily"),
     "weekly_charts_dir": str(Path(outdir) / "charts" / "weekly"),
 }
+
 daily_df = add_safe_labels(safe_read(outputs["daily"]))
 weekly_df = add_safe_labels(safe_read(outputs["weekly"]))
 combined_df = add_safe_labels(safe_read(outputs["combined"]))
