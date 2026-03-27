@@ -43,6 +43,15 @@ def resolve_chart_path(charts_dir: str, ticker: str, suffix: str) -> Optional[Pa
     path = Path(charts_dir) / filename
     return path if path.exists() else None
 
+@st.cache_data(show_spinner=False)
+def load_image_bytes(path: str, mtime_ns: int) -> bytes:
+    return Path(path).read_bytes()
+
+def safe_image_bytes(path: Optional[Path]) -> Optional[bytes]:
+    if not path or not path.exists():
+        return None
+    return load_image_bytes(str(path), path.stat().st_mtime_ns)
+
 def get_last_updated(file_path: str) -> str:
     p = Path(file_path)
     if not p.exists():
@@ -342,13 +351,13 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     with c1:
         st.markdown("**Daily Chart**")
         if dpath:
-            st.image(str(dpath), use_container_width=True)
+            st.image(safe_image_bytes(dpath), use_container_width=True)
         else:
             st.info("Daily chart not available.")
     with c2:
         st.markdown("**Weekly Chart**")
         if wpath:
-            st.image(str(wpath), use_container_width=True)
+            st.image(safe_image_bytes(wpath), use_container_width=True)
         else:
             st.info("Weekly chart not available.")
     with st.expander("Interpretation", expanded=True):
