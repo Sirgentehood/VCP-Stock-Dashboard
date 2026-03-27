@@ -24,6 +24,33 @@ st.markdown(
   [data-testid="stMetricValue"] {font-size: 1rem;}
 }
 pre {white-space: pre-wrap !important; word-break: break-word !important;}
+.mover-card {
+  border: 1px solid rgba(128,128,128,0.18);
+  background: rgba(255,255,255,0.02);
+  border-radius: 14px;
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 0.55rem;
+}
+.mover-top {border-left: 4px solid rgba(0,200,120,0.85);}
+.mover-bottom {border-left: 4px solid rgba(255,80,80,0.85);}
+.mover-head {display:flex; justify-content:space-between; gap:0.5rem; align-items:flex-start;}
+.mover-ticker {font-weight:700; font-size:0.98rem;}
+.mover-company {font-size:0.84rem; opacity:0.88; margin-top:0.12rem;}
+.mover-chip-wrap {display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem;}
+.mover-chip {
+  font-size:0.72rem;
+  padding:0.18rem 0.45rem;
+  border-radius:999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(128,128,128,0.18);
+}
+.mover-change-up {font-weight:800; color:#29d17d;}
+.mover-change-down {font-weight:800; color:#ff7070;}
+@media (max-width: 768px) {
+  .mover-card {padding:0.6rem 0.65rem;}
+  .mover-ticker {font-size:0.92rem;}
+  .mover-company {font-size:0.78rem;}
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -144,6 +171,10 @@ def pretty_columns(df: pd.DataFrame) -> pd.DataFrame:
         "current_rank": "Current Rank",
         "prev_rank": "Previous Rank",
         "new_cluster": "New Cluster",
+        "change_1d_pct": "1D Change %",
+        "change_1w_pct": "1W Change %",
+        "change_1m_pct": "1M Change %",
+        "change_ytd_pct": "YTD Change %",
     }
     return df.rename(columns={c: rename_map.get(c, c) for c in df.columns})
 
@@ -430,6 +461,86 @@ def portfolio_tab(combined):
         st.session_state["portfolio_tickers"] = [t for t in st.session_state["portfolio_tickers"] if t != full_ticker]
         st.rerun()
 
+
+def render_mover_card(row, period_col: str, positive: bool = True):
+    ticker = str(row.get("ticker", "")).replace(".NS", "")
+    company = row.get("Company Name", "")
+    industry = row.get("Industry", "")
+    stage = row.get("stage", "")
+    score = row.get("final_combined_score")
+    change = pd.to_numeric(row.get(period_col), errors="coerce")
+    setup = row.get("overall_setup_label", row.get("combined_bucket", ""))
+    change_cls = "mover-change-up" if pd.notna(change) and change >= 0 else "mover-change-down"
+    shell_cls = "mover-card mover-top" if positive else "mover-card mover-bottom"
+    change_text = f"{change:+.2f}%" if pd.notna(change) else "n/a"
+    score_text = f"{float(score):.1f}" if pd.notna(pd.to_numeric(score, errors="coerce")) else "n/a"
+    html = f"""
+    <div class="{shell_cls}">
+      <div class="mover-head">
+        <div>
+          <div class="mover-ticker">{ticker}</div>
+          <div class="mover-company">{company}</div>
+        </div>
+        <div class="{change_cls}">{change_text}</div>
+      </div>
+      <div class="mover-chip-wrap">
+        <span class="mover-chip">{industry}</span>
+        <span class="mover-chip">{stage}</span>
+        <span class="mover-chip">Score {score_text}</span>
+        <span class="mover-chip">{setup}</span>
+      </div>
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
+def moves_tab(price_moves):
+    st.subheader("Top and bottom stock moves")
+    st.caption("Fast view of relative leaders and laggards. Switch time horizon below.")
+    if price_moves.empty:
+        st.info("No price move data found yet.")
+        return
+
+    period_map = {
+        "1 Day": "change_1d_pct",
+        "1 Week": "change_1w_pct",
+        "1 Month": "change_1m_pct",
+        "YTD": "change_ytd_pct",
+    }
+    selected_period = st.radio("Move window", list(period_map.keys()), horizontal=True, index=0)
+    col_name = period_map[selected_period]
+
+    df = normalize_columns(price_moves.copy())
+    if "overall_setup_label" not in df.columns and "combined_bucket" in df.columns:
+        df["overall_setup_label"] = df["combined_bucket"]
+    df[col_name] = pd.to_numeric(df[col_name], errors="coerce")
+    df["final_combined_score"] = pd.to_numeric(df.get("final_combined_score"), errors="coerce")
+    df = df.dropna(subset=[col_name]).reset_index(drop=True)
+
+    compact_metric_grid([
+        ("Leaders", int((df[col_name] > 0).sum())),
+        ("Laggards", int((df[col_name] < 0).sum())),
+        ("Best move", f"{df[col_name].max():+.2f}%" if not df.empty else "n/a"),
+        ("Worst move", f"{df[col_name].min():+.2f}%" if not df.empty else "n/a"),
+    ])
+
+    top10 = df.sort_values([col_name, "final_combined_score"], ascending=[False, False]).head(10)
+    bottom10 = df.sort_values([col_name, "final_combined_score"], ascending=[True, False]).head(10)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown(f"### Top 10 • {selected_period}")
+        for _, row in top10.iterrows():
+            render_mover_card(row, col_name, positive=True)
+    with c2:
+        st.markdown(f"### Bottom 10 • {selected_period}")
+        for _, row in bottom10.iterrows():
+            render_mover_card(row, col_name, positive=False)
+
+    with st.expander("View as table", expanded=False):
+        cols = [c for c in ["ticker", "Company Name", "Industry", "stage", "final_combined_score", "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct"] if c in df.columns]
+        st.dataframe(pretty_columns(df[cols].sort_values(col_name, ascending=False)), use_container_width=True, hide_index=True, height=420)
+
+
 def help_tab():
     st.subheader("How to read the dashboard")
     st.markdown(
@@ -482,6 +593,7 @@ outputs = {
     "stock_changes": str(Path(outdir) / "stock_changes.csv"),
     "industry_changes": str(Path(outdir) / "industry_changes.csv"),
     "top_movers": str(Path(outdir) / "top_movers.csv"),
+    "price_moves": str(Path(outdir) / "stock_price_moves.csv"),
     "daily_charts_dir": str(Path(outdir) / "charts" / "daily"),
     "weekly_charts_dir": str(Path(outdir) / "charts" / "weekly"),
 }
@@ -494,31 +606,34 @@ regime_df = safe_read(outputs["regime"])
 stock_changes_df = add_safe_labels(safe_read(outputs["stock_changes"]))
 industry_changes_df = add_safe_labels(safe_read(outputs["industry_changes"]))
 top_movers_df = add_safe_labels(safe_read(outputs["top_movers"]))
+price_moves_df = add_safe_labels(safe_read(outputs["price_moves"]))
 last_updated = get_last_updated(outputs["combined"])
 
 if combined_df.empty and daily_df.empty and weekly_df.empty:
     st.warning("No output files found yet. Wait for the scheduled GitHub Action to generate the latest scan.")
 
-tabs = st.tabs(["Dashboard", "Overall", "Portfolio", "Stock", "Daily", "Weekly", "Changes", "Rotation", "Industries", "Stages", "Help"])
+tabs = st.tabs(["Dashboard", "Overall", "Moves", "Portfolio", "Stock", "Daily", "Weekly", "Changes", "Rotation", "Industries", "Stages", "Help"])
 with tabs[0]:
     dashboard_tab(combined_df, daily_df, weekly_df, industry_df, regime_df, last_updated)
 with tabs[1]:
     ranked_tab("Overall candidates", combined_df, "final_combined_score", "overall_setup_label", show_search=True)
 with tabs[2]:
-    portfolio_tab(combined_df)
+    moves_tab(price_moves_df)
 with tabs[3]:
-    stock_detail_tab(combined_df, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
+    portfolio_tab(combined_df)
 with tabs[4]:
-    ranked_tab("Daily candidates", daily_df, "final_daily_score", "daily_setup_label", show_search=False)
+    stock_detail_tab(combined_df, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
 with tabs[5]:
-    ranked_tab("Weekly candidates", weekly_df, "final_weekly_score", "weekly_setup_label", show_search=False)
+    ranked_tab("Daily candidates", daily_df, "final_daily_score", "daily_setup_label", show_search=False)
 with tabs[6]:
-    changes_tab(stock_changes_df, top_movers_df)
+    ranked_tab("Weekly candidates", weekly_df, "final_weekly_score", "weekly_setup_label", show_search=False)
 with tabs[7]:
-    industry_rotation_tab(industry_changes_df)
+    changes_tab(stock_changes_df, top_movers_df)
 with tabs[8]:
-    industry_tab(industry_df)
+    industry_rotation_tab(industry_changes_df)
 with tabs[9]:
-    stage_by_industry_tab(combined_df)
+    industry_tab(industry_df)
 with tabs[10]:
+    stage_by_industry_tab(combined_df)
+with tabs[11]:
     help_tab()

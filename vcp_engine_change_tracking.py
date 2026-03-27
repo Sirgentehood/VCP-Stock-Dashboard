@@ -660,6 +660,10 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     industry_changes = build_industry_changes(industry_df, prev_industry)
     top_movers = stock_changes.sort_values(["new_top_10", "new_top_20", "new_daily_breakout", "new_weekly_breakout", "rank_change", "combined_score_change"], ascending=[False, False, False, False, False, False]).reset_index(drop=True)
 
+    full_tickers = list(dict.fromkeys(tickers + [DEFAULT_CONFIG["market_index"]]))
+    price_data = fetch_prices(full_tickers, DEFAULT_CONFIG["period"], interval="1d")
+    price_moves = build_price_moves(combined_df, price_data)
+
     daily_file = out_path / "vcp_daily_ranked.csv"
     weekly_file = out_path / "vcp_weekly_ranked.csv"
     combined_file = out_path / "vcp_combined_ranked.csv"
@@ -668,6 +672,7 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     stock_changes_file = out_path / "stock_changes.csv"
     industry_changes_file = out_path / "industry_changes.csv"
     top_movers_file = out_path / "top_movers.csv"
+    price_moves_file = out_path / "stock_price_moves.csv"
 
     daily_df.to_csv(daily_file, index=False)
     weekly_df.to_csv(weekly_file, index=False)
@@ -677,11 +682,70 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     stock_changes.to_csv(stock_changes_file, index=False)
     industry_changes.to_csv(industry_changes_file, index=False)
     top_movers.to_csv(top_movers_file, index=False)
+    price_moves.to_csv(price_moves_file, index=False)
 
-    full_tickers = list(dict.fromkeys(tickers + [DEFAULT_CONFIG["market_index"]]))
-    price_data = fetch_prices(full_tickers, DEFAULT_CONFIG["period"], interval="1d")
     chart_paths = export_all_charts(final_report, price_data, out_path) if export_all_ticker_charts else {"daily_charts_dir": str(out_path / "charts" / "daily"), "weekly_charts_dir": str(out_path / "charts" / "weekly")}
-    return {"daily": str(daily_file), "weekly": str(weekly_file), "combined": str(combined_file), "industry": str(industry_file), "regime": str(regime_file), "stock_changes": str(stock_changes_file), "industry_changes": str(industry_changes_file), "top_movers": str(top_movers_file), **chart_paths}
+    return {"daily": str(daily_file), "weekly": str(weekly_file), "combined": str(combined_file), "industry": str(industry_file), "regime": str(regime_file), "stock_changes": str(stock_changes_file), "industry_changes": str(industry_changes_file), "top_movers": str(top_movers_file), "price_moves": str(price_moves_file), **chart_paths}
+
+
+def _perf_from_close(close: pd.Series, bars_back: int) -> float:
+    s = close.dropna()
+    if len(s) <= bars_back:
+        return np.nan
+    prev = float(s.iloc[-(bars_back + 1)])
+    curr = float(s.iloc[-1])
+    if prev == 0:
+        return np.nan
+    return round((curr / prev - 1) * 100, 2)
+
+def _perf_ytd(close: pd.Series) -> float:
+    s = close.dropna()
+    if s.empty:
+        return np.nan
+    current_year = int(s.index[-1].year)
+    year_slice = s[s.index.year == current_year]
+    if year_slice.empty:
+        return np.nan
+    first_close = float(year_slice.iloc[0])
+    last_close = float(year_slice.iloc[-1])
+    if first_close == 0:
+        return np.nan
+    return round((last_close / first_close - 1) * 100, 2)
+
+def build_price_moves(current_df: pd.DataFrame, price_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    base = _clean_stock_snapshot(current_df).copy()
+    if base.empty:
+        return pd.DataFrame()
+    rows = []
+    for _, row in base.iterrows():
+        ticker = row.get("ticker")
+        df = price_data.get(ticker)
+        if df is None or df.empty or "Close" not in df.columns:
+            continue
+        close = df["Close"].dropna()
+        if close.empty:
+            continue
+        rows.append({
+            "ticker": ticker,
+            "Company Name": row.get("Company Name"),
+            "Industry": row.get("Industry"),
+            "stage": row.get("stage"),
+            "overall_setup_label": row.get("combined_bucket"),
+            "final_combined_score": row.get("final_combined_score"),
+            "change_1d_pct": _perf_from_close(close, 1),
+            "change_1w_pct": _perf_from_close(close, 5),
+            "change_1m_pct": _perf_from_close(close, 21),
+            "change_ytd_pct": _perf_ytd(close),
+            "last_close": round(float(close.iloc[-1]), 2),
+        })
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+    for c in ["change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct", "final_combined_score", "last_close"]:
+        if c in out.columns:
+            out[c] = pd.to_numeric(out[c], errors="coerce")
+    return out.sort_values(["change_1d_pct", "final_combined_score"], ascending=[False, False]).reset_index(drop=True)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Daily + Weekly VCP Screener with change tracking")
