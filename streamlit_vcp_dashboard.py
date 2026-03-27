@@ -339,75 +339,106 @@ def normalize_portfolio_ticker(x: str) -> str:
 
 def portfolio_tab(combined):
     st.subheader("My Portfolio")
-    st.caption("Add up to 20 tickers to view current stage, score, setup label, and relative strength for your holdings. This section is informational and analytical only.")
+    st.caption("Add up to 20 tickers. This is an informational analytics view only.")
 
     if combined.empty:
         st.info("No scan outputs found yet.")
         return
 
-    all_tickers = sorted(combined["ticker"].dropna().unique().tolist()) if "ticker" in combined.columns else []
+    all_tickers = sorted(combined["ticker"].dropna().unique().tolist())
+    base_symbols = [t.replace(".NS", "") for t in all_tickers]
 
     if "portfolio_tickers" not in st.session_state:
         st.session_state["portfolio_tickers"] = []
 
+    # ===== ADD MULTIPLE TICKERS =====
     st.markdown("### Add Tickers")
-    a1, a2 = st.columns([4, 1])
-    selected = a1.selectbox(
-        "Search and add ticker",
-        [""] + all_tickers,
-        key="portfolio_ticker_picker",
-        help="Start typing to search and choose a ticker.",
+
+    input_text = st.text_input(
+        "Enter tickers (comma separated)",
+        placeholder="Example: RELIANCE, TCS, INFY"
     )
-    with a2:
-        st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
-        if st.button("＋ Add", key="portfolio_add_btn", use_container_width=True):
-            if selected and selected not in st.session_state["portfolio_tickers"] and len(st.session_state["portfolio_tickers"]) < 20:
-                st.session_state["portfolio_tickers"].append(selected)
+
+    col1, col2 = st.columns([4, 1])
+
+    with col2:
+        if st.button("Add", use_container_width=True):
+            if input_text:
+                raw = [x.strip() for x in input_text.split(",")]
+                normalized = [normalize_portfolio_ticker(x) for x in raw]
+
+                for t in normalized:
+                    if t and t not in st.session_state["portfolio_tickers"]:
+                        if len(st.session_state["portfolio_tickers"]) < 20:
+                            st.session_state["portfolio_tickers"].append(t)
+
                 st.rerun()
 
-    st.caption(f"{len(st.session_state['portfolio_tickers'])} of 20 tickers added")
+    st.caption(f"{len(st.session_state['portfolio_tickers'])}/20 tickers")
 
     if not st.session_state["portfolio_tickers"]:
-        st.info("Add one or more tickers to see portfolio analytics.")
+        st.info("Add tickers to see portfolio analytics.")
         return
 
-    st.markdown("### Holdings")
-    remove_idx = None
-    for i, t in enumerate(st.session_state["portfolio_tickers"]):
-        c1, c2 = st.columns([5, 1])
-        c1.markdown(f"**{t}**")
-        if c2.button("Remove", key=f"portfolio_remove_{i}", use_container_width=True):
-            remove_idx = i
-
-    if remove_idx is not None:
-        st.session_state["portfolio_tickers"].pop(remove_idx)
-        st.rerun()
-
+    # ===== MERGE DATA =====
     portfolio = pd.DataFrame({"ticker": st.session_state["portfolio_tickers"]})
     merged = portfolio.merge(combined, on="ticker", how="left")
 
-    st.markdown("### Portfolio Snapshot")
-    stage1 = int((merged["stage"] == "Stage 1").sum()) if "stage" in merged.columns else 0
-    stage2 = int((merged["stage"] == "Stage 2").sum()) if "stage" in merged.columns else 0
-    stage3 = int((merged["stage"] == "Stage 3").sum()) if "stage" in merged.columns else 0
-    stage4 = int((merged["stage"] == "Stage 4").sum()) if "stage" in merged.columns else 0
-    avg_score = round(float(merged["final_combined_score"].dropna().mean()), 1) if "final_combined_score" in merged.columns and merged["final_combined_score"].notna().any() else "n/a"
+    # ===== SNAPSHOT =====
+    st.markdown("### Snapshot")
+
+    stage_counts = merged["stage"].value_counts() if "stage" in merged.columns else {}
+    avg_score = round(merged["final_combined_score"].mean(), 1) if "final_combined_score" in merged else 0
 
     compact_metric_grid([
-        ("Stage 1", stage1),
-        ("Stage 2", stage2),
-        ("Stage 3", stage3),
-        ("Stage 4", stage4),
-        ("Avg Final Score", avg_score),
+        ("Stage 1", int(stage_counts.get("Stage 1", 0))),
+        ("Stage 2", int(stage_counts.get("Stage 2", 0))),
+        ("Stage 3", int(stage_counts.get("Stage 3", 0))),
+        ("Stage 4", int(stage_counts.get("Stage 4", 0))),
+        ("Avg Score", avg_score),
     ])
 
+    # ===== CLEAN TABLE =====
     st.markdown("### Portfolio View")
-    preferred_cols = [
-        "ticker", "Company Name", "Industry", "stage", "final_combined_score",
-        "daily_score", "weekly_score", "overall_setup_label", "rs_3m_pct", "rs_6m_pct"
+
+    display = merged.copy()
+
+    display["Ticker"] = display["ticker"].str.replace(".NS", "", regex=False)
+
+    cols = [
+        "Ticker",
+        "Industry",
+        "stage",
+        "final_combined_score",
+        "overall_setup_label",
     ]
-    present = [c for c in preferred_cols if c in merged.columns]
-    st.dataframe(pretty_columns(merged[present]), use_container_width=True, hide_index=True, height=430)
+
+    display = display.rename(columns={
+        "stage": "Stage",
+        "final_combined_score": "Final Score",
+        "overall_setup_label": "Setup",
+    })
+
+    display = display[cols]
+
+    # ===== DELETE BUTTONS INLINE =====
+    delete_idx = None
+
+    for i, row in display.iterrows():
+        c1, c2, c3, c4, c5, c6 = st.columns([2, 3, 2, 2, 3, 1])
+
+        c1.markdown(row["Ticker"])
+        c2.markdown(row.get("Industry", ""))
+        c3.markdown(row.get("Stage", ""))
+        c4.markdown(str(row.get("Final Score", "")))
+        c5.markdown(row.get("Setup", ""))
+
+        if c6.button("✕", key=f"del_{i}"):
+            delete_idx = i
+
+    if delete_idx is not None:
+        st.session_state["portfolio_tickers"].pop(delete_idx)
+        st.rerun()
 
 
 def help_tab():
