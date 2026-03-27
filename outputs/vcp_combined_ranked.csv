@@ -1,486 +1,486 @@
 ticker,Company Name,Industry,stage,rs_3m_pct,rs_6m_pct,avg_turnover_inr,notes,daily_setup_bucket,weekly_setup_bucket,combined_bucket,daily_score,weekly_score,combined_score,industry_boost,final_combined_score
-GPIL.NS,Godawari Power & Ispat Ltd.,Capital Goods,Stage 2,20.25,11.32,586005055.52,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok, weekly_strong",forming_vcp,weekly_breakout,watchlist,81.83,63.82,73.73,10.0,83.73
-GMDCLTD.NS,Gujarat Mineral Development Corporation Ltd.,Metals & Mining,Stage 2,8.56,2.46,2271350805.49,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok",forming_vcp,weekly_near_pivot,building_setup,77.82,52.1,66.25,10.0,76.25
-POWERINDIA.NS,Hitachi Energy India Ltd.,Capital Goods,Stage 2,48.16,40.17,3169990860.8,"Stage 2, trend_template_ok, daily_vcp_ok, volume_dryup",near_pivot,weekly_watchlist,watchlist,85.53,42.0,65.94,10.0,75.94
-ONGC.NS,Oil & Natural Gas Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 2,36.19,33.72,7519869898.6,"Stage 2, trend_template_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,77.97,48.32,64.63,10.0,74.63
-KIRLOSENG.NS,Kirloskar Oil Eng Ltd.,Capital Goods,Stage 2,20.37,52.06,538945973.31,"Stage 2, trend_template_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_forming,watchlist,67.35,59.91,64.0,10.0,74.0
-ASTRAL.NS,Astral Ltd.,Capital Goods,Stage 2,30.16,22.82,1255609519.75,"Stage 2, trend_template_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_near_pivot,watchlist,62.31,65.96,63.95,10.0,73.95
-GRANULES.NS,Granules India Ltd.,Healthcare,Stage 2,14.61,28.49,508864044.36,"Stage 2, trend_template_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_breakout,watchlist,63.31,64.31,63.76,10.0,73.76
-ABSLAMC.NS,Aditya Birla Sun Life AMC Ltd.,Financial Services,Stage 2,30.95,21.5,760728746.9,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok",forming_vcp,weekly_near_pivot,building_setup,73.64,56.24,65.81,5.0,70.81
-APARINDS.NS,Apar Industries Ltd.,Capital Goods,Stage 2,33.1,27.88,1323832191.55,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,69.82,47.43,59.74,10.0,69.74
-NLCINDIA.NS,NLC India Ltd.,Power,Stage 2,22.26,6.98,671692799.7,"Stage 2, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_breakout,watchlist,55.92,63.59,59.37,10.0,69.37
-EMCURE.NS,Emcure Pharmaceuticals Ltd.,Healthcare,Stage 2,27.87,32.73,592344208.53,"Stage 2, trend_template_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,74.55,39.39,58.73,10.0,68.73
-HEG.NS,H.E.G. Ltd.,Capital Goods,Stage 2,11.73,15.55,1583645788.02,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,75.69,36.73,58.16,10.0,68.16
-IPCALAB.NS,Ipca Laboratories Ltd.,Healthcare,Stage 2,24.7,22.89,384403861.18,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_breakout,watchlist,51.76,65.43,57.91,10.0,67.91
-COALINDIA.NS,Coal India Ltd.,Oil Gas & Consumable Fuels,Stage 2,24.9,27.29,6439771254.46,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_near_pivot,watchlist,43.24,73.22,56.73,10.0,66.73
-INOXINDIA.NS,INOX India Ltd.,Capital Goods,Stage 3,24.66,11.52,114749536.93,"Stage 3, daily_vcp_ok, weekly_vcp_ok, daily_breakout_volume, weekly_strong",watchlist,weekly_watchlist,watchlist,59.62,51.62,56.02,10.0,66.02
-GLENMARK.NS,Glenmark Pharmaceuticals Ltd.,Healthcare,Stage 2,20.72,17.05,1327350975.7,"Stage 2, trend_template_ok, weekly_vcp_ok",watchlist,weekly_near_pivot,watchlist,56.9,54.78,55.95,10.0,65.95
-GVT&D.NS,GE Vernova T&D India Ltd.,Capital Goods,Stage 2,33.91,32.55,2167679663.88,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,66.42,40.65,54.82,10.0,64.82
-LUPIN.NS,Lupin Ltd.,Healthcare,Stage 2,23.19,26.57,2263565073.45,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_near_pivot,watchlist,39.48,72.98,54.55,10.0,64.55
-SAILIFE.NS,Sai Life Sciences Ltd.,Healthcare,Stage 2,22.29,19.48,741852502.81,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,61.1,45.51,54.08,10.0,64.08
-CCL.NS,CCL Products (I) Ltd.,Fast Moving Consumer Goods,Stage 2,24.87,24.41,274798734.35,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,74.14,46.26,61.59,2.0,63.59
-APOLLOHOSP.NS,Apollo Hospitals Enterprise Ltd.,Healthcare,Stage 3,18.28,8.16,3446000661.07,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,51.64,51.31,51.49,10.0,61.49
-ADANIPOWER.NS,Adani Power Ltd.,Power,Stage 3,20.99,15.88,4308135826.33,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,46.69,52.35,49.24,10.0,59.24
-CHENNPETRO.NS,Chennai Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 2,27.36,35.42,3646083289.65,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,61.71,32.28,48.47,10.0,58.47
-GESHIP.NS,Great Eastern Shipping Co. Ltd.,Services,Stage 2,42.51,48.55,963559503.04,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,70.12,32.8,53.33,5.0,58.33
-CUMMINSIND.NS,Cummins India Ltd.,Capital Goods,Stage 2,19.23,25.41,3638682075.73,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,55.0,38.46,47.56,10.0,57.56
-AUROPHARMA.NS,Aurobindo Pharma Ltd.,Healthcare,Stage 2,20.9,27.43,1981181137.42,Stage 2,watchlist,weekly_watchlist,watchlist,52.69,38.83,46.45,10.0,56.45
-OIL.NS,Oil India Ltd.,Oil Gas & Consumable Fuels,Stage 3,34.39,30.83,3418311671.15,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,46.67,45.52,46.15,10.0,56.15
-NTPC.NS,NTPC Ltd.,Power,Stage 2,29.69,19.32,5126048918.25,"Stage 2, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,63.4,24.9,46.08,10.0,56.08
-ABB.NS,ABB India Ltd.,Capital Goods,Stage 3,31.29,26.68,2353443609.22,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,38.65,54.46,45.76,10.0,55.76
-SUNPHARMA.NS,Sun Pharmaceutical Industries Ltd.,Healthcare,Stage 2,17.83,20.43,5114161130.98,Stage 2,watchlist,weekly_watchlist,watchlist,46.08,45.16,45.67,10.0,55.67
-PRAJIND.NS,Praj Industries Ltd.,Capital Goods,Stage 3,10.13,-2.83,1340661780.01,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.24,56.73,45.46,10.0,55.46
-WELCORP.NS,Welspun Corp Ltd.,Capital Goods,Stage 3,13.69,1.94,421633441.13,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,48.74,40.56,45.06,10.0,55.06
-POWERGRID.NS,Power Grid Corporation of India Ltd.,Power,Stage 3,25.16,12.8,5421851946.11,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,46.8,42.8,45.0,10.0,55.0
-JBCHEPHARM.NS,J.B. Chemicals & Pharmaceuticals Ltd.,Healthcare,Stage 2,27.48,32.44,739606901.85,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,57.99,28.39,44.67,10.0,54.67
-DRREDDY.NS,Dr. Reddy's Laboratories Ltd.,Healthcare,Stage 3,13.81,8.19,2288387839.37,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,39.44,50.87,44.58,10.0,54.58
-BHARATFORG.NS,Bharat Forge Ltd.,Automobile and Auto Components,Stage 2,32.07,47.76,2515637101.93,"Stage 2, trend_template_ok, daily_vcp_ok",forming_vcp,weekly_watchlist,watchlist,65.59,29.58,49.39,5.0,54.39
-ASHOKLEY.NS,Ashok Leyland Ltd.,Capital Goods,Stage 3,5.95,24.63,3911497883.14,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,37.06,51.06,43.36,10.0,53.36
-NATIONALUM.NS,National Aluminium Co. Ltd.,Metals & Mining,Stage 2,35.22,94.57,6606401356.97,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,52.77,31.6,43.24,10.0,53.24
-TORNTPHARM.NS,Torrent Pharmaceuticals Ltd.,Healthcare,Stage 2,25.45,28.38,1469852870.39,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,57.39,25.38,42.99,10.0,52.99
-J&KBANK.NS,Jammu & Kashmir Bank Ltd.,Financial Services,Stage 3,28.18,18.34,1260789507.24,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.99,60.65,47.64,5.0,52.64
-ZENTEC.NS,Zen Technologies Ltd.,Capital Goods,Stage 3,11.35,-2.24,925868932.44,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.9,56.91,42.6,10.0,52.6
-AKUMS.NS,Akums Drugs and Pharmaceuticals Ltd.,Healthcare,Stage 3,20.28,10.34,68818627.76,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,35.06,51.73,42.56,10.0,52.56
-WAAREEENER.NS,Waaree Energies Ltd.,Capital Goods,Stage 3,14.51,-1.77,6473330172.28,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.27,49.94,42.42,10.0,52.42
-NTPCGREEN.NS,NTPC Green Energy Ltd.,Power,Stage 3,15.16,2.41,2711147263.91,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.76,50.42,42.36,10.0,52.36
-ALKEM.NS,Alkem Laboratories Ltd.,Healthcare,Stage 1,9.08,6.08,577987412.52,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.07,61.52,42.02,10.0,52.02
-THERMAX.NS,Thermax Ltd.,Capital Goods,Stage 3,19.29,4.53,544401146.08,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.38,51.05,41.88,10.0,51.88
-MAHSEAMLES.NS,Maharashtra Seamless Ltd.,Capital Goods,Stage 3,17.02,4.56,135527726.76,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.97,58.16,41.01,10.0,51.01
-SARDAEN.NS,Sarda Energy and Minerals Ltd.,Metals & Mining,Stage 1,10.42,-2.57,431747080.52,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.6,43.78,40.93,10.0,50.93
-RPOWER.NS,Reliance Power Ltd.,Power,Stage 4,-28.8,-44.7,1252222558.31,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.11,48.0,40.91,10.0,50.91
-FORTIS.NS,Fortis Healthcare Ltd.,Healthcare,Stage 3,3.14,-5.71,1587672634.36,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.0,48.0,40.3,10.0,50.3
-NAVINFLUOR.NS,Navin Fluorine International Ltd.,Chemicals,Stage 3,16.52,39.48,1142694659.95,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,40.72,61.6,50.12,0.0,50.12
-LLOYDSME.NS,Lloyds Metals And Energy Ltd.,Metals & Mining,Stage 3,6.56,8.01,886336447.28,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,39.46,40.46,39.91,10.0,49.91
-AJANTPHARM.NS,Ajanta Pharmaceuticals Ltd.,Healthcare,Stage 3,16.41,22.02,378917029.09,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.09,59.84,39.63,10.0,49.63
-HINDCOPPER.NS,Hindustan Copper Ltd.,Metals & Mining,Stage 3,15.01,67.02,5741488870.63,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,26.0,56.0,39.5,10.0,49.5
-TORNTPOWER.NS,Torrent Power Ltd.,Power,Stage 3,19.02,18.58,845346515.34,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.91,51.76,39.19,10.0,49.19
-ABBOTINDIA.NS,Abbott India Ltd.,Healthcare,Stage 4,3.21,-4.04,259167503.0,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.0,56.0,38.95,10.0,48.95
-BSE.NS,BSE Ltd.,Financial Services,Stage 3,18.58,44.44,12322466243.63,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.92,54.97,43.94,5.0,48.94
-CASTROLIND.NS,Castrol India Ltd.,Oil Gas & Consumable Fuels,Stage 4,5.66,-1.98,381673750.05,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.37,39.37,38.82,10.0,48.82
-CESC.NS,CESC Ltd.,Power,Stage 4,3.45,2.79,421524351.42,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.5,49.29,38.41,10.0,48.41
-BHEL.NS,Bharat Heavy Electricals Ltd.,Capital Goods,Stage 1,3.4,17.54,2403006643.7,"Stage 1, volume_dryup",watchlist,weekly_watchlist,watchlist,40.38,35.43,38.15,10.0,48.15
-TATAPOWER.NS,Tata Power Co. Ltd.,Power,Stage 3,14.8,8.61,3576411154.0,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,42.79,31.67,37.79,10.0,47.79
-KSB.NS,KSB Ltd.,Capital Goods,Stage 3,19.83,4.33,983027645.5,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,49.1,23.75,37.69,10.0,47.69
-JINDALSAW.NS,Jindal Saw Ltd.,Capital Goods,Stage 3,25.84,-4.23,2708749558.47,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,34.16,41.16,37.31,10.0,47.31
-GRAPHITE.NS,Graphite India Ltd.,Capital Goods,Stage 3,21.29,19.96,1222871006.11,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.91,35.12,37.2,10.0,47.2
-SJVN.NS,SJVN Ltd.,Power,Stage 4,3.52,-17.87,385312188.22,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.1,40.67,37.06,10.0,47.06
-NAVA.NS,Nava Ltd.,Power,Stage 3,11.98,-11.86,167903519.61,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.26,56.01,36.9,10.0,46.9
-BIOCON.NS,Biocon Ltd.,Healthcare,Stage 1,6.71,12.91,1354273974.07,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.28,44.96,36.89,10.0,46.89
-FINCABLES.NS,Finolex Cables Ltd.,Capital Goods,Stage 3,18.08,7.1,874151667.07,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.65,43.18,36.84,10.0,46.84
-BALRAMCHIN.NS,Balrampur Chini Mills Ltd.,Fast Moving Consumer Goods,Stage 3,26.97,16.83,641131923.27,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,44.25,45.05,44.61,2.0,46.61
-BPCL.NS,Bharat Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 1,-7.73,-0.67,4785602722.8,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.0,52.0,36.6,10.0,46.6
-LINDEINDIA.NS,Linde India Ltd.,Chemicals,Stage 3,35.83,20.14,492206424.57,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,47.6,44.6,46.25,0.0,46.25
-MCX.NS,Multi Commodity Exchange of India Ltd.,Financial Services,Stage 3,21.44,60.44,9372724100.81,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.07,59.6,41.16,5.0,46.16
-IOC.NS,Indian Oil Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 1,0.13,7.76,3947268904.73,"Stage 1, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,36.47,35.79,36.16,10.0,46.16
-ARE&M.NS,Amara Raja Energy & Mobility Ltd.,Automobile and Auto Components,Stage 4,-11.79,-21.03,301660196.43,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.52,48.0,41.14,5.0,46.14
-USHAMART.NS,Usha Martin Ltd.,Capital Goods,Stage 3,3.96,-0.06,167893253.56,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,41.35,29.72,36.12,10.0,46.12
-AADHARHFC.NS,Aadhar Housing Finance Ltd.,Financial Services,Stage 1,8.82,-4.52,216685170.61,"Stage 1, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,39.08,43.43,41.04,5.0,46.04
-TIMKEN.NS,Timken India Ltd.,Capital Goods,Stage 3,19.46,16.82,255718758.05,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.63,42.63,36.03,10.0,46.03
-ASTRAZEN.NS,AstraZenca Pharma India Ltd.,Healthcare,Stage 1,2.25,3.04,48931257.85,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.84,53.2,35.95,10.0,45.95
-IGIL.NS,International Gemmological Institute (India) Ltd.,Services,Stage 3,11.5,-2.75,270295497.82,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,33.48,49.54,40.71,5.0,45.71
-POLYMED.NS,Poly Medicure Ltd.,Healthcare,Stage 4,-17.2,-28.59,367051581.68,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,25.25,48.0,35.49,10.0,45.49
-PTCIL.NS,PTC Industries Ltd.,Capital Goods,Stage 3,-1.93,11.96,310887203.35,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.24,32.0,35.43,10.0,45.43
-JUBLPHARMA.NS,Jubilant Pharmova Ltd.,Healthcare,Stage 4,-8.61,-12.41,138743808.23,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.97,40.67,35.34,10.0,45.34
-HAL.NS,Hindustan Aeronautics Ltd.,Capital Goods,Stage 4,-5.31,-14.16,6519761654.56,"Stage 4, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,30.44,40.67,35.04,10.0,45.04
-DATAPATTNS.NS,Data Patterns (India) Ltd.,Capital Goods,Stage 3,30.76,24.79,4117445645.82,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,33.51,36.56,34.88,10.0,44.88
-ACE.NS,Action Construction Equipment Ltd.,Capital Goods,Stage 4,-4.94,-21.87,195522146.28,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.11,40.67,34.86,10.0,44.86
-NATCOPHARM.NS,NATCO Pharma Ltd.,Healthcare,Stage 3,20.52,24.21,1106915323.65,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,35.47,33.81,34.72,10.0,44.72
-WOCKPHARMA.NS,Wockhardt Ltd.,Healthcare,Stage 4,-3.65,-10.17,717937042.67,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.84,48.0,34.71,10.0,44.71
-SCHAEFFLER.NS,Schaeffler India Ltd.,Automobile and Auto Components,Stage 3,17.78,7.14,445737387.31,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.72,43.16,39.62,5.0,44.62
-NHPC.NS,NHPC Ltd.,Power,Stage 3,12.19,-0.35,1393482596.2,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,37.56,30.52,34.39,10.0,44.39
-PPLPHARMA.NS,Piramal Pharma Ltd.,Healthcare,Stage 4,-5.49,-18.1,476701075.82,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.1,40.67,34.31,10.0,44.31
-PFC.NS,Power Finance Corporation Ltd.,Financial Services,Stage 3,26.95,8.96,3658276958.23,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,36.59,42.59,39.29,5.0,44.29
-HINDALCO.NS,Hindalco Industries Ltd.,Metals & Mining,Stage 3,12.09,26.42,6167358885.31,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.85,51.85,34.25,10.0,44.25
-BEL.NS,Bharat Electronics Ltd.,Capital Goods,Stage 3,15.54,12.94,8952577267.36,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,20.39,50.85,34.1,10.0,44.1
-AARTIIND.NS,Aarti Industries Ltd.,Chemicals,Stage 3,23.71,18.32,384455580.23,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,30.85,60.2,44.06,0.0,44.06
-REDINGTON.NS,Redington Ltd.,Services,Stage 4,-12.77,-16.99,3380564498.98,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,31.75,48.0,39.06,5.0,44.06
-MAZDOCK.NS,Mazagoan Dock Shipbuilders Ltd.,Capital Goods,Stage 4,-1.17,-16.09,6431635377.77,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.38,40.67,33.91,10.0,43.91
-GRSE.NS,Garden Reach Shipbuilders & Engineers Ltd.,Capital Goods,Stage 4,-3.33,-13.32,2616618909.4,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.28,40.67,33.86,10.0,43.86
-MEDANTA.NS,Global Health Ltd.,Healthcare,Stage 4,-3.35,-16.0,194108143.99,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.91,40.67,33.65,10.0,43.65
-RAMCOCEM.NS,The Ramco Cements Ltd.,Construction Materials,Stage 1,1.85,-0.22,200445153.1,"Stage 1, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.3,52.16,43.44,0.0,43.44
-MGL.NS,Mahanagar Gas Ltd.,Oil Gas & Consumable Fuels,Stage 4,-2.84,-15.61,612412128.17,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.07,40.67,33.19,10.0,43.19
-ANGELONE.NS,Angel One Ltd.,Financial Services,Stage 3,9.05,18.52,1923652335.11,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.76,50.76,38.11,5.0,43.11
-HYUNDAI.NS,Hyundai Motor India Ltd.,Automobile and Auto Components,Stage 1,-8.91,-24.67,1145019282.17,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.17,51.2,37.98,5.0,42.98
-PNBHOUSING.NS,PNB Housing Finance Ltd.,Financial Services,Stage 4,-3.2,-1.48,727635464.28,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.17,56.0,37.94,5.0,42.94
-ZYDUSLIFE.NS,Zydus Lifesciences Ltd.,Healthcare,Stage 3,11.19,-4.04,585211263.14,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,41.08,22.71,32.81,10.0,42.81
-TRIVENI.NS,Triveni Engineering & Industries Ltd.,Fast Moving Consumer Goods,Stage 3,12.84,23.79,566202406.42,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,39.19,42.66,40.75,2.0,42.75
-GODIGIT.NS,Go Digit General Insurance Ltd.,Financial Services,Stage 1,6.56,1.04,102965116.25,"Stage 1, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,24.84,53.43,37.71,5.0,42.71
-BAJAJHFL.NS,Bajaj Housing Finance Ltd.,Financial Services,Stage 4,-7.79,-23.05,573951574.68,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.2,48.0,37.66,5.0,42.66
-GILLETTE.NS,Gillette India Ltd.,Fast Moving Consumer Goods,Stage 4,2.91,-13.08,178486140.07,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.63,48.0,40.65,2.0,42.65
-JPPOWER.NS,Jaiprakash Power Ventures Ltd.,Power,Stage 4,-2.06,-8.85,1760222057.95,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.0,31.0,32.65,10.0,42.65
-CONCORDBIO.NS,Concord Biotech Ltd.,Healthcare,Stage 4,-11.78,-28.61,505379690.67,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,26.0,40.67,32.6,10.0,42.6
-GODREJIND.NS,Godrej Industries Ltd.,Diversified,Stage 4,-9.6,-25.06,67123445.32,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.49,48.0,40.57,2.0,42.57
-SHYAMMETL.NS,Shyam Metalics and Energy Ltd.,Capital Goods,Stage 4,7.21,-6.53,168637864.73,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.85,40.73,32.55,10.0,42.55
-APLLTD.NS,Alembic Pharmaceuticals Ltd.,Healthcare,Stage 4,-9.15,-18.32,58469638.11,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.76,40.67,32.47,10.0,42.47
-ANANDRATHI.NS,Anand Rathi Wealth Ltd.,Financial Services,Stage 3,10.46,10.23,536868656.5,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,34.5,41.07,37.46,5.0,42.46
-INOXWIND.NS,Inox Wind Ltd.,Capital Goods,Stage 4,-24.52,-35.7,1048407215.53,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.49,40.67,32.32,10.0,42.32
-DMART.NS,Avenue Supermarts Ltd.,Consumer Services,Stage 3,16.28,-6.26,1987686765.48,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,44.0,40.0,42.2,0.0,42.2
-ACMESOLAR.NS,ACME Solar Holdings Ltd.,Power,Stage 3,29.31,4.21,616740284.94,"Stage 3, daily_vcp_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,44.35,17.35,32.2,10.0,42.2
-SYNGENE.NS,Syngene International Ltd.,Healthcare,Stage 4,-24.37,-26.42,618327058.77,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.27,40.67,32.2,10.0,42.2
-GSPL.NS,Gujarat State Petronet Ltd.,Oil Gas & Consumable Fuels,Stage 4,-7.07,-17.08,333027634.2,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.23,40.67,32.18,10.0,42.18
-HDFCLIFE.NS,HDFC Life Insurance Company Ltd.,Financial Services,Stage 4,-6.11,-11.8,2144884729.59,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.19,48.0,37.1,5.0,42.1
-LICHSGFIN.NS,LIC Housing Finance Ltd.,Financial Services,Stage 4,6.44,-3.61,999023715.05,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.28,56.28,37.03,5.0,42.03
-VTL.NS,Vardhman Textiles Ltd.,Textiles,Stage 3,29.2,34.47,277390174.36,Stage 3,watchlist,weekly_watchlist,watchlist,37.58,35.7,36.73,5.0,41.73
-GUJGASLTD.NS,Gujarat Gas Ltd.,Oil Gas & Consumable Fuels,Stage 4,-5.08,-16.3,1152560105.68,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.33,40.67,31.68,10.0,41.68
-IIFL.NS,IIFL Finance Ltd.,Financial Services,Stage 3,-12.1,11.38,542995885.7,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,29.0,46.0,36.65,5.0,41.65
-JSWINFRA.NS,JSW Infrastructure Ltd.,Services,Stage 4,0.04,-16.85,440850833.47,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.56,39.0,36.56,5.0,41.56
-PREMIERENE.NS,Premier Energies Ltd.,Capital Goods,Stage 3,14.99,-4.83,2097988981.49,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,39.02,22.35,31.52,10.0,41.52
-METROPOLIS.NS,Metropolis Healthcare Ltd.,Healthcare,Stage 1,2.79,-7.51,121030224.01,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.51,35.0,31.43,10.0,41.43
-FORCEMOT.NS,Force Motors Ltd.,Automobile and Auto Components,Stage 3,23.42,22.69,2251461548.4,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,23.11,52.61,36.39,5.0,41.39
-HINDZINC.NS,Hindustan Zinc Ltd.,Metals & Mining,Stage 3,-7.24,21.96,3644784031.25,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,30.47,32.47,31.37,10.0,41.37
-GRASIM.NS,Grasim Industries Ltd.,Construction Materials,Stage 1,5.36,2.33,3361655630.21,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,32.02,52.77,41.36,0.0,41.36
-SBICARD.NS,SBI Cards and Payment Services Ltd.,Financial Services,Stage 4,-9.2,-14.36,1107537258.64,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,32.83,40.67,36.36,5.0,41.36
-CUB.NS,City Union Bank Ltd.,Financial Services,Stage 3,-2.94,26.21,687255248.0,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.74,50.33,36.26,5.0,41.26
-GICRE.NS,General Insurance Corporation of India,Financial Services,Stage 3,10.36,9.24,112814224.33,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,17.88,57.96,35.92,5.0,40.92
-SYRMA.NS,Syrma SGS Technology Ltd.,Capital Goods,Stage 3,23.57,4.58,1029957721.84,Stage 3,watchlist,weekly_watchlist,watchlist,29.82,32.15,30.87,10.0,40.87
-360ONE.NS,360 ONE WAM Ltd.,Financial Services,Stage 1,-5.12,6.23,821222636.83,"Stage 1, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.5,44.78,35.83,5.0,40.83
-OLECTRA.NS,Olectra Greentech Ltd.,Automobile and Auto Components,Stage 3,-3.95,-28.0,1719465819.06,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.0,48.67,35.65,5.0,40.65
-LALPATHLAB.NS,Dr. Lal Path Labs Ltd.,Healthcare,Stage 3,6.98,-10.37,424276839.95,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.28,40.67,30.56,10.0,40.56
-DELHIVERY.NS,Delhivery Ltd.,Services,Stage 3,17.73,3.11,708038626.09,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,44.94,24.08,35.55,5.0,40.55
-AEGISLOG.NS,Aegis Logistics Ltd.,Oil Gas & Consumable Fuels,Stage 4,-3.69,-13.09,530521817.52,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,10.0,40.4
-ESCORTS.NS,Escorts Kubota Ltd.,Capital Goods,Stage 3,-9.97,-13.36,454210431.5,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,10.0,40.4
-INDGN.NS,Indegene Ltd.,Healthcare,Stage 4,-0.03,-11.34,186047021.8,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,10.0,40.4
-JYOTICNC.NS,Jyoti CNC Automation Ltd.,Capital Goods,Stage 4,-10.33,-6.59,762792359.31,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,10.0,40.4
-DOMS.NS,DOMS Industries Ltd.,Fast Moving Consumer Goods,Stage 3,0.73,-4.03,946788626.36,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.95,56.0,38.37,2.0,40.37
-OFSS.NS,Oracle Financial Services Software Ltd.,Information Technology,Stage 4,1.94,-12.92,1246786841.25,"Stage 4, weekly_vcp_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,48.0,31.0,40.35,0.0,40.35
-YESBANK.NS,Yes Bank Ltd.,Financial Services,Stage 3,-3.9,-5.98,1925578843.47,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.0,48.0,35.35,5.0,40.35
-ASTERDM.NS,Aster DM Healthcare Ltd.,Healthcare,Stage 3,18.36,12.52,606865383.58,Stage 3,watchlist,weekly_watchlist,watchlist,34.32,25.09,30.17,10.0,40.17
-ADANIGREEN.NS,Adani Green Energy Ltd.,Power,Stage 4,-6.07,-15.18,2679068298.91,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.89,31.0,29.84,10.0,39.84
-SAIL.NS,Steel Authority of India Ltd.,Metals & Mining,Stage 3,23.92,17.25,3107278435.85,Stage 3,watchlist,weekly_watchlist,watchlist,33.33,25.45,29.78,10.0,39.78
-CRISIL.NS,CRISIL Ltd.,Financial Services,Stage 4,3.56,-9.25,207458959.53,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.95,48.0,34.77,5.0,39.77
-KIMS.NS,Krishna Institute of Medical Sciences Ltd.,Healthcare,Stage 1,13.68,-3.65,221101806.57,"Stage 1, volume_dryup",watchlist,weekly_watchlist,watchlist,32.5,26.34,29.73,10.0,39.73
-BANDHANBNK.NS,Bandhan Bank Ltd.,Financial Services,Stage 1,15.26,3.08,2028649864.68,"Stage 1, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,32.83,36.83,34.63,5.0,39.63
-SAREGAMA.NS,Saregama India Ltd,Media Entertainment & Publication,Stage 4,6.63,-21.69,142118860.01,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.5,48.67,37.58,2.0,39.58
-HFCL.NS,HFCL Ltd.,Telecommunication,Stage 3,28.36,3.25,1541718434.71,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,41.52,32.49,37.46,2.0,39.46
-MAHSCOOTER.NS,Maharashtra Scooters Ltd.,Financial Services,Stage 3,-3.13,-24.1,60570895.2,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.37,48.0,34.45,5.0,39.45
-MRPL.NS,Mangalore Refinery & Petrochemicals Ltd.,Oil Gas & Consumable Fuels,Stage 3,35.96,49.58,5107852187.22,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,35.55,22.0,29.45,10.0,39.45
-RRKABEL.NS,R R Kabel Ltd.,Capital Goods,Stage 3,0.69,11.67,398862254.27,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,27.14,32.24,29.44,10.0,39.44
-STARHEALTH.NS,Star Health and Allied Insurance Company Ltd.,Financial Services,Stage 3,15.89,9.61,188196449.88,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,42.34,24.55,34.33,5.0,39.33
-SCI.NS,Shipping Corporation of India Ltd.,Services,Stage 3,16.42,10.84,925895985.24,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,34.73,33.73,34.28,5.0,39.28
-CENTRALBK.NS,Central Bank of India,Financial Services,Stage 4,2.26,-2.57,348896990.03,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.99,40.67,34.25,5.0,39.25
-POONAWALLA.NS,Poonawalla Fincorp Ltd.,Financial Services,Stage 1,-7.14,-12.59,543687657.43,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.56,44.67,34.16,5.0,39.16
-RKFORGE.NS,Ramkrishna Forgings Ltd.,Automobile and Auto Components,Stage 4,8.14,-3.77,180390687.94,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.44,41.1,34.14,5.0,39.14
-SIEMENS.NS,Siemens Ltd.,Capital Goods,Stage 4,11.54,3.81,1280438124.0,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.25,22.87,29.13,10.0,39.13
-SUPREMEIND.NS,Supreme Industries Ltd.,Capital Goods,Stage 3,28.28,-3.48,1151278241.84,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,32.91,24.48,29.12,10.0,39.12
-MSUMI.NS,Motherson Sumi Wiring India Ltd.,Automobile and Auto Components,Stage 1,-4.27,-11.24,286751119.58,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.03,44.67,33.87,5.0,38.87
-MANAPPURAM.NS,Manappuram Finance Ltd.,Financial Services,Stage 1,-6.27,-2.02,1651957029.11,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.0,52.0,33.85,5.0,38.85
-ENDURANCE.NS,Endurance Technologies Ltd.,Automobile and Auto Components,Stage 3,2.23,-8.84,178218095.04,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.26,40.67,33.84,5.0,38.84
-BEML.NS,BEML Ltd.,Capital Goods,Stage 4,-10.51,-23.81,422719928.3,Stage 4,watchlist,weekly_watchlist,watchlist,34.92,21.33,28.8,10.0,38.8
-GRAVITA.NS,Gravita India Ltd.,Metals & Mining,Stage 4,-12.4,-5.13,388973114.68,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,26.95,31.0,28.77,10.0,38.77
-MAPMYINDIA.NS,C.E. Info Systems Ltd.,Information Technology,Stage 4,-36.86,-38.86,188353266.39,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.0,48.0,38.65,0.0,38.65
-KAJARIACER.NS,Kajaria Ceramics Ltd.,Consumer Durables,Stage 3,10.35,-11.75,316864787.54,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.0,39.0,38.45,0.0,38.45
-BAYERCROP.NS,Bayer Cropscience Ltd.,Chemicals,Stage 4,10.92,-0.09,113783781.13,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.08,49.75,38.38,0.0,38.38
-JWL.NS,Jupiter Wagons Ltd.,Capital Goods,Stage 4,-14.77,-13.65,2374350642.79,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,26.0,31.0,28.25,10.0,38.25
-LTFOODS.NS,LT Foods Ltd.,Fast Moving Consumer Goods,Stage 4,5.19,-3.75,2676531461.48,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,26.14,48.14,36.04,2.0,38.04
-ATGL.NS,Adani Total Gas Ltd.,Oil Gas & Consumable Fuels,Stage 3,5.82,-11.19,6060064950.95,Stage 3,watchlist,weekly_watchlist,watchlist,26.79,29.33,27.93,10.0,37.93
-TTML.NS,Tata Teleservices (Maharashtra) Ltd.,Telecommunication,Stage 4,-21.25,-32.11,109776418.3,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.0,48.0,35.9,2.0,37.9
-SUNDRMFAST.NS,Sundram Fasteners Ltd.,Automobile and Auto Components,Stage 4,-4.79,-15.2,258170423.78,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.45,31.0,32.9,5.0,37.9
-GLAND.NS,Gland Pharma Ltd.,Healthcare,Stage 1,15.28,-6.8,153495267.71,"Stage 1, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,41.85,10.85,27.9,10.0,37.9
-JSWENERGY.NS,JSW Energy Ltd.,Power,Stage 3,14.03,0.08,1806730847.05,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,17.58,40.41,27.85,10.0,37.85
-TARIL.NS,Transformers And Rectifiers (India) Ltd.,Capital Goods,Stage 4,4.58,-40.0,1204023825.58,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,25.23,31.0,27.83,10.0,37.83
-CHAMBLFERT.NS,Chambal Fertilizers & Chemicals Ltd.,Chemicals,Stage 4,1.18,-11.22,369096082.39,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.43,40.67,37.79,0.0,37.79
-RELIANCE.NS,Reliance Industries Ltd.,Oil Gas & Consumable Fuels,Stage 3,-0.96,6.68,27641886365.33,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,32.03,22.57,27.77,10.0,37.77
-NIVABUPA.NS,Niva Bupa Health Insurance Company Ltd.,Financial Services,Stage 4,5.33,-4.73,158661522.88,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.06,31.06,32.71,5.0,37.71
-CGPOWER.NS,CG Power and Industrial Solutions Ltd.,Capital Goods,Stage 3,15.01,-3.55,2099690178.23,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,25.33,30.48,27.65,10.0,37.65
-GODREJCP.NS,Godrej Consumer Products Ltd.,Fast Moving Consumer Goods,Stage 4,-2.68,-4.24,1704923368.64,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.51,48.0,35.63,2.0,37.63
-AKZOINDIA.NS,Akzo Nobel India Ltd.,Consumer Durables,Stage 4,6.16,-4.57,134462105.38,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.39,48.83,37.59,0.0,37.59
-IGL.NS,Indraprastha Gas Ltd.,Oil Gas & Consumable Fuels,Stage 4,-9.74,-18.38,524779954.9,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,24.76,31.0,27.57,10.0,37.57
-NETWEB.NS,Netweb Technologies India Ltd.,Information Technology,Stage 3,13.67,2.33,7631321996.45,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,33.6,42.27,37.5,0.0,37.5
-NAUKRI.NS,Info Edge (India) Ltd.,Consumer Services,Stage 4,-13.96,-18.25,1706070888.82,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.78,48.0,37.43,0.0,37.43
-NUVAMA.NS,Nuvama Wealth Management Ltd.,Financial Services,Stage 4,-8.0,11.18,452644358.55,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.31,48.32,32.36,5.0,37.36
-IDFCFIRSTB.NS,IDFC First Bank Ltd.,Financial Services,Stage 3,-15.13,-2.94,2950829232.35,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,19.46,48.0,32.3,5.0,37.3
-WIPRO.NS,Wipro Ltd.,Information Technology,Stage 4,-14.1,-10.97,3228952250.11,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.5,48.0,37.28,0.0,37.28
-CROMPTON.NS,Crompton Greaves Consumer Electricals Ltd.,Consumer Durables,Stage 4,3.19,-13.24,470680663.69,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.48,48.0,37.26,0.0,37.26
-CDSL.NS,Central Depository Services (India) Ltd.,Financial Services,Stage 4,-8.25,-13.27,2510413659.64,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.1,40.67,32.11,5.0,37.11
-AIAENG.NS,AIA Engineering Ltd.,Capital Goods,Stage 1,1.49,23.91,323244677.95,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,18.49,37.54,27.06,10.0,37.06
-IEX.NS,Indian Energy Exchange Ltd.,Financial Services,Stage 4,2.17,-4.44,747810275.57,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,18.39,48.67,32.02,5.0,37.02
-NCC.NS,NCC Ltd.,Construction,Stage 4,-0.83,-25.1,472343042.66,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.0,40.67,37.0,0.0,37.0
-SAGILITY.NS,Sagility Ltd.,Information Technology,Stage 3,-10.9,2.27,1732307738.75,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.0,48.0,37.0,0.0,37.0
-ADANIENSOL.NS,Adani Energy Solutions Ltd.,Power,Stage 3,8.85,12.91,1755067342.51,Stage 3,watchlist,weekly_watchlist,watchlist,29.18,24.18,26.93,10.0,36.93
-DIVISLAB.NS,Divi's Laboratories Ltd.,Healthcare,Stage 4,6.06,9.62,1653233605.6,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,15.7,40.57,26.89,10.0,36.89
-NEULANDLAB.NS,Neuland Laboratories Ltd.,Healthcare,Stage 1,-6.34,-9.97,389151792.1,"Stage 1, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,34.12,18.0,26.87,10.0,36.87
-GODREJAGRO.NS,Godrej Agrovet Ltd.,Fast Moving Consumer Goods,Stage 4,10.25,-13.61,94198929.15,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,38.0,31.0,34.85,2.0,36.85
-CEATLTD.NS,Ceat Ltd.,Automobile and Auto Components,Stage 3,2.19,9.26,551084856.14,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.67,41.81,31.83,5.0,36.83
-SAMMAANCAP.NS,Sammaan Capital Ltd.,Financial Services,Stage 3,18.54,18.75,2182665793.21,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,36.73,25.73,31.78,5.0,36.78
-GMRAIRPORT.NS,GMR Airports Ltd.,Services,Stage 1,-0.69,8.98,1262440450.51,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,20.46,45.5,31.73,5.0,36.73
-RAILTEL.NS,Railtel Corporation Of India Ltd.,Telecommunication,Stage 4,-18.51,-20.95,341939722.77,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.79,48.0,34.68,2.0,36.68
-MINDACORP.NS,Minda Corporation Ltd.,Automobile and Auto Components,Stage 3,1.27,-1.77,123489648.36,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.3,40.67,31.67,5.0,36.67
-PNB.NS,Punjab National Bank,Financial Services,Stage 1,-0.35,3.61,2220608371.56,"Stage 1, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.38,35.33,31.51,5.0,36.51
-HONASA.NS,Honasa Consumer Ltd.,Fast Moving Consumer Goods,Stage 3,21.29,8.56,179807666.49,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,36.27,32.32,34.49,2.0,36.49
-SHRIRAMFIN.NS,Shriram Finance Ltd.,Financial Services,Stage 3,6.9,54.98,9644681835.86,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,15.44,50.99,31.44,5.0,36.44
-CHOLAHLDNG.NS,Cholamandalam Financial Holdings Ltd.,Financial Services,Stage 4,-13.6,-19.06,411408326.43,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.82,40.67,31.4,5.0,36.4
-TITAN.NS,Titan Company Ltd.,Consumer Durables,Stage 3,12.69,26.12,3640297211.97,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.01,52.55,36.3,0.0,36.3
-IRB.NS,IRB Infrastructure Developers Ltd.,Construction,Stage 4,9.18,5.5,313070727.15,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.79,50.13,36.19,0.0,36.19
-ELGIEQUIP.NS,Elgi Equipments Ltd.,Capital Goods,Stage 3,15.43,4.22,219160369.04,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,20.57,32.96,26.15,10.0,36.15
-TIINDIA.NS,Tube Investments of India Ltd.,Automobile and Auto Components,Stage 3,11.87,-11.99,1516342973.22,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,24.7,39.0,31.14,5.0,36.14
-HSCL.NS,Himadri Speciality Chemical Ltd.,Chemicals,Stage 4,5.89,5.44,842936397.63,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,39.35,32.13,36.1,0.0,36.1
-BHARTIARTL.NS,Bharti Airtel Ltd.,Telecommunication,Stage 1,-0.98,3.44,19173614548.53,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.25,52.25,34.1,2.0,36.1
-NH.NS,Narayana Hrudayalaya Ltd.,Healthcare,Stage 4,1.07,4.8,535133423.08,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,21.59,31.59,26.09,10.0,36.09
-CAPLIPOINT.NS,Caplin Point Laboratories Ltd.,Healthcare,Stage 4,-5.92,-21.75,112362293.72,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,22.0,31.0,26.05,10.0,36.05
-MFSL.NS,Max Financial Services Ltd.,Financial Services,Stage 3,6.27,8.04,1449546447.71,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.93,42.1,31.01,5.0,36.01
-AIIL.NS,Authum Investment & Infrastructure Ltd.,Financial Services,Stage 3,-1.17,-7.21,536608340.38,Stage 3,watchlist,weekly_watchlist,watchlist,32.0,29.33,30.8,5.0,35.8
-INDIACEM.NS,India Cements Ltd.,Construction Materials,Stage 3,-7.87,0.04,78975040.82,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,25.6,48.0,35.68,0.0,35.68
-LAURUSLABS.NS,Laurus Labs Ltd.,Healthcare,Stage 3,5.94,20.65,1695998186.81,Stage 3,watchlist,weekly_watchlist,watchlist,32.93,16.66,25.61,10.0,35.61
-PIIND.NS,PI Industries Ltd.,Chemicals,Stage 4,0.77,-12.18,681529829.0,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.45,48.0,35.6,0.0,35.6
-RADICO.NS,Radico Khaitan Ltd,Fast Moving Consumer Goods,Stage 1,-6.75,-0.74,1266182958.51,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,32.37,35.0,33.55,2.0,35.55
-JINDALSTEL.NS,Jindal Steel Ltd.,Metals & Mining,Stage 3,28.12,17.48,1644271884.09,Stage 3,watchlist,weekly_watchlist,watchlist,25.09,25.89,25.45,10.0,35.45
-CONCOR.NS,Container Corporation of India Ltd.,Services,Stage 4,-2.92,-7.56,844262285.8,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,5.0,35.4
-JIOFIN.NS,Jio Financial Services Ltd.,Financial Services,Stage 4,-9.8,-16.57,3758538139.39,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,5.0,35.4
-SBFC.NS,SBFC Finance Ltd.,Financial Services,Stage 4,-10.01,-17.32,168334193.26,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,5.0,35.4
-TRITURBINE.NS,Triveni Turbine Ltd.,Capital Goods,Stage 4,-4.24,-4.01,158788069.43,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,20.62,31.0,25.29,10.0,35.29
-APLAPOLLO.NS,APL Apollo Tubes Ltd.,Capital Goods,Stage 3,18.57,28.47,1377258520.14,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,35.12,13.1,25.21,10.0,35.21
-COCHINSHIP.NS,Cochin Shipyard Ltd.,Capital Goods,Stage 4,-10.55,-23.63,1563767125.39,Stage 4,watchlist,weekly_watchlist,watchlist,28.35,21.33,25.19,10.0,35.19
-VGUARD.NS,V-Guard Industries Ltd.,Consumer Durables,Stage 4,8.58,-4.73,55113913.69,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.37,41.05,35.18,0.0,35.18
-CARBORUNIV.NS,Carborundum Universal Ltd.,Capital Goods,Stage 4,3.09,-11.76,83516515.09,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,28.15,21.33,25.08,10.0,35.08
-ZFCVINDIA.NS,ZF Commercial Vehicle Control Systems India Ltd.,Automobile and Auto Components,Stage 1,3.21,12.6,191156868.3,Stage 1,watchlist,weekly_watchlist,watchlist,32.58,26.91,30.03,5.0,35.03
-MANKIND.NS,Mankind Pharma Ltd.,Healthcare,Stage 4,5.28,-10.44,1562581777.45,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,28.0,21.33,25.0,10.0,35.0
-PFIZER.NS,Pfizer Ltd.,Healthcare,Stage 4,5.97,3.48,90999276.47,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,20.49,30.28,24.9,10.0,34.9
-RVNL.NS,Rail Vikas Nigam Ltd.,Construction,Stage 4,-18.63,-14.03,2056889357.65,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,24.11,48.0,34.86,0.0,34.86
-BRITANNIA.NS,Britannia Industries Ltd.,Fast Moving Consumer Goods,Stage 1,4.32,1.89,2074419200.35,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.49,45.29,32.75,2.0,34.75
-RECLTD.NS,REC Ltd.,Financial Services,Stage 4,4.22,-4.06,2714535423.52,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.3,31.02,29.52,5.0,34.52
-CYIENT.NS,Cyient Ltd.,Information Technology,Stage 4,-16.87,-23.01,264167046.07,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.35,40.67,34.44,0.0,34.44
-BAJAJHLDNG.NS,Bajaj Holdings & Investment Ltd.,Financial Services,Stage 4,-5.14,-21.28,547230146.2,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,35.94,21.33,29.37,5.0,34.37
-COROMANDEL.NS,Coromandel International Ltd.,Chemicals,Stage 4,-4.11,-2.86,841848570.11,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.12,40.67,34.32,0.0,34.32
-RAINBOW.NS,Rainbow Childrens Medicare Ltd.,Healthcare,Stage 4,-1.8,-8.43,158690085.53,Stage 4,watchlist,weekly_watchlist,watchlist,26.22,22.0,24.32,10.0,34.32
-GLAXO.NS,Glaxosmithkline Pharmaceuticals Ltd.,Healthcare,Stage 4,4.85,-8.01,119105161.36,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,18.84,31.0,24.31,10.0,34.31
-BBTC.NS,Bombay Burmah Trading Corporation Ltd.,Fast Moving Consumer Goods,Stage 4,-12.06,-17.2,78098488.59,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.96,40.67,32.03,2.0,34.03
-CHALET.NS,Chalet Hotels Ltd.,Consumer Services,Stage 4,-3.9,-19.2,126411342.61,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.43,40.67,33.94,0.0,33.94
-CGCL.NS,Capri Global Capital Ltd.,Financial Services,Stage 1,5.24,-4.84,363528354.71,Stage 1,watchlist,weekly_watchlist,watchlist,25.3,33.37,28.93,5.0,33.93
-FLUOROCHEM.NS,Gujarat Fluorochemicals Ltd.,Chemicals,Stage 4,-2.65,-9.74,276555087.24,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.4,40.67,33.92,0.0,33.92
-KIRLOSBROS.NS,Kirloskar Brothers Ltd.,Capital Goods,Stage 4,3.11,-17.65,363997913.18,"Stage 4, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,14.0,23.9,10.0,33.9
-IRCON.NS,IRCON International Ltd.,Construction,Stage 4,-19.21,-21.11,970071086.09,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.1,48.0,33.76,0.0,33.76
-NSLNISP.NS,NMDC Steel Ltd.,Metals & Mining,Stage 3,-4.78,-16.64,155347913.38,Stage 3,watchlist,weekly_watchlist,watchlist,25.75,21.33,23.76,10.0,33.76
-DABUR.NS,Dabur India Ltd.,Fast Moving Consumer Goods,Stage 3,-1.2,-9.08,826196153.07,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,32.25,31.0,31.69,2.0,33.69
-AUBANK.NS,AU Small Finance Bank Ltd.,Financial Services,Stage 3,2.88,28.81,3379645183.68,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,13.83,46.77,28.65,5.0,33.65
-ZEEL.NS,Zee Entertainment Enterprises Ltd.,Media Entertainment & Publication,Stage 4,-5.98,-26.82,836505908.01,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.25,40.67,31.64,2.0,33.64
-CAMPUS.NS,Campus Activewear Ltd.,Consumer Durables,Stage 4,-0.45,-6.47,63953450.42,"Stage 4, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,27.8,40.67,33.59,0.0,33.59
-SONACOMS.NS,Sona BLW Precision Forgings Ltd.,Automobile and Auto Components,Stage 3,14.65,27.26,769229769.83,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,23.17,35.19,28.58,5.0,33.58
-TATACONSUM.NS,Tata Consumer Products Ltd.,Fast Moving Consumer Goods,Stage 3,2.04,1.45,1524626102.99,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,17.61,48.35,31.44,2.0,33.44
-HONAUT.NS,Honeywell Automation India Ltd.,Capital Goods,Stage 4,-5.55,-16.88,167819039.5,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,17.14,31.0,23.38,10.0,33.38
-HBLENGINE.NS,HBL Engineering Ltd.,Capital Goods,Stage 3,-13.94,-11.05,825787710.15,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,30.99,14.0,23.34,10.0,33.34
-APOLLOTYRE.NS,Apollo Tyres Ltd.,Automobile and Auto Components,Stage 3,-4.68,-6.2,499283184.92,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,12.0,48.0,28.2,5.0,33.2
-DCMSHRIRAM.NS,DCM Shriram Ltd.,Diversified,Stage 3,1.26,1.63,77891468.62,Stage 3,watchlist,weekly_watchlist,watchlist,32.29,29.62,31.09,2.0,33.09
-UNITDSPR.NS,United Spirits Ltd.,Fast Moving Consumer Goods,Stage 4,1.83,3.83,1722489051.77,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.57,48.57,30.97,2.0,32.97
-BALKRISIND.NS,Balkrishna Industries Ltd.,Automobile and Auto Components,Stage 3,6.76,-1.26,300513003.73,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,25.04,31.55,27.97,5.0,32.97
-RHIM.NS,RHI MAGNESITA INDIA LTD.,Capital Goods,Stage 4,-13.05,-18.34,92940245.13,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,30.21,14.0,22.92,10.0,32.92
-MOTILALOFS.NS,Motilal Oswal Financial Services Ltd.,Financial Services,Stage 4,-8.98,-19.05,599573992.5,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,25.36,31.0,27.9,5.0,32.9
-BRIGADE.NS,Brigade Enterprises Ltd.,Realty,Stage 4,-7.9,-14.31,935307857.63,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,20.5,48.0,32.88,0.0,32.88
-NMDC.NS,NMDC Ltd.,Metals & Mining,Stage 3,9.59,13.01,1865988211.79,Stage 3,watchlist,weekly_watchlist,watchlist,30.21,13.86,22.85,10.0,32.85
-VENTIVE.NS,Ventive Hospitality Ltd.,Consumer Services,Stage 4,-3.18,-10.47,59760287.03,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.21,40.67,32.72,0.0,32.72
-TATASTEEL.NS,Tata Steel Ltd.,Metals & Mining,Stage 3,27.2,21.47,7041415183.05,Stage 3,watchlist,weekly_watchlist,watchlist,25.83,18.87,22.7,10.0,32.7
-WHIRLPOOL.NS,Whirlpool of India Ltd.,Consumer Durables,Stage 4,0.73,-29.0,294886361.94,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.02,31.0,32.66,0.0,32.66
-VBL.NS,Varun Beverages Ltd.,Fast Moving Consumer Goods,Stage 4,-6.1,-4.04,2670710482.76,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.15,48.0,30.48,2.0,32.48
-BHARTIHEXA.NS,Bharti Hexacom Ltd.,Telecommunication,Stage 4,-3.93,-0.36,231247844.55,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,2.0,32.4
-KEI.NS,KEI Industries Ltd.,Capital Goods,Stage 3,7.7,11.04,2432615620.45,Stage 3,watchlist,weekly_watchlist,watchlist,27.72,15.87,22.39,10.0,32.39
-TATAINVEST.NS,Tata Investment Corporation Ltd.,Financial Services,Stage 3,-6.32,-26.08,441173074.89,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,38.0,14.0,27.2,5.0,32.2
-IRCTC.NS,Indian Railway Catering And Tourism Corporation Ltd.,Consumer Services,Stage 4,-14.34,-18.22,1967423726.79,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,19.08,48.0,32.09,0.0,32.09
-ERIS.NS,Eris Lifesciences Ltd.,Healthcare,Stage 4,-1.22,-9.34,87976900.42,Stage 4,watchlist,weekly_watchlist,watchlist,22.14,22.0,22.08,10.0,32.08
-IFCI.NS,IFCI Ltd.,Financial Services,Stage 3,8.45,0.05,1334022725.01,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,23.15,31.85,27.07,5.0,32.07
-FACT.NS,Fertilisers and Chemicals Travancore Ltd.,Chemicals,Stage 4,-0.47,-11.32,2345558675.84,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.0,40.67,32.05,0.0,32.05
-SOBHA.NS,Sobha Ltd.,Realty,Stage 4,-4.98,-13.61,158726277.4,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.0,40.67,32.05,0.0,32.05
-IREDA.NS,Indian Renewable Energy Development Agency Ltd.,Financial Services,Stage 4,-5.46,-15.12,1058884978.35,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,23.24,31.0,26.73,5.0,31.73
-ELECON.NS,Elecon Engineering Co. Ltd.,Capital Goods,Stage 4,-9.54,-28.2,185654781.92,Stage 4,watchlist,weekly_watchlist,watchlist,28.0,14.0,21.7,10.0,31.7
-GAIL.NS,GAIL (India) Ltd.,Oil Gas & Consumable Fuels,Stage 4,-4.28,-9.97,2535124480.98,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,21.33,21.7,10.0,31.7
-SONATSOFTW.NS,Sonata Software Ltd.,Information Technology,Stage 4,-27.24,-32.05,247648258.07,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.3,40.67,31.67,0.0,31.67
-SUNDARMFIN.NS,Sundaram Finance Ltd.,Financial Services,Stage 1,1.94,8.27,432530744.35,"Stage 1, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,32.59,19.02,26.48,5.0,31.48
-ASIANPAINT.NS,Asian Paints Ltd.,Consumer Durables,Stage 3,-6.92,-0.68,2782838193.71,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,17.87,48.0,31.43,0.0,31.43
-PAYTM.NS,One 97 Communications Ltd.,Financial Services,Stage 3,-10.23,-3.44,2683411859.2,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,22.54,31.0,26.35,5.0,31.35
-FINPIPE.NS,Finolex Industries Ltd.,Capital Goods,Stage 4,6.8,-15.54,120674808.24,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,27.19,14.0,21.25,10.0,31.25
-MAXHEALTH.NS,Max Healthcare Institute Ltd.,Healthcare,Stage 4,3.22,-4.88,3227039589.91,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,13.27,31.0,21.25,10.0,31.25
-BDL.NS,Bharat Dynamics Ltd.,Capital Goods,Stage 4,-9.22,-17.02,2263602189.33,Stage 4,watchlist,weekly_watchlist,watchlist,21.14,21.33,21.23,10.0,31.23
-KFINTECH.NS,Kfin Technologies Ltd.,Financial Services,Stage 4,-4.41,-4.69,717744882.63,Stage 4,watchlist,weekly_watchlist,watchlist,30.07,21.33,26.14,5.0,31.14
-BAJFINANCE.NS,Bajaj Finance Ltd.,Financial Services,Stage 3,-3.14,-8.96,9209497636.44,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,22.0,31.0,26.05,5.0,31.05
-KAYNES.NS,Kaynes Technology India Ltd.,Capital Goods,Stage 4,2.11,-42.04,4775711209.31,Stage 4,watchlist,weekly_watchlist,watchlist,14.02,29.33,20.91,10.0,30.91
-PIDILITIND.NS,Pidilite Industries Ltd.,Chemicals,Stage 4,3.03,-3.98,993244675.38,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.79,48.0,30.83,0.0,30.83
-HAPPSTMNDS.NS,Happiest Minds Technologies Ltd.,Information Technology,Stage 3,-4.37,-18.55,3258866993.78,Stage 3,watchlist,weekly_watchlist,watchlist,38.0,22.0,30.8,0.0,30.8
-LICI.NS,Life Insurance Corporation of India,Financial Services,Stage 4,3.06,-4.82,835597884.56,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,35.11,14.0,25.61,5.0,30.61
-CERA.NS,Cera Sanitaryware Ltd,Consumer Durables,Stage 4,1.78,-15.03,99834666.83,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.21,40.67,30.52,0.0,30.52
-CAMS.NS,Computer Age Management Services Ltd.,Financial Services,Stage 4,-1.31,-7.46,1183830051.96,Stage 4,watchlist,weekly_watchlist,watchlist,28.9,21.33,25.49,5.0,30.49
-TRENT.NS,Trent Ltd.,Consumer Services,Stage 4,-8.53,-21.77,3143437065.13,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.08,48.0,30.44,0.0,30.44
-ABREL.NS,Aditya Birla Real Estate Ltd.,Forest Materials,Stage 4,-20.06,-29.41,322515912.7,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.02,40.67,30.41,0.0,30.41
-INTELLECT.NS,Intellect Design Arena Ltd.,Information Technology,Stage 4,-23.54,-29.26,309451601.54,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,0.0,30.4
-LTTS.NS,L&T Technology Services Ltd.,Information Technology,Stage 4,-16.74,-14.12,1119764368.78,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,0.0,30.4
-SOLARINDS.NS,Solar Industries India Ltd.,Chemicals,Stage 4,12.38,-3.15,3272735803.5,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,29.04,31.92,30.34,0.0,30.34
-JYOTHYLAB.NS,Jyothy Labs Ltd.,Fast Moving Consumer Goods,Stage 4,-13.87,-25.67,131563544.9,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.0,21.33,28.3,2.0,30.3
-JBMA.NS,JBM Auto Ltd.,Automobile and Auto Components,Stage 4,0.62,-15.51,2796757134.56,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,29.33,25.3,5.0,30.3
-CHOICEIN.NS,Choice International Ltd.,Financial Services,Stage 3,-9.69,-13.43,442357788.52,Stage 3,watchlist,weekly_watchlist,watchlist,22.0,29.2,25.24,5.0,30.24
-PATANJALI.NS,Patanjali Foods Ltd.,Fast Moving Consumer Goods,Stage 4,-0.08,-11.11,839106745.76,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,25.86,31.0,28.17,2.0,30.17
-SUMICHEM.NS,Sumitomo Chemical India Ltd.,Chemicals,Stage 4,-6.28,-24.24,106544613.42,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,29.43,31.0,30.14,0.0,30.14
-ADANIENT.NS,Adani Enterprises Ltd.,Metals & Mining,Stage 4,-5.77,-21.31,3899573814.5,Stage 4,watchlist,weekly_watchlist,watchlist,25.05,14.0,20.08,10.0,30.08
-IOB.NS,Indian Overseas Bank,Financial Services,Stage 4,6.92,-9.83,247569076.67,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,28.0,21.33,25.0,5.0,30.0
-CRAFTSMAN.NS,Craftsman Automation Ltd.,Automobile and Auto Components,Stage 3,10.58,10.83,297552977.8,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,18.34,33.14,25.0,5.0,30.0
-EIDPARRY.NS,E.I.D. Parry (India) Ltd.,Fast Moving Consumer Goods,Stage 4,-14.09,-17.79,196388366.79,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,25.48,31.0,27.96,2.0,29.96
-BANKINDIA.NS,Bank of India,Financial Services,Stage 3,16.11,28.81,1394749645.02,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,16.28,35.49,24.92,5.0,29.92
-JKCEMENT.NS,J.K. Cement Ltd.,Construction Materials,Stage 4,2.84,-13.86,381262205.38,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.92,31.0,29.86,0.0,29.86
-TECHM.NS,Tech Mahindra Ltd.,Information Technology,Stage 3,-1.0,6.14,2972576494.22,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.51,31.51,29.86,0.0,29.86
-WELSPUNLIV.NS,Welspun Living Ltd.,Textiles,Stage 4,0.28,4.35,212654871.14,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,19.46,31.46,24.86,5.0,29.86
-HINDPETRO.NS,Hindustan Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 3,-14.58,-9.78,4435302699.54,Stage 3,watchlist,weekly_watchlist,watchlist,18.65,21.33,19.86,10.0,29.86
-BIKAJI.NS,Bikaji Foods International Ltd.,Fast Moving Consumer Goods,Stage 4,-5.14,-9.58,87055435.46,Stage 4,watchlist,weekly_watchlist,watchlist,26.39,29.33,27.71,2.0,29.71
-JSWSTEEL.NS,JSW Steel Ltd.,Metals & Mining,Stage 1,16.33,8.01,2110408008.59,Stage 1,watchlist,weekly_watchlist,watchlist,19.13,20.43,19.71,10.0,29.71
-DBREALTY.NS,Valor Estate Ltd.,Consumer Services,Stage 4,-9.74,-37.06,210154763.48,Stage 4,watchlist,weekly_watchlist,watchlist,36.08,21.33,29.44,0.0,29.44
-APTUS.NS,Aptus Value Housing Finance India Ltd.,Financial Services,Stage 4,-16.44,-28.21,503925902.07,Stage 4,watchlist,weekly_watchlist,watchlist,32.88,14.0,24.38,5.0,29.38
-KPIL.NS,Kalpataru Projects International Ltd.,Construction,Stage 3,2.19,-4.85,251197141.96,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.0,31.0,29.35,0.0,29.35
-FIRSTCRY.NS,Brainbees Solutions Ltd.,Consumer Services,Stage 4,-10.66,-34.14,1832831519.21,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,14.08,48.0,29.34,0.0,29.34
-DEEPAKNTR.NS,Deepak Nitrite Ltd.,Chemicals,Stage 4,-11.76,-19.36,219340744.46,Stage 4,watchlist,weekly_watchlist,watchlist,35.83,21.33,29.3,0.0,29.3
-POLYCAB.NS,Polycab India Ltd.,Capital Goods,Stage 3,6.01,2.93,4708000559.02,Stage 3,watchlist,weekly_watchlist,watchlist,22.89,14.89,19.29,10.0,29.29
-KPRMILL.NS,K.P.R. Mill Ltd.,Textiles,Stage 4,2.95,-13.92,575633214.67,Stage 4,watchlist,weekly_watchlist,watchlist,26.67,21.33,24.27,5.0,29.27
-TEJASNET.NS,Tejas Networks Ltd.,Telecommunication,Stage 3,2.99,-21.94,15668267262.38,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,21.33,27.2,2.0,29.2
-PETRONET.NS,Petronet LNG Ltd.,Oil Gas & Consumable Fuels,Stage 3,0.69,3.17,2204854072.23,Stage 3,watchlist,weekly_watchlist,watchlist,22.94,14.39,19.09,10.0,29.09
-OLAELEC.NS,Ola Electric Mobility Ltd.,Automobile and Auto Components,Stage 4,-20.61,-48.31,1400802460.62,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,18.38,31.0,24.06,5.0,29.06
-ENGINERSIN.NS,Engineers India Ltd.,Construction,Stage 4,5.49,3.83,702934200.09,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,26.43,31.93,28.91,0.0,28.91
-CREDITACC.NS,CreditAccess Grameen Ltd.,Financial Services,Stage 3,4.85,-7.12,358860610.84,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,14.0,23.9,5.0,28.9
-SUNTV.NS,Sun TV Network Ltd.,Media Entertainment & Publication,Stage 3,16.56,19.49,358985482.58,Stage 3,watchlist,weekly_watchlist,watchlist,28.45,24.94,26.87,2.0,28.87
-ADANIPORTS.NS,Adani Ports and Special Economic Zone Ltd.,Services,Stage 3,2.09,2.19,3920673525.01,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,25.56,21.76,23.85,5.0,28.85
-JSL.NS,Jindal Stainless Ltd.,Metals & Mining,Stage 3,2.5,-1.71,689844169.57,Stage 3,watchlist,weekly_watchlist,watchlist,22.63,14.08,18.78,10.0,28.78
-BLUEDART.NS,Blue Dart Express Ltd.,Services,Stage 4,1.41,-7.09,55940222.52,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,25.7,21.33,23.73,5.0,28.73
-VEDL.NS,Vedanta Ltd.,Metals & Mining,Stage 3,21.32,54.93,10041861348.22,Stage 3,watchlist,weekly_watchlist,watchlist,22.61,13.63,18.57,10.0,28.57
-ALOKINDS.NS,Alok Industries Ltd.,Textiles,Stage 4,-12.63,-23.16,67117346.26,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,17.42,31.0,23.53,5.0,28.53
-NAM-INDIA.NS,Nippon Life India Asset Management Ltd.,Financial Services,Stage 3,9.52,8.93,534978770.85,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,29.75,15.85,23.5,5.0,28.5
-HOMEFIRST.NS,Home First Finance Company India Ltd.,Financial Services,Stage 4,-4.1,-18.13,907386277.17,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,25.1,21.33,23.4,5.0,28.4
-SUZLON.NS,Suzlon Energy Ltd.,Capital Goods,Stage 4,-10.06,-19.23,3035745370.85,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,21.33,18.4,10.0,28.4
-KOTAKBANK.NS,Kotak Mahindra Bank Ltd.,Financial Services,Stage 4,-3.28,-1.16,7893182556.93,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,25.0,21.33,23.35,5.0,28.35
-MAHABANK.NS,Bank of Maharashtra,Financial Services,Stage 3,27.0,24.97,1596344727.47,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.21,10.0,23.32,5.0,28.32
-BLUEJET.NS,Blue Jet Healthcare Ltd.,Healthcare,Stage 4,-22.28,-39.56,235508999.53,Stage 4,watchlist,weekly_watchlist,watchlist,22.17,13.2,18.13,10.0,28.13
-PGHH.NS,Procter & Gamble Hygiene & Health Care Ltd.,Fast Moving Consumer Goods,Stage 4,-12.67,-18.21,179808049.1,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,36.0,14.0,26.1,2.0,28.1
-INFY.NS,Infosys Ltd.,Information Technology,Stage 4,-10.67,-4.45,15188558852.93,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,25.26,31.0,27.84,0.0,27.84
-SHREECEM.NS,Shree Cement Ltd.,Construction Materials,Stage 4,3.03,-9.98,809154278.0,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,25.12,31.0,27.77,0.0,27.77
-KARURVYSYA.NS,Karur Vysya Bank Ltd.,Financial Services,Stage 3,23.85,46.96,959431166.63,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,35.51,7.08,22.72,5.0,27.72
-INDIANB.NS,Indian Bank,Financial Services,Stage 3,24.86,32.63,1661418093.36,Stage 3,watchlist,weekly_watchlist,watchlist,29.73,14.15,22.72,5.0,27.72
-VIJAYA.NS,Vijaya Diagnostic Centre Ltd.,Healthcare,Stage 4,-2.89,-7.84,99357532.8,Stage 4,watchlist,weekly_watchlist,watchlist,14.38,21.33,17.51,10.0,27.51
-KALYANKJIL.NS,Kalyan Jewellers India Ltd.,Consumer Durables,Stage 4,-7.95,-9.33,1257581197.4,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,26.0,29.33,27.5,0.0,27.5
-NIACL.NS,The New India Assurance Company Ltd.,Financial Services,Stage 4,-7.76,-28.23,72938937.53,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,29.44,14.0,22.49,5.0,27.49
-OBEROIRLTY.NS,Oberoi Realty Ltd.,Realty,Stage 4,-0.06,-0.07,942142068.8,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,17.94,39.0,27.42,0.0,27.42
-NUVOCO.NS,Nuvoco Vistas Corporation Ltd.,Construction Materials,Stage 4,-7.12,-24.95,119909863.51,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,24.37,31.0,27.35,0.0,27.35
-TATAELXSI.NS,Tata Elxsi Ltd.,Information Technology,Stage 4,-9.42,-15.02,1435431143.56,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,10.38,48.0,27.31,0.0,27.31
-RCF.NS,Rashtriya Chemicals & Fertilizers Ltd.,Chemicals,Stage 4,-5.59,-13.02,858597538.27,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.36,40.67,27.3,0.0,27.3
-HEROMOTOCO.NS,Hero MotoCorp Ltd.,Automobile and Auto Components,Stage 3,5.88,8.87,2610441922.62,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,29.48,13.48,22.28,5.0,27.28
-RBLBANK.NS,RBL Bank Ltd.,Financial Services,Stage 3,10.29,18.81,1201195510.43,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,32.16,10.11,22.24,5.0,27.24
-EIHOTEL.NS,EIH Ltd.,Consumer Services,Stage 4,-10.28,-16.95,224678372.6,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,21.33,27.2,0.0,27.2
-LODHA.NS,Lodha Developers Ltd.,Realty,Stage 4,-22.1,-31.35,2414170099.52,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.09,40.67,27.15,0.0,27.15
-PVRINOX.NS,PVR INOX Ltd.,Media Entertainment & Publication,Stage 1,4.66,-6.22,380953261.86,Stage 1,watchlist,weekly_watchlist,watchlist,31.0,18.0,25.15,2.0,27.15
-HDFCAMC.NS,HDFC Asset Management Company Ltd.,Financial Services,Stage 3,-0.04,-10.9,2562261327.95,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,16.53,29.0,22.14,5.0,27.14
-IDBI.NS,IDBI Bank Ltd.,Financial Services,Stage 3,-24.12,-21.05,2594261379.16,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,14.88,31.0,22.13,5.0,27.13
-JUBLINGREA.NS,Jubilant Ingrevia Ltd.,Chemicals,Stage 4,-8.64,-6.34,147727363.47,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.0,40.67,27.1,0.0,27.1
-NBCC.NS,NBCC (India) Ltd.,Construction,Stage 4,-21.02,-17.02,1010860869.04,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.0,40.67,27.1,0.0,27.1
-PGEL.NS,PG Electroplast Ltd.,Consumer Durables,Stage 3,-2.77,-0.43,2389338495.22,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.0,40.67,27.1,0.0,27.1
-ICICIPRULI.NS,ICICI Prudential Life Insurance Company Ltd.,Financial Services,Stage 3,-5.61,-1.68,664765083.51,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,14.75,31.0,22.06,5.0,27.06
-FSL.NS,Firstsource Solutions Ltd.,Services,Stage 4,-23.93,-29.84,363046596.59,Stage 4,watchlist,weekly_watchlist,watchlist,22.37,21.33,21.9,5.0,26.9
-DIXON.NS,Dixon Technologies (India) Ltd.,Consumer Durables,Stage 4,-5.69,-35.33,8000233191.85,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,23.43,31.0,26.84,0.0,26.84
-VOLTAS.NS,Voltas Ltd.,Consumer Durables,Stage 1,8.66,5.89,1473085296.27,Stage 1,watchlist,weekly_watchlist,watchlist,26.72,26.79,26.75,0.0,26.75
-MMTC.NS,MMTC Ltd.,Services,Stage 4,-1.55,-9.98,573239955.76,Stage 4,watchlist,weekly_watchlist,watchlist,28.0,14.0,21.7,5.0,26.7
-ANANTRAJ.NS,Anant Raj Ltd.,Realty,Stage 3,-8.84,-26.44,888851623.99,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,31.02,21.33,26.66,0.0,26.66
-BASF.NS,BASF India Ltd.,Chemicals,Stage 4,-2.69,-19.26,80373685.55,Stage 4,watchlist,weekly_watchlist,watchlist,30.87,21.33,26.58,0.0,26.58
-ZENSARTECH.NS,Zensar Technolgies Ltd.,Information Technology,Stage 4,-14.33,-25.38,254472472.25,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,30.52,21.33,26.38,0.0,26.38
-CANBK.NS,Canara Bank,Financial Services,Stage 3,-0.81,14.96,3457531694.0,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,12.24,32.41,21.32,5.0,26.32
-ECLERX.NS,eClerx Services Ltd.,Services,Stage 3,-25.73,-20.35,407766761.94,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,27.01,14.0,21.16,5.0,26.16
-TITAGARH.NS,Titagarh Rail Systems Ltd.,Capital Goods,Stage 4,-20.69,-24.03,456641082.39,Stage 4,watchlist,weekly_watchlist,watchlist,17.91,14.0,16.15,10.0,26.15
-CIPLA.NS,Cipla Ltd.,Healthcare,Stage 4,-5.44,-10.52,1955792890.25,Stage 4,watchlist,weekly_watchlist,watchlist,17.79,14.0,16.08,10.0,26.08
-LATENTVIEW.NS,Latent View Analytics Ltd.,Information Technology,Stage 3,-30.73,-26.26,235095734.12,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,22.0,31.0,26.05,0.0,26.05
-ACC.NS,ACC Ltd.,Construction Materials,Stage 4,-11.61,-20.11,368414150.81,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,35.89,14.0,26.04,0.0,26.04
-MRF.NS,MRF Ltd.,Automobile and Auto Components,Stage 3,-2.06,-7.9,1072735900.75,Stage 3,watchlist,weekly_watchlist,watchlist,26.77,14.0,21.02,5.0,26.02
-UTIAMC.NS,UTI Asset Management Company Ltd.,Financial Services,Stage 4,-3.95,-23.02,81641556.08,Stage 4,watchlist,weekly_watchlist,watchlist,26.36,14.0,20.8,5.0,25.8
-UNIONBANK.NS,Union Bank of India,Financial Services,Stage 3,28.22,34.02,3053367118.55,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,24.73,15.82,20.72,5.0,25.72
-POLICYBZR.NS,PB Fintech Ltd.,Financial Services,Stage 4,-10.74,-9.23,2305058345.59,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,26.11,14.0,20.66,5.0,25.66
-BLUESTARCO.NS,Blue Star Ltd.,Consumer Durables,Stage 1,8.6,-3.69,1041834063.26,Stage 1,watchlist,weekly_watchlist,watchlist,25.49,25.82,25.64,0.0,25.64
-TATACHEM.NS,Tata Chemicals Ltd.,Chemicals,Stage 4,-7.74,-27.75,318167282.25,Stage 4,watchlist,weekly_watchlist,watchlist,34.86,14.0,25.47,0.0,25.47
-PRESTIGE.NS,Prestige Estates Projects Ltd.,Realty,Stage 4,-14.24,-15.9,1035695867.44,Stage 4,watchlist,weekly_watchlist,watchlist,28.33,21.33,25.18,0.0,25.18
-FIVESTAR.NS,Five-Star Business Finance Ltd.,Financial Services,Stage 4,-19.76,-19.24,561511006.83,Stage 4,watchlist,weekly_watchlist,watchlist,25.19,14.0,20.15,5.0,25.15
-EXIDEIND.NS,Exide Industries Ltd.,Automobile and Auto Components,Stage 4,-4.63,-15.15,447728780.55,Stage 4,watchlist,weekly_watchlist,watchlist,25.0,14.0,20.05,5.0,25.05
-INDIGO.NS,InterGlobe Aviation Ltd.,Services,Stage 4,-6.15,-18.28,8917664560.07,Stage 4,watchlist,weekly_watchlist,watchlist,25.0,14.0,20.05,5.0,25.05
-UCOBANK.NS,UCO Bank,Financial Services,Stage 4,-5.37,-13.78,215813855.67,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,25.0,14.0,20.05,5.0,25.05
-BLS.NS,BLS International Services Ltd.,Consumer Services,Stage 4,-8.72,-20.0,1852482564.71,Stage 4,watchlist,weekly_watchlist,watchlist,28.0,21.33,25.0,0.0,25.0
-IDEA.NS,Vodafone Idea Ltd.,Telecommunication,Stage 3,-12.32,13.6,4708140070.01,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,16.13,31.13,22.88,2.0,24.88
-INDUSTOWER.NS,Indus Towers Ltd.,Telecommunication,Stage 3,13.97,28.06,1758039771.13,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,20.69,25.54,22.87,2.0,24.87
-HUDCO.NS,Housing & Urban Development Corporation Ltd.,Financial Services,Stage 4,-10.57,-17.26,662409909.99,Stage 4,watchlist,weekly_watchlist,watchlist,24.19,14.0,19.6,5.0,24.6
-PCBL.NS,PCBL Chemical Ltd.,Chemicals,Stage 4,-3.95,-24.56,1292363406.78,Stage 4,watchlist,weekly_watchlist,watchlist,33.12,14.0,24.52,0.0,24.52
-BAJAJFINSV.NS,Bajaj Finserv Ltd.,Financial Services,Stage 3,-3.86,-9.33,2831411625.36,Stage 3,watchlist,weekly_watchlist,watchlist,23.84,14.0,19.41,5.0,24.41
-BSOFT.NS,Birlasoft Ltd.,Information Technology,Stage 3,-12.2,1.21,490093878.04,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,18.77,31.0,24.27,0.0,24.27
-TECHNOE.NS,Techno Electric & Engineering Company Ltd.,Construction,Stage 4,8.63,-15.08,248176223.66,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,32.55,14.0,24.2,0.0,24.2
-BOSCHLTD.NS,Bosch Ltd.,Automobile and Auto Components,Stage 1,-4.36,-13.97,705564870.25,Stage 1,watchlist,weekly_watchlist,watchlist,20.05,18.0,19.13,5.0,24.13
-TATACOMM.NS,Tata Communications Ltd.,Telecommunication,Stage 4,-8.43,-5.93,483944844.29,Stage 4,watchlist,weekly_watchlist,watchlist,22.67,21.33,22.07,2.0,24.07
-HDFCBANK.NS,HDFC Bank Ltd.,Financial Services,Stage 4,-11.03,-11.12,43621695933.65,Stage 4,watchlist,weekly_watchlist,watchlist,30.44,4.8,18.9,5.0,23.9
-MARUTI.NS,Maruti Suzuki India Ltd.,Automobile and Auto Components,Stage 1,-12.77,-14.55,8183026695.45,Stage 1,watchlist,weekly_watchlist,watchlist,19.35,18.0,18.74,5.0,23.74
-ITI.NS,ITI Ltd.,Telecommunication,Stage 4,-6.96,-11.01,2398794589.13,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,21.33,21.7,2.0,23.7
-SWANCORP.NS,Swan Corp Ltd.,Chemicals,Stage 4,-21.09,-27.22,457501456.91,Stage 4,watchlist,weekly_watchlist,watchlist,25.52,21.33,23.63,0.0,23.63
-ABFRL.NS,Aditya Birla Fashion and Retail Ltd.,Consumer Services,Stage 3,-12.68,-27.83,343955851.32,Stage 3,watchlist,weekly_watchlist,watchlist,25.45,21.33,23.6,0.0,23.6
-TVSMOTOR.NS,TVS Motor Company Ltd.,Automobile and Auto Components,Stage 3,8.25,9.89,3921329741.81,Stage 3,watchlist,weekly_watchlist,watchlist,20.76,15.81,18.53,5.0,23.53
-JMFINANCIL.NS,JM Financial Ltd.,Financial Services,Stage 4,-3.99,-19.81,400936639.2,Stage 4,watchlist,weekly_watchlist,watchlist,22.15,14.0,18.48,5.0,23.48
-CHOLAFIN.NS,Cholamandalam Investment and Finance Company Ltd.,Financial Services,Stage 3,-3.38,-3.26,3533737270.25,Stage 3,watchlist,weekly_watchlist,watchlist,16.09,21.33,18.45,5.0,23.45
-DLF.NS,DLF Ltd.,Realty,Stage 4,-11.64,-19.01,2979328430.66,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,17.24,31.0,23.43,0.0,23.43
-UNOMINDA.NS,UNO Minda Ltd.,Automobile and Auto Components,Stage 3,-4.79,-10.54,1183890390.07,Stage 3,watchlist,weekly_watchlist,watchlist,22.0,14.0,18.4,5.0,23.4
-TRIDENT.NS,Trident Ltd.,Textiles,Stage 4,1.95,-9.54,404789068.01,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,21.33,18.4,5.0,23.4
-FEDERALBNK.NS,Federal Bank Ltd.,Financial Services,Stage 3,14.8,47.56,2544553055.22,Stage 3,watchlist,weekly_watchlist,watchlist,19.39,17.04,18.33,5.0,23.33
-AXISBANK.NS,Axis Bank Ltd.,Financial Services,Stage 1,11.06,13.57,9535383034.36,Stage 1,watchlist,weekly_watchlist,watchlist,16.45,20.46,18.25,5.0,23.25
-ALKYLAMINE.NS,Alkyl Amines Chemicals Ltd.,Chemicals,Stage 4,-3.78,-25.45,281589282.29,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,16.36,31.0,22.95,0.0,22.95
-BERGEPAINT.NS,Berger Paints India Ltd.,Consumer Durables,Stage 4,-10.67,-13.15,202638467.24,Stage 4,watchlist,weekly_watchlist,watchlist,34.79,8.4,22.91,0.0,22.91
-CANFINHOME.NS,Can Fin Homes Ltd.,Financial Services,Stage 3,2.04,16.45,137016620.75,Stage 3,watchlist,weekly_watchlist,watchlist,28.87,4.25,17.79,5.0,22.79
-AFCONS.NS,Afcons Infrastructure Ltd.,Construction,Stage 4,-15.67,-29.53,161663068.9,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,16.0,31.0,22.75,0.0,22.75
-ABCAPITAL.NS,Aditya Birla Capital Ltd.,Financial Services,Stage 3,-0.16,13.27,3113382745.45,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,26.94,6.11,17.57,5.0,22.57
-CLEAN.NS,Clean Science and Technology Ltd.,Chemicals,Stage 4,-9.45,-29.98,191202057.92,Stage 4,watchlist,weekly_watchlist,watchlist,29.37,14.0,22.45,0.0,22.45
-JUBLFOOD.NS,Jubilant Foodworks Ltd.,Consumer Services,Stage 4,-6.45,-18.9,1160093817.22,"Stage 4, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,23.14,21.33,22.33,0.0,22.33
-ULTRACEMCO.NS,UltraTech Cement Ltd.,Construction Materials,Stage 3,6.46,-0.15,4487920212.25,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,14.38,31.63,22.14,0.0,22.14
-IKS.NS,Inventurus Knowledge Solutions Ltd.,Information Technology,Stage 4,-11.95,-3.66,372063278.26,Stage 4,watchlist,weekly_watchlist,watchlist,22.72,21.33,22.09,0.0,22.09
-HCLTECH.NS,HCL Technologies Ltd.,Information Technology,Stage 4,-4.47,5.49,4423815144.3,Stage 4,watchlist,weekly_watchlist,watchlist,28.87,13.3,21.86,0.0,21.86
-MARICO.NS,Marico Ltd.,Fast Moving Consumer Goods,Stage 3,13.02,14.71,1291992098.64,Stage 3,watchlist,weekly_watchlist,watchlist,22.99,15.57,19.65,2.0,21.65
-COLPAL.NS,Colgate Palmolive (India) Ltd.,Fast Moving Consumer Goods,Stage 4,3.41,-8.16,917669599.86,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,10.23,31.0,19.58,2.0,21.58
-INDUSINDBK.NS,IndusInd Bank Ltd.,Financial Services,Stage 1,5.26,15.54,3774861421.27,Stage 1,watchlist,weekly_watchlist,watchlist,13.7,20.08,16.57,5.0,21.57
-KPITTECH.NS,KPIT Technologies Ltd.,Information Technology,Stage 4,-32.63,-37.39,1462656512.74,Stage 4,watchlist,weekly_watchlist,watchlist,21.75,21.33,21.56,0.0,21.56
-NEWGEN.NS,Newgen Software Technologies Ltd.,Information Technology,Stage 4,-37.01,-42.51,1157749762.42,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,29.0,12.0,21.35,0.0,21.35
-3MINDIA.NS,3M India Ltd.,Diversified,Stage 1,2.44,13.35,140016413.5,Stage 1,watchlist,weekly_watchlist,watchlist,19.17,19.58,19.35,2.0,21.35
-GODFRYPHLP.NS,Godfrey Phillips India Ltd.,Fast Moving Consumer Goods,Stage 4,-18.65,-33.47,2029375384.98,Stage 4,watchlist,weekly_watchlist,watchlist,23.57,14.0,19.26,2.0,21.26
-AFFLE.NS,Affle 3i Ltd.,Information Technology,Stage 4,-6.26,-19.86,515042781.68,Stage 4,watchlist,weekly_watchlist,watchlist,27.0,14.0,21.15,0.0,21.15
-DEVYANI.NS,Devyani International Ltd.,Consumer Services,Stage 4,-18.86,-34.7,343166356.28,Stage 4,watchlist,weekly_watchlist,watchlist,20.99,21.33,21.14,0.0,21.14
-INDHOTEL.NS,Indian Hotels Co. Ltd.,Consumer Services,Stage 4,-6.8,-10.87,1905433767.09,Stage 4,watchlist,weekly_watchlist,watchlist,26.97,14.0,21.13,0.0,21.13
-PAGEIND.NS,Page Industries Ltd.,Textiles,Stage 4,0.33,-15.48,725661904.0,Stage 4,watchlist,weekly_watchlist,watchlist,17.87,14.0,16.13,5.0,21.13
-SIGNATURE.NS,Signatureglobal (India) Ltd.,Realty,Stage 4,-20.49,-21.75,341199274.02,Stage 4,watchlist,weekly_watchlist,watchlist,26.94,14.0,21.12,0.0,21.12
-NYKAA.NS,FSN E-Commerce Ventures Ltd.,Consumer Services,Stage 3,4.75,10.08,1078903553.29,Stage 3,watchlist,weekly_watchlist,watchlist,19.64,22.82,21.07,0.0,21.07
-EICHERMOT.NS,Eicher Motors Ltd.,Automobile and Auto Components,Stage 3,5.81,6.58,4366242908.68,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,26.24,3.64,16.07,5.0,21.07
-EMAMILTD.NS,Emami Ltd.,Fast Moving Consumer Goods,Stage 4,-9.31,-20.67,279596928.52,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,9.0,31.0,18.9,2.0,20.9
-AAVAS.NS,Aavas Financiers Ltd.,Financial Services,Stage 4,-13.15,-24.97,315293641.74,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,8.4,15.88,5.0,20.88
-ICICIGI.NS,ICICI Lombard General Insurance Company Ltd.,Financial Services,Stage 4,2.27,2.62,1103866743.32,Stage 4,watchlist,weekly_watchlist,watchlist,16.98,14.49,15.86,5.0,20.86
-IRFC.NS,Indian Railway Finance Corporation Ltd.,Financial Services,Stage 4,-17.55,-15.82,1740543213.86,Stage 4,watchlist,weekly_watchlist,watchlist,17.37,14.0,15.85,5.0,20.85
-ICICIBANK.NS,ICICI Bank Ltd.,Financial Services,Stage 4,4.53,-1.0,23409939632.06,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,25.35,3.95,15.72,5.0,20.72
-LTF.NS,L&T Finance Ltd.,Financial Services,Stage 3,-3.93,11.13,2668985769.49,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,27.84,0.72,15.64,5.0,20.64
-GODREJPROP.NS,Godrej Properties Ltd.,Realty,Stage 4,-12.19,-16.19,2150236186.59,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,19.73,21.33,20.45,0.0,20.45
-PERSISTENT.NS,Persistent Systems Ltd.,Information Technology,Stage 3,-9.18,4.16,3573542686.37,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,26.33,13.2,20.42,0.0,20.42
-MOTHERSON.NS,Samvardhana Motherson International Ltd.,Automobile and Auto Components,Stage 3,4.91,11.22,2356715194.05,Stage 3,watchlist,weekly_watchlist,watchlist,23.61,5.21,15.33,5.0,20.33
-ASAHIINDIA.NS,Asahi India Glass Ltd.,Automobile and Auto Components,Stage 3,-6.24,-2.33,636560987.23,Stage 3,watchlist,weekly_watchlist,watchlist,16.0,14.0,15.1,5.0,20.1
-HAVELLS.NS,Havells India Ltd.,Consumer Durables,Stage 4,-0.26,-10.76,1143607404.5,Stage 4,watchlist,weekly_watchlist,watchlist,25.0,14.0,20.05,0.0,20.05
-AWL.NS,AWL Agri Business Ltd.,Fast Moving Consumer Goods,Stage 4,-9.91,-18.15,1153963829.32,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,13.2,18.04,2.0,20.04
-M&MFIN.NS,Mahindra & Mahindra Financial Services Ltd.,Financial Services,Stage 3,-9.45,18.14,480620658.53,Stage 3,watchlist,weekly_watchlist,watchlist,17.25,11.67,14.74,5.0,19.74
-DEEPAKFERT.NS,Deepak Fertilisers & Petrochemicals Corp. Ltd.,Chemicals,Stage 4,-11.49,-30.51,646618226.59,Stage 4,watchlist,weekly_watchlist,watchlist,24.3,14.0,19.67,0.0,19.67
-TBOTEK.NS,TBO Tek Ltd.,Consumer Services,Stage 3,-22.9,-21.6,176760568.35,Stage 3,watchlist,weekly_watchlist,watchlist,24.06,14.0,19.53,0.0,19.53
-ATUL.NS,Atul Ltd.,Chemicals,Stage 3,15.8,8.87,189405093.05,Stage 3,watchlist,weekly_watchlist,watchlist,18.47,20.07,19.19,0.0,19.19
-UBL.NS,United Breweries Ltd.,Fast Moving Consumer Goods,Stage 3,10.03,-2.72,354164760.66,Stage 3,watchlist,weekly_watchlist,watchlist,13.11,22.06,17.14,2.0,19.14
-TCS.NS,Tata Consultancy Services Ltd.,Information Technology,Stage 4,-13.16,-10.25,8917510057.5,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.74,0.0,19.11,0.0,19.11
-RITES.NS,RITES Ltd.,Construction,Stage 4,-13.93,-18.32,124882127.03,Stage 4,watchlist,weekly_watchlist,watchlist,16.94,21.33,18.92,0.0,18.92
-MANYAVAR.NS,Vedant Fashions Ltd.,Consumer Services,Stage 4,-26.93,-41.37,250109514.88,Stage 4,watchlist,weekly_watchlist,watchlist,25.05,10.8,18.64,0.0,18.64
-PHOENIXLTD.NS,Phoenix Mills Ltd.,Realty,Stage 3,-5.62,2.42,836538385.14,Stage 3,watchlist,weekly_watchlist,watchlist,16.34,21.33,18.59,0.0,18.59
-JKTYRE.NS,JK Tyre & Industries Ltd.,Automobile and Auto Components,Stage 3,-7.37,15.35,743254493.84,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,12.57,14.8,13.57,5.0,18.57
-AMBER.NS,Amber Enterprises India Ltd.,Consumer Durables,Stage 1,11.73,-12.38,2460138424.68,Stage 1,watchlist,weekly_watchlist,watchlist,18.83,18.0,18.46,0.0,18.46
-LEMONTREE.NS,Lemon Tree Hotels Ltd.,Consumer Services,Stage 3,-22.52,-29.76,469578731.05,Stage 3,watchlist,weekly_watchlist,watchlist,16.0,21.33,18.4,0.0,18.4
-SRF.NS,SRF Ltd.,Chemicals,Stage 4,-6.56,-4.53,1580540442.62,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,21.33,18.4,0.0,18.4
-M&M.NS,Mahindra & Mahindra Ltd.,Automobile and Auto Components,Stage 1,-3.43,-5.68,12033046276.22,Stage 1,watchlist,weekly_watchlist,watchlist,19.0,6.4,13.33,5.0,18.33
-ETERNAL.NS,Eternal Ltd.,Consumer Services,Stage 3,-5.06,-21.46,13761574033.37,Stage 3,watchlist,weekly_watchlist,watchlist,22.0,13.2,18.04,0.0,18.04
-BANKBARODA.NS,Bank of Baroda,Financial Services,Stage 1,2.33,10.89,2963752026.64,Stage 1,watchlist,weekly_watchlist,watchlist,15.23,10.12,12.93,5.0,17.93
-NESTLEIND.NS,Nestle India Ltd.,Fast Moving Consumer Goods,Stage 1,7.62,11.82,1450259196.71,Stage 1,watchlist,weekly_watchlist,watchlist,19.97,10.74,15.82,2.0,17.82
-BAJAJ-AUTO.NS,Bajaj Auto Ltd.,Automobile and Auto Components,Stage 3,11.15,10.29,3260273879.05,Stage 3,watchlist,weekly_watchlist,watchlist,21.55,2.14,12.82,5.0,17.82
-TATATECH.NS,Tata Technologies Ltd.,Information Technology,Stage 4,-6.11,-14.17,594061351.43,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,28.88,3.6,17.5,0.0,17.5
-AMBUJACEM.NS,Ambuja Cements Ltd.,Construction Materials,Stage 4,-13.5,-20.43,1464099287.39,Stage 4,watchlist,weekly_watchlist,watchlist,20.04,14.0,17.32,0.0,17.32
-MPHASIS.NS,MphasiS Ltd.,Information Technology,Stage 4,-13.45,-13.87,1205979262.68,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,28.05,3.6,17.05,0.0,17.05
-LT.NS,Larsen & Toubro Ltd.,Construction,Stage 1,0.82,6.41,18003310680.38,Stage 1,watchlist,weekly_watchlist,watchlist,15.22,18.72,16.8,0.0,16.8
-UPL.NS,UPL Ltd.,Chemicals,Stage 3,-9.96,-2.12,1647730943.19,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,12.84,21.33,16.66,0.0,16.66
-SBILIFE.NS,SBI Life Insurance Company Ltd.,Financial Services,Stage 3,3.81,10.57,2072392501.24,Stage 3,watchlist,weekly_watchlist,watchlist,19.78,1.44,11.53,5.0,16.53
-COFORGE.NS,Coforge Ltd.,Information Technology,Stage 4,-18.86,-19.96,3944162011.17,Stage 4,watchlist,weekly_watchlist,watchlist,25.0,6.0,16.45,0.0,16.45
-MUTHOOTFIN.NS,Muthoot Finance Ltd.,Financial Services,Stage 3,-2.25,13.92,3712006313.23,Stage 3,watchlist,weekly_watchlist,watchlist,17.17,3.57,11.05,5.0,16.05
-BATAINDIA.NS,Bata India Ltd.,Consumer Durables,Stage 4,-20.52,-38.4,169443792.25,Stage 4,watchlist,weekly_watchlist,watchlist,16.97,14.0,15.63,0.0,15.63
-HINDUNILVR.NS,Hindustan Unilever Ltd.,Fast Moving Consumer Goods,Stage 3,3.63,-8.54,4338094746.84,Stage 3,watchlist,weekly_watchlist,watchlist,13.17,14.0,13.54,2.0,15.54
-KEC.NS,Kec International Ltd.,Construction,Stage 4,-14.84,-30.63,483977965.09,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,14.0,15.1,0.0,15.1
-SWIGGY.NS,Swiggy Ltd.,Consumer Services,Stage 4,-18.59,-29.28,3411444638.43,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,14.0,15.1,0.0,15.1
-SAPPHIRE.NS,Sapphire Foods India Ltd.,Consumer Services,Stage 4,-25.51,-40.13,154349324.34,Stage 4,watchlist,weekly_watchlist,watchlist,15.5,14.0,14.82,0.0,14.82
-CENTURYPLY.NS,Century Plyboards (India) Ltd.,Consumer Durables,Stage 3,-0.36,-1.72,43940165.68,Stage 3,watchlist,weekly_watchlist,watchlist,15.17,14.0,14.64,0.0,14.64
-DALBHARAT.NS,Dalmia Bharat Ltd.,Construction Materials,Stage 4,-1.27,-10.45,486156311.1,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,24.47,2.4,14.54,0.0,14.54
-SBIN.NS,State Bank of India,Financial Services,Stage 3,19.0,27.92,18046933477.09,Stage 3,watchlist,weekly_watchlist,watchlist,12.69,4.69,9.09,5.0,14.09
-ITC.NS,ITC Ltd.,Fast Moving Consumer Goods,Stage 4,-13.18,-15.97,7132918935.56,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,6.0,11.5,2.0,13.5
-INDIAMART.NS,Indiamart Intermesh Ltd.,Consumer Services,Stage 4,2.28,-7.16,329946963.57,Stage 4,watchlist,weekly_watchlist,watchlist,8.62,14.0,11.04,0.0,11.04
-VMM.NS,Vishal Mega Mart Ltd.,Consumer Services,Stage 4,-9.78,-19.05,6620311548.9,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,15.13,2.4,9.4,0.0,9.4
+GPIL.NS,Godawari Power & Ispat Ltd.,Capital Goods,Stage 2,20.47,11.54,591921860.38,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok, weekly_strong",forming_vcp,weekly_breakout,watchlist,82.77,63.87,74.27,10.0,84.27
+GMDCLTD.NS,Gujarat Mineral Development Corporation Ltd.,Metals & Mining,Stage 2,8.91,2.8,2284760821.27,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok",forming_vcp,weekly_near_pivot,building_setup,78.06,52.17,66.41,10.0,76.41
+POWERINDIA.NS,Hitachi Energy India Ltd.,Capital Goods,Stage 2,47.23,39.28,3254240847.3,"Stage 2, trend_template_ok, daily_vcp_ok, volume_dryup",near_pivot,weekly_watchlist,watchlist,85.81,42.0,66.1,10.0,76.1
+GRANULES.NS,Granules India Ltd.,Healthcare,Stage 2,14.66,28.53,517351142.52,"Stage 2, trend_template_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_breakout,watchlist,63.66,64.32,63.96,10.0,73.96
+KIRLOSENG.NS,Kirloskar Oil Eng Ltd.,Capital Goods,Stage 2,19.53,50.9,545893064.93,"Stage 2, trend_template_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_forming,watchlist,66.35,59.71,63.36,10.0,73.36
+APARINDS.NS,Apar Industries Ltd.,Capital Goods,Stage 2,35.7,30.45,1403716613.2,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,72.74,47.95,61.58,10.0,71.58
+HEG.NS,H.E.G. Ltd.,Capital Goods,Stage 2,14.94,18.99,1865087265.03,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,79.04,37.39,60.3,10.0,70.3
+ABSLAMC.NS,Aditya Birla Sun Life AMC Ltd.,Financial Services,Stage 2,29.91,20.52,763602710.93,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok",forming_vcp,weekly_near_pivot,building_setup,72.74,56.04,65.22,5.0,70.22
+ONGC.NS,Oil & Natural Gas Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 2,35.76,33.29,7699545141.09,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,70.0,48.24,60.21,10.0,70.21
+NLCINDIA.NS,NLC India Ltd.,Power,Stage 2,22.44,7.16,680794309.47,"Stage 2, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_breakout,watchlist,56.86,63.63,59.91,10.0,69.91
+IPCALAB.NS,Ipca Laboratories Ltd.,Healthcare,Stage 2,24.82,23.01,395446226.72,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_breakout,watchlist,54.3,65.45,59.32,10.0,69.32
+EMCURE.NS,Emcure Pharmaceuticals Ltd.,Healthcare,Stage 2,29.83,34.83,607046040.09,"Stage 2, trend_template_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,74.02,39.8,58.62,10.0,68.62
+COALINDIA.NS,Coal India Ltd.,Oil Gas & Consumable Fuels,Stage 2,24.84,27.23,6525456892.02,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_near_pivot,watchlist,44.69,73.21,57.52,10.0,67.52
+GLENMARK.NS,Glenmark Pharmaceuticals Ltd.,Healthcare,Stage 2,20.66,17.0,1355284671.97,"Stage 2, trend_template_ok, weekly_vcp_ok",watchlist,weekly_near_pivot,watchlist,58.66,54.77,56.91,10.0,66.91
+GVT&D.NS,GE Vernova T&D India Ltd.,Capital Goods,Stage 2,34.61,33.27,2279045675.58,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,68.96,40.79,56.28,10.0,66.28
+LUPIN.NS,Lupin Ltd.,Healthcare,Stage 2,23.24,26.61,2300919302.43,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_near_pivot,watchlist,39.83,72.98,54.75,10.0,64.75
+INOXINDIA.NS,INOX India Ltd.,Capital Goods,Stage 3,21.08,8.27,129475402.26,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,50.94,58.94,54.54,10.0,64.54
+SAILIFE.NS,Sai Life Sciences Ltd.,Healthcare,Stage 2,22.67,19.86,770893607.47,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,61.78,45.59,54.49,10.0,64.49
+ASTRAL.NS,Astral Ltd.,Capital Goods,Stage 2,29.19,21.89,1267236464.17,"Stage 2, weekly_vcp_ok, weekly_strong",watchlist,weekly_near_pivot,watchlist,44.83,65.77,54.25,10.0,64.25
+CCL.NS,CCL Products (I) Ltd.,Fast Moving Consumer Goods,Stage 2,25.26,24.81,276881704.76,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,74.12,46.34,61.62,2.0,63.62
+ANANDRATHI.NS,Anand Rathi Wealth Ltd.,Financial Services,Stage 2,11.73,11.54,556360401.03,"Stage 2, trend_template_ok, daily_vcp_ok, weekly_vcp_ok",forming_vcp,weekly_near_pivot,building_setup,62.22,53.33,58.22,5.0,63.22
+APOLLOHOSP.NS,Apollo Hospitals Enterprise Ltd.,Healthcare,Stage 3,18.34,8.23,3522732504.18,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,52.37,51.32,51.9,10.0,61.9
+CHENNPETRO.NS,Chennai Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 2,28.57,36.74,3680005669.33,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,63.76,32.53,49.71,10.0,59.71
+CUMMINSIND.NS,Cummins India Ltd.,Capital Goods,Stage 2,19.75,25.97,4359059472.51,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,58.57,38.57,49.57,10.0,59.57
+ADANIPOWER.NS,Adani Power Ltd.,Power,Stage 3,20.96,15.86,4350237461.67,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,46.8,52.35,49.3,10.0,59.3
+GESHIP.NS,Great Eastern Shipping Co. Ltd.,Services,Stage 2,42.69,48.74,967374058.09,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,70.12,32.8,53.33,5.0,58.33
+NTPC.NS,NTPC Ltd.,Power,Stage 2,29.49,19.15,5377719936.09,"Stage 2, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,66.02,24.86,47.5,10.0,57.5
+AUROPHARMA.NS,Aurobindo Pharma Ltd.,Healthcare,Stage 2,21.2,27.74,2011442868.24,Stage 2,watchlist,weekly_watchlist,watchlist,52.9,38.89,46.6,10.0,56.6
+OIL.NS,Oil India Ltd.,Oil Gas & Consumable Fuels,Stage 3,33.21,29.66,3459212924.3,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,47.5,45.29,46.51,10.0,56.51
+POWERGRID.NS,Power Grid Corporation of India Ltd.,Power,Stage 3,25.28,12.93,5638992944.6,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,49.16,42.82,46.31,10.0,56.31
+SUNPHARMA.NS,Sun Pharmaceutical Industries Ltd.,Healthcare,Stage 2,17.7,20.29,5236219413.72,Stage 2,watchlist,weekly_watchlist,watchlist,46.0,45.13,45.61,10.0,55.61
+ABB.NS,ABB India Ltd.,Capital Goods,Stage 3,30.5,25.9,2392507337.22,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,38.25,54.31,45.48,10.0,55.48
+WELCORP.NS,Welspun Corp Ltd.,Capital Goods,Stage 3,14.0,2.25,425530899.38,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,48.65,40.63,45.04,10.0,55.04
+DRREDDY.NS,Dr. Reddy's Laboratories Ltd.,Healthcare,Stage 3,13.69,8.07,2357782900.0,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,40.09,50.84,44.93,10.0,54.93
+BHARATFORG.NS,Bharat Forge Ltd.,Automobile and Auto Components,Stage 2,31.78,47.39,2596175376.43,"Stage 2, trend_template_ok, daily_vcp_ok",forming_vcp,weekly_watchlist,watchlist,66.49,29.52,49.85,5.0,54.85
+PRAJIND.NS,Praj Industries Ltd.,Capital Goods,Stage 3,7.79,-4.93,1365928796.96,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.46,56.29,44.83,10.0,54.83
+JBCHEPHARM.NS,J.B. Chemicals & Pharmaceuticals Ltd.,Healthcare,Stage 2,26.55,31.44,759160078.53,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,57.8,28.2,44.48,10.0,54.48
+TORNTPHARM.NS,Torrent Pharmaceuticals Ltd.,Healthcare,Stage 2,25.24,28.16,1546099925.23,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,58.88,25.34,43.79,10.0,53.79
+ASHOKLEY.NS,Ashok Leyland Ltd.,Capital Goods,Stage 3,6.07,24.76,3973459687.55,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,37.69,51.08,43.72,10.0,53.72
+AKUMS.NS,Akums Drugs and Pharmaceuticals Ltd.,Healthcare,Stage 3,18.99,9.15,75182052.46,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,36.66,51.48,43.33,10.0,53.33
+NATIONALUM.NS,National Aluminium Co. Ltd.,Metals & Mining,Stage 2,35.13,94.36,6691744306.38,"Stage 2, trend_template_ok",watchlist,weekly_watchlist,watchlist,52.66,31.6,43.18,10.0,53.18
+J&KBANK.NS,Jammu & Kashmir Bank Ltd.,Financial Services,Stage 3,28.76,18.9,1266233047.42,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,37.43,60.77,47.93,5.0,52.93
+ZENTEC.NS,Zen Technologies Ltd.,Capital Goods,Stage 3,11.36,-2.21,941516016.29,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.09,56.91,42.71,10.0,52.71
+WAAREEENER.NS,Waaree Energies Ltd.,Capital Goods,Stage 3,14.22,-2.0,6523253725.96,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.22,49.89,42.37,10.0,52.37
+NTPCGREEN.NS,NTPC Green Energy Ltd.,Power,Stage 3,14.95,2.23,2720566219.98,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.72,50.38,42.32,10.0,52.32
+MAHSEAMLES.NS,Maharashtra Seamless Ltd.,Capital Goods,Stage 3,14.91,2.65,147865707.19,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.63,57.76,42.29,10.0,52.29
+ALKEM.NS,Alkem Laboratories Ltd.,Healthcare,Stage 1,9.5,6.51,599489513.98,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.16,61.6,42.11,10.0,52.11
+THERMAX.NS,Thermax Ltd.,Capital Goods,Stage 3,19.25,4.52,548481371.08,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.38,51.04,41.88,10.0,51.88
+TIMKEN.NS,Timken India Ltd.,Capital Goods,Stage 3,20.92,18.3,257743463.35,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,40.92,42.92,41.82,10.0,51.82
+RPOWER.NS,Reliance Power Ltd.,Power,Stage 4,-28.86,-44.71,1267367318.26,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.32,48.0,41.58,10.0,51.58
+KSB.NS,KSB Ltd.,Capital Goods,Stage 3,17.43,2.23,1003807590.36,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,49.02,31.3,41.05,10.0,51.05
+BALRAMCHIN.NS,Balrampur Chini Mills Ltd.,Fast Moving Consumer Goods,Stage 3,26.07,15.99,648866885.85,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,45.91,52.87,49.04,2.0,51.04
+FORTIS.NS,Fortis Healthcare Ltd.,Healthcare,Stage 3,2.93,-5.89,1627180085.15,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.33,48.0,41.03,10.0,51.03
+TORNTPOWER.NS,Torrent Power Ltd.,Power,Stage 3,17.88,17.4,890039905.19,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.65,51.53,40.6,10.0,50.6
+NAVINFLUOR.NS,Navin Fluorine International Ltd.,Chemicals,Stage 3,15.79,38.53,1170857925.85,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,40.77,61.43,50.07,0.0,50.07
+LLOYDSME.NS,Lloyds Metals And Energy Ltd.,Metals & Mining,Stage 3,6.03,7.46,895386254.4,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,39.35,40.35,39.8,10.0,49.8
+HINDCOPPER.NS,Hindustan Copper Ltd.,Metals & Mining,Stage 3,16.63,69.44,5894299709.32,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,26.0,56.0,39.5,10.0,49.5
+ABBOTINDIA.NS,Abbott India Ltd.,Healthcare,Stage 4,3.13,-4.11,264899868.75,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.99,56.0,39.49,10.0,49.49
+AJANTPHARM.NS,Ajanta Pharmaceuticals Ltd.,Healthcare,Stage 3,15.39,20.91,383349552.22,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.88,59.63,39.42,10.0,49.42
+TATAPOWER.NS,Tata Power Co. Ltd.,Power,Stage 3,14.33,8.16,3644024364.21,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,45.15,31.58,39.04,10.0,49.04
+CASTROLIND.NS,Castrol India Ltd.,Oil Gas & Consumable Fuels,Stage 4,5.81,-1.82,386683836.96,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.74,39.4,39.04,10.0,49.04
+CESC.NS,CESC Ltd.,Power,Stage 4,3.47,2.8,424395588.62,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.37,49.29,38.33,10.0,48.33
+BHEL.NS,Bharat Heavy Electricals Ltd.,Capital Goods,Stage 1,3.24,17.32,2423756078.19,"Stage 1, volume_dryup",watchlist,weekly_watchlist,watchlist,40.23,35.39,38.05,10.0,48.05
+GRAPHITE.NS,Graphite India Ltd.,Capital Goods,Stage 3,22.56,21.26,1279178609.52,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,40.06,35.38,37.95,10.0,47.95
+MCX.NS,Multi Commodity Exchange of India Ltd.,Financial Services,Stage 3,21.21,60.06,9760857786.37,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.91,59.6,42.72,5.0,47.72
+SJVN.NS,SJVN Ltd.,Power,Stage 4,3.35,-17.97,391846505.88,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.6,40.67,37.33,10.0,47.33
+VTL.NS,Vardhman Textiles Ltd.,Textiles,Stage 3,30.69,36.07,280005138.16,Stage 3,watchlist,weekly_watchlist,watchlist,47.48,36.01,42.32,5.0,47.32
+ASTRAZEN.NS,AstraZenca Pharma India Ltd.,Healthcare,Stage 1,-0.78,-0.14,68817126.45,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.0,44.67,37.15,10.0,47.15
+SARDAEN.NS,Sarda Energy and Minerals Ltd.,Metals & Mining,Stage 1,9.91,-3.01,435323822.07,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.29,35.69,37.12,10.0,47.12
+JINDALSAW.NS,Jindal Saw Ltd.,Capital Goods,Stage 3,24.68,-5.07,2715718664.34,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,33.96,40.96,37.11,10.0,47.11
+BIOCON.NS,Biocon Ltd.,Healthcare,Stage 1,6.3,12.44,1390421783.88,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.76,44.87,37.11,10.0,47.11
+IOC.NS,Indian Oil Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 1,-0.27,7.29,3999427821.29,"Stage 1, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.01,35.7,36.97,10.0,46.97
+NAVA.NS,Nava Ltd.,Power,Stage 3,11.76,-12.0,169845748.82,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.25,56.0,36.89,10.0,46.89
+FINCABLES.NS,Finolex Cables Ltd.,Capital Goods,Stage 3,17.85,6.9,878728511.17,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.43,43.14,36.7,10.0,46.7
+BPCL.NS,Bharat Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 1,-7.87,-0.84,4838076647.97,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.0,52.0,36.6,10.0,46.6
+ARE&M.NS,Amara Raja Energy & Mobility Ltd.,Automobile and Auto Components,Stage 4,-11.46,-20.7,307165176.78,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.12,48.0,41.47,5.0,46.47
+LINDEINDIA.NS,Linde India Ltd.,Chemicals,Stage 3,34.74,19.18,498568580.02,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,48.12,44.39,46.44,0.0,46.44
+USHAMART.NS,Usha Martin Ltd.,Capital Goods,Stage 3,4.84,0.83,171999002.16,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,41.23,29.9,36.13,10.0,46.13
+JUBLPHARMA.NS,Jubilant Pharmova Ltd.,Healthcare,Stage 4,-8.73,-12.51,141002121.83,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,32.37,40.67,36.11,10.0,46.11
+ACE.NS,Action Construction Equipment Ltd.,Capital Goods,Stage 4,-5.22,-22.07,199156125.02,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.93,40.67,35.86,10.0,45.86
+RAMCOCEM.NS,The Ramco Cements Ltd.,Construction Materials,Stage 1,-1.43,-3.53,215909071.28,"Stage 1, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,40.75,52.0,45.81,0.0,45.81
+WOCKPHARMA.NS,Wockhardt Ltd.,Healthcare,Stage 4,-4.36,-10.84,731834315.57,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.78,48.0,35.78,10.0,45.78
+HAL.NS,Hindustan Aeronautics Ltd.,Capital Goods,Stage 4,-5.23,-14.07,6690601980.59,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.32,40.67,35.53,10.0,45.53
+PTCIL.NS,PTC Industries Ltd.,Capital Goods,Stage 3,-2.01,11.84,319915752.2,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.23,31.98,35.42,10.0,45.42
+POLYMED.NS,Poly Medicure Ltd.,Healthcare,Stage 4,-17.27,-28.63,370167787.1,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,25.08,48.0,35.39,10.0,45.39
+MEDANTA.NS,Global Health Ltd.,Healthcare,Stage 4,-3.44,-16.05,199493579.4,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.0,40.67,34.8,10.0,44.8
+PPLPHARMA.NS,Piramal Pharma Ltd.,Healthcare,Stage 4,-4.89,-17.55,489180540.36,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.0,40.67,34.8,10.0,44.8
+SYNGENE.NS,Syngene International Ltd.,Healthcare,Stage 4,-23.81,-25.84,670367616.38,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.0,40.67,34.8,10.0,44.8
+DATAPATTNS.NS,Data Patterns (India) Ltd.,Capital Goods,Stage 3,30.46,24.5,4139166282.27,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,33.34,36.5,34.76,10.0,44.76
+NATCOPHARM.NS,NATCO Pharma Ltd.,Healthcare,Stage 3,20.62,24.31,1115109200.02,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,35.49,33.83,34.74,10.0,44.74
+BSE.NS,BSE Ltd.,Financial Services,Stage 3,17.65,43.21,12452935714.87,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,33.84,46.75,39.65,5.0,44.65
+HYUNDAI.NS,Hyundai Motor India Ltd.,Automobile and Auto Components,Stage 1,-9.02,-24.74,1183699462.77,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.0,51.2,39.54,5.0,44.54
+SCHAEFFLER.NS,Schaeffler India Ltd.,Automobile and Auto Components,Stage 3,17.48,6.88,451630466.4,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.42,43.1,39.43,5.0,44.43
+REDINGTON.NS,Redington Ltd.,Services,Stage 4,-13.22,-17.43,3406243231.06,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,32.3,48.0,39.37,5.0,44.37
+NHPC.NS,NHPC Ltd.,Power,Stage 3,12.22,-0.3,1408686906.91,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,37.46,30.52,34.34,10.0,44.34
+MGL.NS,Mahanagar Gas Ltd.,Oil Gas & Consumable Fuels,Stage 4,-3.7,-16.36,620620008.06,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.96,40.67,34.23,10.0,44.23
+HINDALCO.NS,Hindalco Industries Ltd.,Metals & Mining,Stage 3,12.0,26.29,6226421519.77,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.83,51.83,34.23,10.0,44.23
+PFC.NS,Power Finance Corporation Ltd.,Financial Services,Stage 3,26.38,8.48,3711202617.05,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,36.54,42.49,39.22,5.0,44.22
+MAZDOCK.NS,Mazagoan Dock Shipbuilders Ltd.,Capital Goods,Stage 4,-1.92,-16.71,6491722560.88,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.82,40.67,34.15,10.0,44.15
+CUB.NS,City Union Bank Ltd.,Financial Services,Stage 3,-0.51,29.53,714794171.21,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.16,50.9,38.94,5.0,43.94
+AARTIIND.NS,Aarti Industries Ltd.,Chemicals,Stage 3,23.6,18.22,396842925.32,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,30.31,60.18,43.75,0.0,43.75
+GRSE.NS,Garden Reach Shipbuilders & Engineers Ltd.,Capital Goods,Stage 4,-4.2,-14.1,2650670510.97,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.01,40.67,33.71,10.0,43.71
+BEL.NS,Bharat Electronics Ltd.,Capital Goods,Stage 3,14.72,12.12,9156117013.73,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.46,50.68,33.51,10.0,43.51
+APLLTD.NS,Alembic Pharmaceuticals Ltd.,Healthcare,Stage 4,-8.25,-17.47,78485931.78,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.38,40.67,33.36,10.0,43.36
+GODIGIT.NS,Go Digit General Insurance Ltd.,Financial Services,Stage 1,6.61,1.1,105696793.89,"Stage 1, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,25.94,53.44,38.31,5.0,43.31
+GSPL.NS,Gujarat State Petronet Ltd.,Oil Gas & Consumable Fuels,Stage 4,-7.96,-17.88,337257981.72,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.27,40.67,33.3,10.0,43.3
+GILLETTE.NS,Gillette India Ltd.,Fast Moving Consumer Goods,Stage 4,2.78,-13.16,181293761.47,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.72,48.0,41.25,2.0,43.25
+ZYDUSLIFE.NS,Zydus Lifesciences Ltd.,Healthcare,Stage 4,11.08,-4.11,606935541.1,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,41.81,22.7,33.21,10.0,43.21
+GUJGASLTD.NS,Gujarat Gas Ltd.,Oil Gas & Consumable Fuels,Stage 4,-6.2,-17.29,1178982549.37,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.0,40.67,33.15,10.0,43.15
+JPPOWER.NS,Jaiprakash Power Ventures Ltd.,Power,Stage 4,-2.2,-8.97,1772139022.92,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.87,31.0,33.13,10.0,43.13
+BAJAJHFL.NS,Bajaj Housing Finance Ltd.,Financial Services,Stage 4,-7.56,-22.82,670212322.3,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.0,48.0,38.1,5.0,43.1
+YESBANK.NS,Yes Bank Ltd.,Financial Services,Stage 3,-3.09,-5.15,2061689791.45,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.0,48.0,38.1,5.0,43.1
+SHYAMMETL.NS,Shyam Metalics and Energy Ltd.,Capital Goods,Stage 4,6.85,-6.83,170596564.29,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.89,40.67,33.09,10.0,43.09
+ANGELONE.NS,Angel One Ltd.,Financial Services,Stage 3,8.5,17.89,1943904735.47,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.64,50.64,37.99,5.0,42.99
+HDFCLIFE.NS,HDFC Life Insurance Company Ltd.,Financial Services,Stage 4,-5.76,-11.44,2192345246.57,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.7,48.0,37.94,5.0,42.94
+INOXWIND.NS,Inox Wind Ltd.,Capital Goods,Stage 4,-24.59,-35.73,1060686042.86,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.6,40.67,32.93,10.0,42.93
+GRASIM.NS,Grasim Industries Ltd.,Construction Materials,Stage 1,5.98,2.95,3481240066.55,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.72,52.89,42.9,0.0,42.9
+PNBHOUSING.NS,PNB Housing Finance Ltd.,Financial Services,Stage 4,-3.09,-1.37,738591970.1,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.97,56.0,37.83,5.0,42.83
+CONCORDBIO.NS,Concord Biotech Ltd.,Healthcare,Stage 4,-11.56,-28.39,507088429.09,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,26.0,40.67,32.6,10.0,42.6
+DELHIVERY.NS,Delhivery Ltd.,Services,Stage 3,17.99,3.36,762861494.54,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,48.56,24.13,37.57,5.0,42.57
+GODREJIND.NS,Godrej Industries Ltd.,Diversified,Stage 4,-10.25,-25.58,68059292.04,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,34.27,48.0,40.45,2.0,42.45
+METROPOLIS.NS,Metropolis Healthcare Ltd.,Healthcare,Stage 1,2.53,-7.73,138820006.72,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.0,35.0,32.25,10.0,42.25
+ACMESOLAR.NS,ACME Solar Holdings Ltd.,Power,Stage 3,29.38,4.3,635282827.68,"Stage 3, daily_vcp_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,44.37,17.37,32.22,10.0,42.22
+DMART.NS,Avenue Supermarts Ltd.,Consumer Services,Stage 3,15.77,-6.65,2104058014.84,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,43.91,39.91,42.11,0.0,42.11
+LICHSGFIN.NS,LIC Housing Finance Ltd.,Financial Services,Stage 4,6.52,-3.53,1025571360.11,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.3,56.3,37.05,5.0,42.05
+JSWINFRA.NS,JSW Infrastructure Ltd.,Services,Stage 4,-0.88,-17.59,447912708.82,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,35.42,39.0,37.03,5.0,42.03
+GLAND.NS,Gland Pharma Ltd.,Healthcare,Stage 1,17.2,-5.19,158263050.93,"Stage 1, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,42.2,19.2,31.85,10.0,41.85
+IIFL.NS,IIFL Finance Ltd.,Financial Services,Stage 3,-11.94,11.56,554501764.41,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,29.0,46.0,36.65,5.0,41.65
+MAHSCOOTER.NS,Maharashtra Scooters Ltd.,Financial Services,Stage 3,-4.57,-25.21,87045687.55,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.12,48.0,36.52,5.0,41.52
+SBICARD.NS,SBI Cards and Payment Services Ltd.,Financial Services,Stage 4,-9.07,-14.22,1146301586.22,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,33.0,40.67,36.45,5.0,41.45
+PREMIERENE.NS,Premier Energies Ltd.,Capital Goods,Stage 3,14.63,-5.11,2124747353.05,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,38.95,22.29,31.45,10.0,41.45
+HINDZINC.NS,Hindustan Zinc Ltd.,Metals & Mining,Stage 3,-7.26,21.88,3678497649.93,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,30.46,32.46,31.36,10.0,41.36
+FORCEMOT.NS,Force Motors Ltd.,Automobile and Auto Components,Stage 3,23.2,22.47,2267565924.4,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,22.94,52.57,36.27,5.0,41.27
+GICRE.NS,General Insurance Corporation of India,Financial Services,Stage 3,10.49,9.38,115563793.35,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,18.48,57.99,36.26,5.0,41.26
+SYRMA.NS,Syrma SGS Technology Ltd.,Capital Goods,Stage 3,23.62,4.65,1041860447.78,Stage 3,watchlist,weekly_watchlist,watchlist,30.44,32.16,31.21,10.0,41.21
+TRIVENI.NS,Triveni Engineering & Industries Ltd.,Fast Moving Consumer Goods,Stage 3,10.7,21.33,584839442.42,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,36.68,42.2,39.16,2.0,41.16
+CRISIL.NS,CRISIL Ltd.,Financial Services,Stage 4,2.94,-9.79,212221411.55,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.16,48.0,35.99,5.0,40.99
+INDGN.NS,Indegene Ltd.,Healthcare,Stage 4,-0.42,-11.67,188604080.76,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.56,40.67,30.71,10.0,40.71
+ESCORTS.NS,Escorts Kubota Ltd.,Capital Goods,Stage 3,-10.04,-13.43,461853394.34,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.51,40.67,30.68,10.0,40.68
+360ONE.NS,360 ONE WAM Ltd.,Financial Services,Stage 1,-5.57,5.68,829421595.79,"Stage 1, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.26,44.68,35.65,5.0,40.65
+OLECTRA.NS,Olectra Greentech Ltd.,Automobile and Auto Components,Stage 3,-4.42,-28.3,1726530693.51,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.0,48.67,35.65,5.0,40.65
+ASTERDM.NS,Aster DM Healthcare Ltd.,Healthcare,Stage 3,20.81,14.92,619365140.57,Stage 3,watchlist,weekly_watchlist,watchlist,34.77,25.57,30.63,10.0,40.63
+JSWENERGY.NS,JSW Energy Ltd.,Power,Stage 3,13.84,-0.07,2088047811.26,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,22.38,40.38,30.48,10.0,40.48
+MSUMI.NS,Motherson Sumi Wiring India Ltd.,Automobile and Auto Components,Stage 1,-3.31,-10.32,295886876.45,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.94,44.67,35.47,5.0,40.47
+LALPATHLAB.NS,Dr. Lal Path Labs Ltd.,Healthcare,Stage 3,7.31,-10.06,430510537.39,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.01,40.67,30.41,10.0,40.41
+SUNDRMFAST.NS,Sundram Fasteners Ltd.,Automobile and Auto Components,Stage 4,-6.05,-16.34,290371403.32,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,39.0,31.0,35.4,5.0,40.4
+AEGISLOG.NS,Aegis Logistics Ltd.,Oil Gas & Consumable Fuels,Stage 4,-2.99,-12.42,534655549.53,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,10.0,40.4
+JYOTICNC.NS,Jyoti CNC Automation Ltd.,Capital Goods,Stage 4,-10.82,-7.14,768000444.93,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,10.0,40.4
+OFSS.NS,Oracle Financial Services Software Ltd.,Information Technology,Stage 4,2.04,-12.81,1298061502.97,"Stage 4, weekly_vcp_ok, daily_breakout_volume",watchlist,weekly_watchlist,watchlist,48.0,31.0,40.35,0.0,40.35
+DOMS.NS,DOMS Industries Ltd.,Fast Moving Consumer Goods,Stage 3,-0.03,-4.77,949913722.15,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.83,56.0,38.31,2.0,40.31
+SAREGAMA.NS,Saregama India Ltd,Media Entertainment & Publication,Stage 4,7.01,-21.35,143856691.57,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.63,48.67,38.2,2.0,40.2
+HFCL.NS,HFCL Ltd.,Telecommunication,Stage 3,27.82,2.85,1563461729.15,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,42.7,32.4,38.07,2.0,40.07
+IGIL.NS,International Gemmological Institute (India) Ltd.,Services,Stage 4,10.71,-3.43,271658413.57,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.26,49.39,35.02,5.0,40.02
+RKFORGE.NS,Ramkrishna Forgings Ltd.,Automobile and Auto Components,Stage 4,8.09,-3.8,184740544.44,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.86,41.1,34.92,5.0,39.92
+BEML.NS,BEML Ltd.,Capital Goods,Stage 4,-10.63,-23.89,433879266.63,Stage 4,watchlist,weekly_watchlist,watchlist,36.72,21.33,29.79,10.0,39.79
+KIMS.NS,Krishna Institute of Medical Sciences Ltd.,Healthcare,Stage 1,14.33,-3.06,225551566.23,"Stage 1, volume_dryup",watchlist,weekly_watchlist,watchlist,32.49,26.46,29.78,10.0,39.78
+NAUKRI.NS,Info Edge (India) Ltd.,Consumer Services,Stage 4,-14.54,-18.81,2147095324.7,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,33.0,48.0,39.75,0.0,39.75
+MINDACORP.NS,Minda Corporation Ltd.,Automobile and Auto Components,Stage 3,3.75,0.73,137197959.86,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.55,41.11,34.75,5.0,39.75
+ADANIGREEN.NS,Adani Green Energy Ltd.,Power,Stage 4,-5.52,-14.65,2710348722.11,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.72,31.0,29.75,10.0,39.75
+BANDHANBNK.NS,Bandhan Bank Ltd.,Financial Services,Stage 1,15.49,3.3,2038719913.08,"Stage 1, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,32.88,36.88,34.68,5.0,39.68
+SAIL.NS,Steel Authority of India Ltd.,Metals & Mining,Stage 3,23.4,16.77,3141319171.25,Stage 3,watchlist,weekly_watchlist,watchlist,33.23,25.35,29.68,10.0,39.68
+GRAVITA.NS,Gravita India Ltd.,Metals & Mining,Stage 4,-12.5,-5.26,393467075.17,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.22,31.0,29.47,10.0,39.47
+AADHARHFC.NS,Aadhar Housing Finance Ltd.,Financial Services,Stage 1,7.0,-6.13,219124441.61,"Stage 1, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,27.21,43.09,34.36,5.0,39.36
+SIEMENS.NS,Siemens Ltd.,Capital Goods,Stage 4,11.12,3.43,1305742910.89,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.74,22.79,29.36,10.0,39.36
+MANAPPURAM.NS,Manappuram Finance Ltd.,Financial Services,Stage 1,-6.11,-1.85,1681265753.78,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.88,52.0,34.33,5.0,39.33
+RRKABEL.NS,R R Kabel Ltd.,Capital Goods,Stage 3,0.4,11.31,400617088.46,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,26.96,32.17,29.3,10.0,39.3
+BHARTIARTL.NS,Bharti Airtel Ltd.,Telecommunication,Stage 1,0.29,4.82,20767583186.42,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.77,52.51,37.25,2.0,39.25
+CENTRALBK.NS,Central Bank of India,Financial Services,Stage 4,2.72,-2.11,352881022.75,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.84,40.73,34.19,5.0,39.19
+GODREJCP.NS,Godrej Consumer Products Ltd.,Fast Moving Consumer Goods,Stage 4,-3.3,-4.87,1750811107.39,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.31,48.0,37.17,2.0,39.17
+SCI.NS,Shipping Corporation of India Ltd.,Services,Stage 3,15.81,10.26,931982501.05,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,34.61,33.61,34.16,5.0,39.16
+SUPREMEIND.NS,Supreme Industries Ltd.,Capital Goods,Stage 4,27.21,-4.24,1171592494.01,"Stage 4, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,33.12,24.3,29.15,10.0,39.15
+MAPMYINDIA.NS,C.E. Info Systems Ltd.,Information Technology,Stage 4,-37.02,-39.02,191686631.41,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.88,48.0,39.13,0.0,39.13
+STARHEALTH.NS,Star Health and Allied Insurance Company Ltd.,Financial Services,Stage 3,15.88,9.61,192638065.42,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,41.9,24.55,34.09,5.0,39.09
+POONAWALLA.NS,Poonawalla Fincorp Ltd.,Financial Services,Stage 1,-5.99,-11.46,557750464.55,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.25,44.67,33.99,5.0,38.99
+MRPL.NS,Mangalore Refinery & Petrochemicals Ltd.,Oil Gas & Consumable Fuels,Stage 3,34.84,48.28,5129477984.89,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.65,22.0,28.96,10.0,38.96
+GODREJAGRO.NS,Godrej Agrovet Ltd.,Fast Moving Consumer Goods,Stage 4,9.41,-14.23,107858293.85,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,41.6,31.0,36.83,2.0,38.83
+RELIANCE.NS,Reliance Industries Ltd.,Oil Gas & Consumable Fuels,Stage 3,-0.83,6.81,28106489611.83,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,33.88,22.6,28.8,10.0,38.8
+IGL.NS,Indraprastha Gas Ltd.,Oil Gas & Consumable Fuels,Stage 4,-9.17,-17.83,582999653.5,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,27.0,31.0,28.8,10.0,38.8
+ENDURANCE.NS,Endurance Technologies Ltd.,Automobile and Auto Components,Stage 3,1.34,-9.63,180464484.24,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.06,40.67,33.73,5.0,38.73
+BAYERCROP.NS,Bayer Cropscience Ltd.,Chemicals,Stage 4,11.73,0.68,115324094.83,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.24,49.91,38.54,0.0,38.54
+TTML.NS,Tata Teleservices (Maharashtra) Ltd.,Telecommunication,Stage 4,-21.22,-32.05,111088501.8,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.1,48.0,36.51,2.0,38.51
+KAJARIACER.NS,Kajaria Ceramics Ltd.,Consumer Durables,Stage 3,10.27,-11.78,320908868.69,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,38.0,39.0,38.45,0.0,38.45
+IRB.NS,IRB Infrastructure Developers Ltd.,Construction,Stage 4,9.84,6.16,353841244.93,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,28.6,50.27,38.35,0.0,38.35
+AKZOINDIA.NS,Akzo Nobel India Ltd.,Consumer Durables,Stage 3,7.07,-3.72,139394976.14,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.6,49.0,38.33,0.0,38.33
+JWL.NS,Jupiter Wagons Ltd.,Capital Goods,Stage 4,-15.01,-13.91,2381800724.83,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,26.0,31.0,28.25,10.0,38.25
+WIPRO.NS,Wipro Ltd.,Information Technology,Stage 4,-13.48,-10.31,3329276241.26,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.12,48.0,38.17,0.0,38.17
+CHAMBLFERT.NS,Chambal Fertilizers & Chemicals Ltd.,Chemicals,Stage 4,1.4,-10.99,372965888.73,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,36.1,40.67,38.16,0.0,38.16
+ATGL.NS,Adani Total Gas Ltd.,Oil Gas & Consumable Fuels,Stage 3,5.57,-11.37,6096602690.74,Stage 3,watchlist,weekly_watchlist,watchlist,27.0,29.33,28.05,10.0,38.05
+LTFOODS.NS,LT Foods Ltd.,Fast Moving Consumer Goods,Stage 4,5.06,-3.85,2679091280.82,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,26.12,48.12,36.02,2.0,38.02
+ZFCVINDIA.NS,ZF Commercial Vehicle Control Systems India Ltd.,Automobile and Auto Components,Stage 1,5.33,15.01,204744415.5,Stage 1,watchlist,weekly_watchlist,watchlist,37.53,27.37,32.96,5.0,37.96
+DIVISLAB.NS,Divi's Laboratories Ltd.,Healthcare,Stage 4,6.02,9.56,1729672388.95,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,17.4,40.56,27.82,10.0,37.82
+LAURUSLABS.NS,Laurus Labs Ltd.,Healthcare,Stage 3,5.69,20.32,1958138234.15,Stage 3,watchlist,weekly_watchlist,watchlist,36.99,16.6,27.81,10.0,37.81
+PNB.NS,Punjab National Bank,Financial Services,Stage 1,0.05,4.04,2297013363.46,"Stage 1, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.67,35.41,32.8,5.0,37.8
+IEX.NS,Indian Energy Exchange Ltd.,Financial Services,Stage 4,1.56,-5.01,772446137.28,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.81,48.67,32.8,5.0,37.8
+TARIL.NS,Transformers And Rectifiers (India) Ltd.,Capital Goods,Stage 4,4.61,-39.91,1210688819.99,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,25.15,31.0,27.78,10.0,37.78
+SAGILITY.NS,Sagility Ltd.,Information Technology,Stage 3,-7.96,5.81,1777174375.47,"Stage 3, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,29.4,48.0,37.77,0.0,37.77
+NIVABUPA.NS,Niva Bupa Health Insurance Company Ltd.,Financial Services,Stage 4,5.53,-4.53,159623462.49,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,34.1,31.1,32.75,5.0,37.75
+CDSL.NS,Central Depository Services (India) Ltd.,Financial Services,Stage 4,-8.29,-13.3,2542242425.56,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.27,40.67,32.75,5.0,37.75
+SHRIRAMFIN.NS,Shriram Finance Ltd.,Financial Services,Stage 3,6.83,54.79,9821014552.09,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,17.59,50.96,32.61,5.0,37.61
+NCC.NS,NCC Ltd.,Construction,Stage 4,-0.66,-24.93,479978009.14,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,35.08,40.67,37.6,0.0,37.6
+AIAENG.NS,AIA Engineering Ltd.,Capital Goods,Stage 1,0.44,22.51,328111594.12,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,19.66,37.3,27.6,10.0,37.6
+RADICO.NS,Radico Khaitan Ltd,Fast Moving Consumer Goods,Stage 1,-7.33,-1.4,1405763152.75,"Stage 1, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,36.0,35.0,35.55,2.0,37.55
+NETWEB.NS,Netweb Technologies India Ltd.,Information Technology,Stage 3,13.74,2.42,7654614503.37,"Stage 3, daily_vcp_ok, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,33.62,42.28,37.52,0.0,37.52
+CGPOWER.NS,CG Power and Industrial Solutions Ltd.,Capital Goods,Stage 3,14.76,-3.74,2153060258.23,Stage 3,watchlist,weekly_watchlist,watchlist,24.93,30.44,27.41,10.0,37.41
+IDFCFIRSTB.NS,IDFC First Bank Ltd.,Financial Services,Stage 3,-14.6,-2.33,3036167480.96,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,19.49,48.0,32.32,5.0,37.32
+NUVAMA.NS,Nuvama Wealth Management Ltd.,Financial Services,Stage 4,-8.8,10.11,462898138.67,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.38,48.13,32.32,5.0,37.32
+NEULANDLAB.NS,Neuland Laboratories Ltd.,Healthcare,Stage 1,-6.73,-10.34,395359183.25,"Stage 1, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,34.91,18.0,27.3,10.0,37.3
+CROMPTON.NS,Crompton Greaves Consumer Electricals Ltd.,Consumer Durables,Stage 4,3.15,-13.24,477434837.84,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,28.31,48.0,37.17,0.0,37.17
+CAPLIPOINT.NS,Caplin Point Laboratories Ltd.,Healthcare,Stage 4,-5.95,-21.74,114947962.13,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,23.99,31.0,27.14,10.0,37.14
+SBFC.NS,SBFC Finance Ltd.,Financial Services,Stage 4,-8.54,-15.9,178117933.61,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.05,40.67,32.08,5.0,37.08
+RAILTEL.NS,Railtel Corporation Of India Ltd.,Telecommunication,Stage 4,-18.18,-20.61,347889157.05,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.36,48.0,35.0,2.0,37.0
+VGUARD.NS,V-Guard Industries Ltd.,Consumer Durables,Stage 4,9.2,-4.15,83111971.9,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,33.5,41.17,36.95,0.0,36.95
+CHOLAHLDNG.NS,Cholamandalam Financial Holdings Ltd.,Financial Services,Stage 4,-12.55,-18.02,415537594.12,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.8,40.67,31.94,5.0,36.94
+ADANIENSOL.NS,Adani Energy Solutions Ltd.,Power,Stage 3,8.64,12.68,1786357054.69,Stage 3,watchlist,weekly_watchlist,watchlist,29.13,24.13,26.88,10.0,36.88
+SAMMAANCAP.NS,Sammaan Capital Ltd.,Financial Services,Stage 3,18.76,18.98,2235784903.13,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,36.77,25.77,31.82,5.0,36.82
+CEATLTD.NS,Ceat Ltd.,Automobile and Auto Components,Stage 3,2.47,9.57,559051874.96,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.47,41.87,31.75,5.0,36.75
+GMRAIRPORT.NS,GMR Airports Ltd.,Services,Stage 1,-0.33,9.38,1279371832.55,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,20.31,45.57,31.68,5.0,36.68
+TITAN.NS,Titan Company Ltd.,Consumer Durables,Stage 3,12.45,25.81,3728012935.52,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.62,52.49,36.61,0.0,36.61
+PIIND.NS,PI Industries Ltd.,Chemicals,Stage 4,-0.26,-13.08,701419826.14,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.06,48.0,36.48,0.0,36.48
+COROMANDEL.NS,Coromandel International Ltd.,Chemicals,Stage 4,-4.97,-3.77,870811784.85,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,33.0,40.67,36.45,0.0,36.45
+CYIENT.NS,Cyient Ltd.,Information Technology,Stage 4,-17.19,-23.3,274489211.87,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,32.9,40.67,36.4,0.0,36.4
+BAJAJHLDNG.NS,Bajaj Holdings & Investment Ltd.,Financial Services,Stage 4,-5.26,-21.36,585860746.9,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,39.6,21.33,31.38,5.0,36.38
+HSCL.NS,Himadri Speciality Chemical Ltd.,Chemicals,Stage 4,4.69,4.21,862397691.52,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,39.98,31.89,36.34,0.0,36.34
+HONASA.NS,Honasa Consumer Ltd.,Fast Moving Consumer Goods,Stage 3,21.09,8.39,183510325.61,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,36.03,32.28,34.34,2.0,36.34
+CONCOR.NS,Container Corporation of India Ltd.,Services,Stage 4,-2.5,-7.13,859817217.53,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.65,40.67,31.31,5.0,36.31
+JIOFIN.NS,Jio Financial Services Ltd.,Financial Services,Stage 4,-9.49,-16.26,3824332734.46,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.53,40.67,31.24,5.0,36.24
+TIINDIA.NS,Tube Investments of India Ltd.,Automobile and Auto Components,Stage 3,11.47,-12.27,1527124526.74,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,24.58,39.0,31.07,5.0,36.07
+MFSL.NS,Max Financial Services Ltd.,Financial Services,Stage 3,5.84,7.58,1475487735.36,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.12,42.01,31.07,5.0,36.07
+COCHINSHIP.NS,Cochin Shipyard Ltd.,Capital Goods,Stage 4,-11.04,-24.03,1589485008.74,Stage 4,watchlist,weekly_watchlist,watchlist,29.87,21.33,26.03,10.0,36.03
+NH.NS,Narayana Hrudayalaya Ltd.,Healthcare,Stage 4,0.66,4.36,565103795.38,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,21.5,31.5,26.0,10.0,36.0
+ELGIEQUIP.NS,Elgi Equipments Ltd.,Capital Goods,Stage 3,15.0,3.85,221267180.54,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,20.37,32.88,26.0,10.0,36.0
+FACT.NS,Fertilisers and Chemicals Travancore Ltd.,Chemicals,Stage 3,1.44,-9.56,2372318256.61,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.62,48.67,35.99,0.0,35.99
+FLUOROCHEM.NS,Gujarat Fluorochemicals Ltd.,Chemicals,Stage 4,-2.72,-9.79,286972184.89,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.84,40.67,35.81,0.0,35.81
+CHALET.NS,Chalet Hotels Ltd.,Consumer Services,Stage 4,-3.63,-18.94,130573640.69,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,31.8,40.67,35.79,0.0,35.79
+KIRLOSBROS.NS,Kirloskar Brothers Ltd.,Capital Goods,Stage 4,1.77,-18.69,380181592.43,"Stage 4, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,35.27,14.0,25.7,10.0,35.7
+INDIACEM.NS,India Cements Ltd.,Construction Materials,Stage 3,-6.62,1.44,80423062.87,"Stage 3, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,25.37,48.0,35.55,0.0,35.55
+CARBORUNIV.NS,Carborundum Universal Ltd.,Capital Goods,Stage 4,3.3,-11.55,84841239.49,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,28.72,21.33,25.39,10.0,35.39
+SONACOMS.NS,Sona BLW Precision Forgings Ltd.,Automobile and Auto Components,Stage 3,14.42,26.98,934011726.28,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,26.39,35.14,30.33,5.0,35.33
+JINDALSTEL.NS,Jindal Steel Ltd.,Metals & Mining,Stage 3,27.4,16.82,1689318068.67,Stage 3,watchlist,weekly_watchlist,watchlist,24.88,25.75,25.27,10.0,35.27
+CAMPUS.NS,Campus Activewear Ltd.,Consumer Durables,Stage 4,-1.73,-7.7,74411133.92,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,30.73,40.67,35.2,0.0,35.2
+TRITURBINE.NS,Triveni Turbine Ltd.,Capital Goods,Stage 4,-3.96,-3.72,162210977.67,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,20.38,31.0,25.16,10.0,35.16
+BHARTIHEXA.NS,Bharti Hexacom Ltd.,Telecommunication,Stage 4,-5.0,-1.53,269530353.73,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.0,40.67,33.15,2.0,35.15
+MANKIND.NS,Mankind Pharma Ltd.,Healthcare,Stage 4,5.68,-10.07,1580481317.94,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,28.19,21.33,25.1,10.0,35.1
+BBTC.NS,Bombay Burmah Trading Corporation Ltd.,Fast Moving Consumer Goods,Stage 4,-11.72,-16.86,79446277.95,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.85,40.67,33.07,2.0,35.07
+RAINBOW.NS,Rainbow Childrens Medicare Ltd.,Healthcare,Stage 4,-1.69,-8.3,161598476.94,Stage 4,watchlist,weekly_watchlist,watchlist,27.59,22.0,25.07,10.0,35.07
+RVNL.NS,Rail Vikas Nigam Ltd.,Construction,Stage 4,-19.01,-14.47,2076525597.11,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,24.11,48.0,34.86,0.0,34.86
+PFIZER.NS,Pfizer Ltd.,Healthcare,Stage 4,5.58,3.08,92130839.27,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,20.29,30.2,24.75,10.0,34.75
+APLAPOLLO.NS,APL Apollo Tubes Ltd.,Capital Goods,Stage 3,18.02,27.83,1393035378.3,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,34.23,12.98,24.67,10.0,34.67
+ZEEL.NS,Zee Entertainment Enterprises Ltd.,Media Entertainment & Publication,Stage 4,-6.5,-27.19,851756049.29,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.11,40.67,32.66,2.0,34.66
+BRITANNIA.NS,Britannia Industries Ltd.,Fast Moving Consumer Goods,Stage 1,3.88,1.46,2138895853.95,"Stage 1, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.15,45.2,32.52,2.0,34.52
+NSLNISP.NS,NMDC Steel Ltd.,Metals & Mining,Stage 3,-4.39,-16.26,157768249.36,Stage 3,watchlist,weekly_watchlist,watchlist,27.12,21.33,24.51,10.0,34.51
+RECLTD.NS,REC Ltd.,Financial Services,Stage 4,3.85,-4.4,2761880071.21,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.01,31.0,29.36,5.0,34.36
+IRCON.NS,IRCON International Ltd.,Construction,Stage 4,-18.91,-20.8,977174461.63,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,23.16,48.0,34.34,0.0,34.34
+GLAXO.NS,Glaxosmithkline Pharmaceuticals Ltd.,Healthcare,Stage 4,4.4,-8.39,121748121.15,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,18.53,31.0,24.14,10.0,34.14
+TATACONSUM.NS,Tata Consumer Products Ltd.,Fast Moving Consumer Goods,Stage 3,1.89,1.3,1562316574.41,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,18.81,48.32,32.09,2.0,34.09
+AUBANK.NS,AU Small Finance Bank Ltd.,Financial Services,Stage 3,3.25,29.25,3466830509.29,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,14.39,46.85,29.0,5.0,34.0
+WHIRLPOOL.NS,Whirlpool of India Ltd.,Consumer Durables,Stage 4,1.71,-28.25,304305272.32,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,36.31,31.0,33.92,0.0,33.92
+UNITDSPR.NS,United Spirits Ltd.,Fast Moving Consumer Goods,Stage 4,1.27,3.24,1756989194.8,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,18.35,48.45,31.9,2.0,33.9
+CGCL.NS,Capri Global Capital Ltd.,Financial Services,Stage 1,5.35,-4.72,367721553.81,Stage 1,watchlist,weekly_watchlist,watchlist,25.06,33.4,28.81,5.0,33.81
+HONAUT.NS,Honeywell Automation India Ltd.,Capital Goods,Stage 4,-5.95,-17.22,170157163.5,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,17.75,31.0,23.71,10.0,33.71
+DABUR.NS,Dabur India Ltd.,Fast Moving Consumer Goods,Stage 3,-1.34,-9.2,840157590.86,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,32.25,31.0,31.69,2.0,33.69
+HBLENGINE.NS,HBL Engineering Ltd.,Capital Goods,Stage 3,-14.27,-11.42,841736243.29,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,31.49,14.0,23.62,10.0,33.62
+VBL.NS,Varun Beverages Ltd.,Fast Moving Consumer Goods,Stage 4,-6.67,-4.65,2726755478.08,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,18.17,48.0,31.59,2.0,33.59
+VENTIVE.NS,Ventive Hospitality Ltd.,Consumer Services,Stage 4,-5.96,-13.1,69003061.21,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.25,40.67,33.29,0.0,33.29
+RHIM.NS,RHI MAGNESITA INDIA LTD.,Capital Goods,Stage 4,-12.99,-18.27,94636901.78,Stage 4,watchlist,weekly_watchlist,watchlist,30.84,14.0,23.26,10.0,33.26
+ERIS.NS,Eris Lifesciences Ltd.,Healthcare,Stage 4,-0.5,-8.65,90409479.65,Stage 4,watchlist,weekly_watchlist,watchlist,24.26,22.0,23.24,10.0,33.24
+APOLLOTYRE.NS,Apollo Tyres Ltd.,Automobile and Auto Components,Stage 3,-5.18,-6.71,502933036.25,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,12.0,48.0,28.2,5.0,33.2
+CERA.NS,Cera Sanitaryware Ltd,Consumer Durables,Stage 4,1.1,-15.57,115119031.38,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,27.0,40.67,33.15,0.0,33.15
+DCMSHRIRAM.NS,DCM Shriram Ltd.,Diversified,Stage 3,1.38,1.76,78800661.83,Stage 3,watchlist,weekly_watchlist,watchlist,32.31,29.65,31.11,2.0,33.11
+JYOTHYLAB.NS,Jyothy Labs Ltd.,Fast Moving Consumer Goods,Stage 4,-15.09,-26.73,146063553.45,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,39.0,21.33,31.05,2.0,33.05
+AIIL.NS,Authum Investment & Infrastructure Ltd.,Financial Services,Stage 3,-4.14,-10.08,601084824.33,Stage 3,watchlist,weekly_watchlist,watchlist,27.0,29.33,28.05,5.0,33.05
+ABREL.NS,Aditya Birla Real Estate Ltd.,Forest Materials,Stage 4,-20.05,-29.38,339826482.53,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,26.79,40.67,33.04,0.0,33.04
+BRIGADE.NS,Brigade Enterprises Ltd.,Realty,Stage 4,-8.76,-15.12,1013326148.94,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,20.5,48.0,32.88,0.0,32.88
+BALKRISIND.NS,Balkrishna Industries Ltd.,Automobile and Auto Components,Stage 3,6.64,-1.36,306345005.07,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,24.8,31.53,27.83,5.0,32.83
+KEI.NS,KEI Industries Ltd.,Capital Goods,Stage 3,7.25,10.55,2455591710.72,Stage 3,watchlist,weekly_watchlist,watchlist,28.58,15.78,22.82,10.0,32.82
+FINPIPE.NS,Finolex Industries Ltd.,Capital Goods,Stage 4,6.02,-16.13,142150580.38,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,30.0,14.0,22.8,10.0,32.8
+MOTILALOFS.NS,Motilal Oswal Financial Services Ltd.,Financial Services,Stage 4,-9.22,-19.24,609492259.62,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,25.13,31.0,27.77,5.0,32.77
+IOB.NS,Indian Overseas Bank,Financial Services,Stage 4,7.61,-9.21,271033867.22,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,33.0,21.33,27.75,5.0,32.75
+NMDC.NS,NMDC Ltd.,Metals & Mining,Stage 3,9.0,12.38,1885401788.98,Stage 3,watchlist,weekly_watchlist,watchlist,29.92,13.74,22.64,10.0,32.64
+TATASTEEL.NS,Tata Steel Ltd.,Metals & Mining,Stage 3,26.96,21.24,7151155459.18,Stage 3,watchlist,weekly_watchlist,watchlist,25.73,18.82,22.62,10.0,32.62
+PIDILITIND.NS,Pidilite Industries Ltd.,Chemicals,Stage 4,2.86,-4.13,1037725141.57,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,19.71,48.0,32.44,0.0,32.44
+LICI.NS,Life Insurance Corporation of India,Financial Services,Stage 4,2.81,-5.04,1014690257.39,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,38.38,14.0,27.41,5.0,32.41
+IREDA.NS,Indian Renewable Energy Development Agency Ltd.,Financial Services,Stage 4,-6.21,-15.79,1071541509.21,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,24.35,31.0,27.34,5.0,32.34
+GAIL.NS,GAIL (India) Ltd.,Oil Gas & Consumable Fuels,Stage 4,-4.57,-10.24,2577200363.43,Stage 4,watchlist,weekly_watchlist,watchlist,23.13,21.33,22.32,10.0,32.32
+SOBHA.NS,Sobha Ltd.,Realty,Stage 4,-4.21,-12.88,160650016.1,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.39,40.67,32.27,0.0,32.27
+TATAINVEST.NS,Tata Investment Corporation Ltd.,Financial Services,Stage 3,-7.06,-26.64,449650058.49,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,38.0,14.0,27.2,5.0,32.2
+SONATSOFTW.NS,Sonata Software Ltd.,Information Technology,Stage 4,-27.3,-32.1,250188518.32,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,25.18,40.67,32.15,0.0,32.15
+IFCI.NS,IFCI Ltd.,Financial Services,Stage 3,8.29,-0.08,1339857229.78,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,23.07,31.82,27.01,5.0,32.01
+IRCTC.NS,Indian Railway Catering And Tourism Corporation Ltd.,Consumer Services,Stage 4,-14.51,-18.38,1983312046.16,"Stage 4, weekly_vcp_ok, volume_dryup, weekly_strong",watchlist,weekly_watchlist,watchlist,18.87,48.0,31.98,0.0,31.98
+KFINTECH.NS,Kfin Technologies Ltd.,Financial Services,Stage 4,-4.26,-4.53,729843719.05,Stage 4,watchlist,weekly_watchlist,watchlist,31.36,21.33,26.85,5.0,31.85
+ELECON.NS,Elecon Engineering Co. Ltd.,Capital Goods,Stage 4,-9.48,-28.12,187246435.57,Stage 4,watchlist,weekly_watchlist,watchlist,28.16,14.0,21.79,10.0,31.79
+BDL.NS,Bharat Dynamics Ltd.,Capital Goods,Stage 4,-10.09,-17.82,2313222412.75,Stage 4,watchlist,weekly_watchlist,watchlist,21.99,21.33,21.69,10.0,31.69
+BAJFINANCE.NS,Bajaj Finance Ltd.,Financial Services,Stage 3,-2.91,-8.72,9364508727.25,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,22.96,31.0,26.58,5.0,31.58
+TRENT.NS,Trent Ltd.,Consumer Services,Stage 4,-7.96,-21.24,3211524831.4,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,17.89,48.0,31.44,0.0,31.44
+SOLARINDS.NS,Solar Industries India Ltd.,Chemicals,Stage 4,12.17,-3.31,3333395372.6,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,31.05,31.89,31.43,0.0,31.43
+SUNDARMFIN.NS,Sundaram Finance Ltd.,Financial Services,Stage 1,1.95,8.27,441771867.38,"Stage 1, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,32.32,19.02,26.34,5.0,31.34
+ASIANPAINT.NS,Asian Paints Ltd.,Consumer Durables,Stage 3,-6.92,-0.69,2830584317.24,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,17.59,48.0,31.27,0.0,31.27
+PAYTM.NS,One 97 Communications Ltd.,Financial Services,Stage 3,-10.59,-3.86,2718544238.33,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,22.35,31.0,26.24,5.0,31.24
+MAXHEALTH.NS,Max Healthcare Institute Ltd.,Healthcare,Stage 4,3.48,-4.62,3267738209.47,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,13.05,31.0,21.13,10.0,31.13
+DEEPAKNTR.NS,Deepak Nitrite Ltd.,Chemicals,Stage 4,-11.05,-18.67,259288990.32,Stage 4,watchlist,weekly_watchlist,watchlist,39.0,21.33,31.05,0.0,31.05
+DBREALTY.NS,Valor Estate Ltd.,Consumer Services,Stage 4,-10.08,-37.24,223939337.36,Stage 4,watchlist,weekly_watchlist,watchlist,39.0,21.33,31.05,0.0,31.05
+CAMS.NS,Computer Age Management Services Ltd.,Financial Services,Stage 4,-1.73,-7.86,1194997885.36,Stage 4,watchlist,weekly_watchlist,watchlist,29.78,21.33,25.98,5.0,30.98
+ADANIENT.NS,Adani Enterprises Ltd.,Metals & Mining,Stage 4,-5.54,-21.08,3965470858.97,Stage 4,watchlist,weekly_watchlist,watchlist,26.61,14.0,20.94,10.0,30.94
+SUMICHEM.NS,Sumitomo Chemical India Ltd.,Chemicals,Stage 4,-6.21,-24.14,108728070.62,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.84,31.0,30.91,0.0,30.91
+JSWSTEEL.NS,JSW Steel Ltd.,Metals & Mining,Stage 1,15.99,7.7,2187280447.06,Stage 1,watchlist,weekly_watchlist,watchlist,21.3,20.37,20.88,10.0,30.88
+HINDPETRO.NS,Hindustan Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 3,-14.4,-9.6,4486288820.61,Stage 3,watchlist,weekly_watchlist,watchlist,20.22,21.33,20.72,10.0,30.72
+KPIL.NS,Kalpataru Projects International Ltd.,Construction,Stage 3,2.16,-4.86,258434787.49,"Stage 3, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,30.25,31.0,30.59,0.0,30.59
+EIDPARRY.NS,E.I.D. Parry (India) Ltd.,Fast Moving Consumer Goods,Stage 4,-12.86,-16.55,202119601.28,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,26.53,31.0,28.54,2.0,30.54
+ALOKINDS.NS,Alok Industries Ltd.,Textiles,Stage 4,-14.13,-24.5,74517309.92,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,21.0,31.0,25.5,5.0,30.5
+INTELLECT.NS,Intellect Design Arena Ltd.,Information Technology,Stage 4,-23.75,-29.45,312241423.29,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,0.0,30.4
+LTTS.NS,L&T Technology Services Ltd.,Information Technology,Stage 4,-16.5,-13.87,1128399811.9,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,22.0,40.67,30.4,0.0,30.4
+JBMA.NS,JBM Auto Ltd.,Automobile and Auto Components,Stage 4,0.52,-15.56,2802693669.07,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,29.33,25.3,5.0,30.3
+CHOICEIN.NS,Choice International Ltd.,Financial Services,Stage 3,-9.3,-13.03,449503931.72,Stage 3,watchlist,weekly_watchlist,watchlist,22.0,29.2,25.24,5.0,30.24
+BANKINDIA.NS,Bank of India,Financial Services,Stage 3,16.44,29.17,1430215363.09,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,16.79,35.56,25.24,5.0,30.24
+CRAFTSMAN.NS,Craftsman Automation Ltd.,Automobile and Auto Components,Stage 3,10.84,11.09,298696049.1,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,18.47,33.19,25.09,5.0,30.09
+PATANJALI.NS,Patanjali Foods Ltd.,Fast Moving Consumer Goods,Stage 4,-0.12,-11.12,852274883.37,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,25.65,31.0,28.06,2.0,30.06
+KARURVYSYA.NS,Karur Vysya Bank Ltd.,Financial Services,Stage 3,25.24,48.65,1024957052.05,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,39.51,7.39,25.06,5.0,30.06
+CIPLA.NS,Cipla Ltd.,Healthcare,Stage 4,-4.8,-9.89,2008204248.16,Stage 4,watchlist,weekly_watchlist,watchlist,18.46,22.0,20.05,10.0,30.05
+FIRSTCRY.NS,Brainbees Solutions Ltd.,Consumer Services,Stage 4,-8.83,-32.74,1850809168.96,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,15.23,48.0,29.98,0.0,29.98
+WELSPUNLIV.NS,Welspun Living Ltd.,Textiles,Stage 4,0.56,4.65,219631787.71,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,19.52,31.52,24.92,5.0,29.92
+TECHM.NS,Tech Mahindra Ltd.,Information Technology,Stage 3,-0.98,6.15,3022656179.24,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.58,31.52,29.9,0.0,29.9
+LODHA.NS,Lodha Developers Ltd.,Realty,Stage 4,-22.06,-31.29,2523614979.8,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,21.0,40.67,29.85,0.0,29.85
+OLAELEC.NS,Ola Electric Mobility Ltd.,Automobile and Auto Components,Stage 4,-20.23,-48.0,1432782835.43,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,19.78,31.0,24.83,5.0,29.83
+PETRONET.NS,Petronet LNG Ltd.,Oil Gas & Consumable Fuels,Stage 3,0.11,2.54,2225716904.21,Stage 3,watchlist,weekly_watchlist,watchlist,24.34,14.26,19.8,10.0,29.8
+JKCEMENT.NS,J.K. Cement Ltd.,Construction Materials,Stage 4,2.17,-14.41,386921035.0,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,28.72,31.0,29.75,0.0,29.75
+PGHH.NS,Procter & Gamble Hygiene & Health Care Ltd.,Fast Moving Consumer Goods,Stage 4,-15.96,-21.39,212209319.9,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,39.0,14.0,27.75,2.0,29.75
+JSL.NS,Jindal Stainless Ltd.,Metals & Mining,Stage 3,2.63,-1.57,703547815.05,Stage 3,watchlist,weekly_watchlist,watchlist,24.23,14.11,19.68,10.0,29.68
+BIKAJI.NS,Bikaji Foods International Ltd.,Fast Moving Consumer Goods,Stage 4,-4.96,-9.4,87728772.03,Stage 4,watchlist,weekly_watchlist,watchlist,26.28,29.33,27.65,2.0,29.65
+KOTAKBANK.NS,Kotak Mahindra Bank Ltd.,Financial Services,Stage 4,-2.7,-0.54,8144388144.4,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,27.36,21.33,24.65,5.0,29.65
+POLYCAB.NS,Polycab India Ltd.,Capital Goods,Stage 3,6.23,3.16,4774974785.93,Stage 3,watchlist,weekly_watchlist,watchlist,23.47,14.94,19.63,10.0,29.63
+HDFCAMC.NS,HDFC Asset Management Company Ltd.,Financial Services,Stage 3,0.12,-10.74,3035565272.26,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,21.0,29.0,24.6,5.0,29.6
+BLUEDART.NS,Blue Dart Express Ltd.,Services,Stage 4,1.66,-6.84,57464645.67,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,27.18,21.33,24.55,5.0,29.55
+APTUS.NS,Aptus Value Housing Finance India Ltd.,Financial Services,Stage 4,-16.88,-28.58,519182748.58,Stage 4,watchlist,weekly_watchlist,watchlist,32.88,14.0,24.38,5.0,29.38
+SHREECEM.NS,Shree Cement Ltd.,Construction Materials,Stage 4,2.43,-10.49,836540516.0,"Stage 4, daily_vcp_ok, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,27.93,31.0,29.31,0.0,29.31
+KPRMILL.NS,K.P.R. Mill Ltd.,Textiles,Stage 4,2.81,-14.01,579782052.87,Stage 4,watchlist,weekly_watchlist,watchlist,26.56,21.33,24.21,5.0,29.21
+TEJASNET.NS,Tejas Networks Ltd.,Telecommunication,Stage 3,4.19,-20.99,15687349801.34,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,21.33,27.2,2.0,29.2
+VEDL.NS,Vedanta Ltd.,Metals & Mining,Stage 3,22.58,56.56,10036351638.5,Stage 3,watchlist,weekly_watchlist,watchlist,23.35,13.91,19.1,10.0,29.1
+ADANIPORTS.NS,Adani Ports and Special Economic Zone Ltd.,Services,Stage 3,2.67,2.78,3990772739.87,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,25.74,21.88,24.0,5.0,29.0
+ENGINERSIN.NS,Engineers India Ltd.,Construction,Stage 4,5.78,4.13,707592612.57,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,26.49,31.99,28.96,0.0,28.96
+CREDITACC.NS,CreditAccess Grameen Ltd.,Financial Services,Stage 3,5.23,-6.76,362566259.95,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,14.0,23.9,5.0,28.9
+SUZLON.NS,Suzlon Energy Ltd.,Capital Goods,Stage 4,-10.56,-19.67,3074276820.39,Stage 4,watchlist,weekly_watchlist,watchlist,16.66,21.33,18.76,10.0,28.76
+NIACL.NS,The New India Assurance Company Ltd.,Financial Services,Stage 4,-8.1,-28.46,74482577.06,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,31.66,14.0,23.71,5.0,28.71
+MAHABANK.NS,Bank of Maharashtra,Financial Services,Stage 3,27.54,25.51,1609137802.11,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,34.38,10.1,23.45,5.0,28.45
+OBEROIRLTY.NS,Oberoi Realty Ltd.,Realty,Stage 4,-0.48,-0.5,963422391.95,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,19.77,39.0,28.42,0.0,28.42
+HOMEFIRST.NS,Home First Finance Company India Ltd.,Financial Services,Stage 4,-3.95,-17.96,909023478.89,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,25.06,21.33,23.38,5.0,28.38
+SUNTV.NS,Sun TV Network Ltd.,Media Entertainment & Publication,Stage 3,15.78,18.65,361619313.24,Stage 3,watchlist,weekly_watchlist,watchlist,27.49,24.78,26.27,2.0,28.27
+BLUEJET.NS,Blue Jet Healthcare Ltd.,Healthcare,Stage 4,-22.31,-39.54,238086535.05,Stage 4,watchlist,weekly_watchlist,watchlist,22.03,13.2,18.06,10.0,28.06
+NAM-INDIA.NS,Nippon Life India Asset Management Ltd.,Financial Services,Stage 3,8.65,8.04,540818332.88,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,29.06,15.67,23.03,5.0,28.03
+FSL.NS,Firstsource Solutions Ltd.,Services,Stage 4,-23.81,-29.71,373750631.7,Stage 4,watchlist,weekly_watchlist,watchlist,24.24,21.33,22.93,5.0,27.93
+RCF.NS,Rashtriya Chemicals & Fertilizers Ltd.,Chemicals,Stage 4,-7.7,-15.01,867835332.95,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,17.38,40.67,27.86,0.0,27.86
+UCOBANK.NS,UCO Bank,Financial Services,Stage 4,-4.86,-13.29,229605735.18,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,30.0,14.0,22.8,5.0,27.8
+BASF.NS,BASF India Ltd.,Chemicals,Stage 4,-2.76,-19.28,96475442.3,Stage 4,watchlist,weekly_watchlist,watchlist,33.0,21.33,27.75,0.0,27.75
+INFY.NS,Infosys Ltd.,Information Technology,Stage 4,-10.62,-4.41,15526821567.31,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,25.07,31.0,27.74,0.0,27.74
+INDIANB.NS,Indian Bank,Financial Services,Stage 3,24.69,32.43,1693117601.88,Stage 3,watchlist,weekly_watchlist,watchlist,29.47,14.11,22.56,5.0,27.56
+CANBK.NS,Canara Bank,Financial Services,Stage 3,-0.36,15.47,3591358523.4,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,14.4,32.51,22.55,5.0,27.55
+HEROMOTOCO.NS,Hero MotoCorp Ltd.,Automobile and Auto Components,Stage 3,5.72,8.7,2645210218.95,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,29.99,13.44,22.54,5.0,27.54
+VOLTAS.NS,Voltas Ltd.,Consumer Durables,Stage 1,8.47,5.71,1494115533.54,Stage 1,watchlist,weekly_watchlist,watchlist,28.14,26.75,27.51,0.0,27.51
+VIJAYA.NS,Vijaya Diagnostic Centre Ltd.,Healthcare,Stage 4,-2.82,-7.76,100298513.43,Stage 4,watchlist,weekly_watchlist,watchlist,14.38,21.33,17.51,10.0,27.51
+KALYANKJIL.NS,Kalyan Jewellers India Ltd.,Consumer Durables,Stage 4,-8.22,-9.61,1273415825.8,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,26.0,29.33,27.5,0.0,27.5
+RBLBANK.NS,RBL Bank Ltd.,Financial Services,Stage 3,10.2,18.69,1233597196.36,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,32.66,10.09,22.5,5.0,27.5
+UNIONBANK.NS,Union Bank of India,Financial Services,Stage 3,29.52,35.43,3654031968.71,Stage 3,watchlist,weekly_watchlist,watchlist,27.63,16.1,22.44,5.0,27.44
+IDBI.NS,IDBI Bank Ltd.,Financial Services,Stage 3,-24.15,-21.1,2624524735.87,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,15.32,31.0,22.38,5.0,27.38
+TITAGARH.NS,Titagarh Rail Systems Ltd.,Capital Goods,Stage 4,-20.95,-24.28,466344749.3,Stage 4,watchlist,weekly_watchlist,watchlist,20.11,14.0,17.36,10.0,27.36
+TATAELXSI.NS,Tata Elxsi Ltd.,Information Technology,Stage 4,-9.49,-15.07,1451858563.32,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,10.44,48.0,27.34,0.0,27.34
+ZENSARTECH.NS,Zensar Technolgies Ltd.,Information Technology,Stage 4,-14.37,-25.39,262528978.62,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,32.24,21.33,27.33,0.0,27.33
+NBCC.NS,NBCC (India) Ltd.,Construction,Stage 4,-21.23,-17.27,1021490344.02,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.39,40.67,27.32,0.0,27.32
+KAYNES.NS,Kaynes Technology India Ltd.,Capital Goods,Stage 4,1.68,-42.2,4814045824.62,Stage 4,watchlist,weekly_watchlist,watchlist,14.01,21.33,17.3,10.0,27.3
+NUVOCO.NS,Nuvoco Vistas Corporation Ltd.,Construction Materials,Stage 4,-6.23,-24.19,120554465.57,"Stage 4, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,24.25,31.0,27.29,0.0,27.29
+ICICIPRULI.NS,ICICI Prudential Life Insurance Company Ltd.,Financial Services,Stage 3,-5.68,-1.77,673682463.3,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,15.04,31.0,22.22,5.0,27.22
+EIHOTEL.NS,EIH Ltd.,Consumer Services,Stage 4,-9.85,-16.52,226712008.63,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,32.0,21.33,27.2,0.0,27.2
+PVRINOX.NS,PVR INOX Ltd.,Media Entertainment & Publication,Stage 1,4.28,-6.55,386560271.86,Stage 1,watchlist,weekly_watchlist,watchlist,31.0,18.0,25.15,2.0,27.15
+PGEL.NS,PG Electroplast Ltd.,Consumer Durables,Stage 3,-3.3,-1.01,2411824918.43,"Stage 3, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.07,40.67,27.14,0.0,27.14
+JUBLINGREA.NS,Jubilant Ingrevia Ltd.,Chemicals,Stage 4,-8.52,-6.21,149382587.31,"Stage 4, weekly_vcp_ok, weekly_strong",watchlist,weekly_watchlist,watchlist,16.0,40.67,27.1,0.0,27.1
+ECLERX.NS,eClerx Services Ltd.,Services,Stage 3,-24.8,-19.3,416134126.95,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,28.21,14.0,21.82,5.0,26.82
+ANANTRAJ.NS,Anant Raj Ltd.,Realty,Stage 3,-8.45,-26.08,903270029.81,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,31.17,21.33,26.74,0.0,26.74
+MMTC.NS,MMTC Ltd.,Services,Stage 4,-1.43,-9.84,576225875.68,Stage 4,watchlist,weekly_watchlist,watchlist,28.0,14.0,21.7,5.0,26.7
+TATACHEM.NS,Tata Chemicals Ltd.,Chemicals,Stage 4,-7.95,-27.88,325694003.11,Stage 4,watchlist,weekly_watchlist,watchlist,37.01,14.0,26.66,0.0,26.66
+ACC.NS,ACC Ltd.,Construction Materials,Stage 4,-11.55,-20.03,375578846.55,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,37.0,14.0,26.65,0.0,26.65
+PRESTIGE.NS,Prestige Estates Projects Ltd.,Realty,Stage 4,-14.43,-16.09,1058058619.39,Stage 4,watchlist,weekly_watchlist,watchlist,30.27,21.33,26.25,0.0,26.25
+UTIAMC.NS,UTI Asset Management Company Ltd.,Financial Services,Stage 4,-4.03,-23.05,82944816.97,Stage 4,watchlist,weekly_watchlist,watchlist,27.07,14.0,21.19,5.0,26.19
+POLICYBZR.NS,PB Fintech Ltd.,Financial Services,Stage 4,-11.14,-9.67,2344124888.94,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,26.96,14.0,21.13,5.0,26.13
+MRF.NS,MRF Ltd.,Automobile and Auto Components,Stage 3,-1.72,-7.56,1096723906.75,Stage 3,watchlist,weekly_watchlist,watchlist,26.85,14.0,21.07,5.0,26.07
+LATENTVIEW.NS,Latent View Analytics Ltd.,Information Technology,Stage 3,-30.8,-26.35,238786835.38,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,22.0,31.0,26.05,0.0,26.05
+FIVESTAR.NS,Five-Star Business Finance Ltd.,Financial Services,Stage 4,-19.13,-18.58,570477690.32,Stage 4,watchlist,weekly_watchlist,watchlist,26.33,14.0,20.78,5.0,25.78
+BAJAJFINSV.NS,Bajaj Finserv Ltd.,Financial Services,Stage 3,-3.29,-8.76,2894565547.75,Stage 3,watchlist,weekly_watchlist,watchlist,26.25,14.0,20.74,5.0,25.74
+ALKYLAMINE.NS,Alkyl Amines Chemicals Ltd.,Chemicals,Stage 4,-5.55,-26.79,291700570.78,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,21.0,31.0,25.5,0.0,25.5
+BLUESTARCO.NS,Blue Star Ltd.,Consumer Durables,Stage 1,7.68,-4.5,1051522502.31,Stage 1,watchlist,weekly_watchlist,watchlist,25.32,25.65,25.47,0.0,25.47
+INDIGO.NS,InterGlobe Aviation Ltd.,Services,Stage 4,-6.5,-18.57,9013587769.37,Stage 4,watchlist,weekly_watchlist,watchlist,25.57,14.0,20.36,5.0,25.36
+HUDCO.NS,Housing & Urban Development Corporation Ltd.,Financial Services,Stage 4,-10.47,-17.14,673795087.0,Stage 4,watchlist,weekly_watchlist,watchlist,25.56,14.0,20.36,5.0,25.36
+HAPPSTMNDS.NS,Happiest Minds Technologies Ltd.,Information Technology,Stage 4,-5.83,-19.79,3278347092.63,Stage 4,watchlist,weekly_watchlist,watchlist,28.0,22.0,25.3,0.0,25.3
+EXIDEIND.NS,Exide Industries Ltd.,Automobile and Auto Components,Stage 4,-4.9,-15.38,456257154.17,Stage 4,watchlist,weekly_watchlist,watchlist,25.12,14.0,20.12,5.0,25.12
+INDUSTOWER.NS,Indus Towers Ltd.,Telecommunication,Stage 3,14.25,28.36,1799069351.33,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,20.93,25.59,23.03,2.0,25.03
+BLS.NS,BLS International Services Ltd.,Consumer Services,Stage 4,-8.65,-19.92,1861927825.71,Stage 4,watchlist,weekly_watchlist,watchlist,28.0,21.33,25.0,0.0,25.0
+FEDERALBNK.NS,Federal Bank Ltd.,Financial Services,Stage 3,15.5,48.45,2676105585.36,Stage 3,watchlist,weekly_watchlist,watchlist,22.21,17.19,19.95,5.0,24.95
+HDFCBANK.NS,HDFC Bank Ltd.,Financial Services,Stage 4,-11.07,-11.15,44309546524.44,Stage 4,watchlist,weekly_watchlist,watchlist,32.32,4.8,19.94,5.0,24.94
+CHOLAFIN.NS,Cholamandalam Investment and Finance Company Ltd.,Financial Services,Stage 3,-3.82,-3.72,3614183801.26,Stage 3,watchlist,weekly_watchlist,watchlist,18.77,21.33,19.92,5.0,24.92
+BOSCHLTD.NS,Bosch Ltd.,Automobile and Auto Components,Stage 1,-4.69,-14.26,730116585.25,Stage 1,watchlist,weekly_watchlist,watchlist,21.3,18.0,19.82,5.0,24.82
+MARUTI.NS,Maruti Suzuki India Ltd.,Automobile and Auto Components,Stage 1,-12.64,-14.42,8329769967.2,Stage 1,watchlist,weekly_watchlist,watchlist,21.27,18.0,19.8,5.0,24.8
+IDEA.NS,Vodafone Idea Ltd.,Telecommunication,Stage 3,-12.83,12.83,4749021527.16,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,16.0,31.0,22.75,2.0,24.75
+PCBL.NS,PCBL Chemical Ltd.,Chemicals,Stage 4,-3.3,-24.0,1318355192.82,Stage 4,watchlist,weekly_watchlist,watchlist,33.5,14.0,24.73,0.0,24.73
+SWANCORP.NS,Swan Corp Ltd.,Chemicals,Stage 4,-21.05,-27.17,465150082.17,Stage 4,watchlist,weekly_watchlist,watchlist,27.26,21.33,24.59,0.0,24.59
+TECHNOE.NS,Techno Electric & Engineering Company Ltd.,Construction,Stage 4,7.76,-15.72,251684052.93,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,32.85,14.0,24.37,0.0,24.37
+DLF.NS,DLF Ltd.,Realty,Stage 4,-12.04,-19.38,3027517914.98,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,18.93,31.0,24.36,0.0,24.36
+MUTHOOTFIN.NS,Muthoot Finance Ltd.,Financial Services,Stage 3,-1.15,15.24,4299848607.16,Stage 3,watchlist,weekly_watchlist,watchlist,22.41,15.41,19.26,5.0,24.26
+BSOFT.NS,Birlasoft Ltd.,Information Technology,Stage 3,-12.33,1.02,494710673.18,"Stage 3, weekly_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,18.63,31.0,24.2,0.0,24.2
+TATACOMM.NS,Tata Communications Ltd.,Telecommunication,Stage 4,-8.63,-6.15,492526243.95,Stage 4,watchlist,weekly_watchlist,watchlist,22.38,21.33,21.91,2.0,23.91
+ABFRL.NS,Aditya Birla Fashion and Retail Ltd.,Consumer Services,Stage 3,-12.99,-28.06,353904962.09,Stage 3,watchlist,weekly_watchlist,watchlist,25.74,21.33,23.76,0.0,23.76
+ITI.NS,ITI Ltd.,Telecommunication,Stage 4,-7.02,-11.07,2401057165.4,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,21.33,21.7,2.0,23.7
+AXISBANK.NS,Axis Bank Ltd.,Financial Services,Stage 1,10.84,13.33,9702572628.38,Stage 1,watchlist,weekly_watchlist,watchlist,17.26,20.42,18.68,5.0,23.68
+BERGEPAINT.NS,Berger Paints India Ltd.,Consumer Durables,Stage 4,-10.79,-13.27,206340736.28,Stage 4,watchlist,weekly_watchlist,watchlist,36.11,8.4,23.64,0.0,23.64
+UNOMINDA.NS,UNO Minda Ltd.,Automobile and Auto Components,Stage 3,-4.75,-10.48,1195749955.96,Stage 3,watchlist,weekly_watchlist,watchlist,22.23,14.0,18.53,5.0,23.53
+JMFINANCIL.NS,JM Financial Ltd.,Financial Services,Stage 4,-4.3,-20.05,405417999.45,Stage 4,watchlist,weekly_watchlist,watchlist,22.0,14.0,18.4,5.0,23.4
+TRIDENT.NS,Trident Ltd.,Textiles,Stage 4,1.18,-10.22,408409967.35,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,21.33,18.4,5.0,23.4
+ICICIGI.NS,ICICI Lombard General Insurance Company Ltd.,Financial Services,Stage 4,2.3,2.64,1505857264.91,Stage 4,watchlist,weekly_watchlist,watchlist,21.49,14.49,18.34,5.0,23.34
+TVSMOTOR.NS,TVS Motor Company Ltd.,Automobile and Auto Components,Stage 3,7.51,9.11,3998195240.38,Stage 3,watchlist,weekly_watchlist,watchlist,20.2,15.66,18.16,5.0,23.16
+ULTRACEMCO.NS,UltraTech Cement Ltd.,Construction Materials,Stage 3,6.39,-0.2,4548453185.8,"Stage 3, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,15.8,31.62,22.92,0.0,22.92
+AFCONS.NS,Afcons Infrastructure Ltd.,Construction,Stage 4,-14.95,-28.88,163786745.9,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,16.18,31.0,22.85,0.0,22.85
+HAVELLS.NS,Havells India Ltd.,Consumer Durables,Stage 4,-0.18,-10.68,1465133369.45,Stage 4,watchlist,weekly_watchlist,watchlist,30.0,14.0,22.8,0.0,22.8
+ABCAPITAL.NS,Aditya Birla Capital Ltd.,Financial Services,Stage 3,0.53,14.06,3134545059.66,"Stage 3, daily_vcp_ok, volume_dryup",watchlist,weekly_watchlist,watchlist,27.08,6.26,17.71,5.0,22.71
+CLEAN.NS,Clean Science and Technology Ltd.,Chemicals,Stage 4,-9.92,-30.3,193666513.24,Stage 4,watchlist,weekly_watchlist,watchlist,29.75,14.0,22.66,0.0,22.66
+INDUSINDBK.NS,IndusInd Bank Ltd.,Financial Services,Stage 1,5.97,16.33,3885001598.33,Stage 1,watchlist,weekly_watchlist,watchlist,15.42,20.23,17.58,5.0,22.58
+HCLTECH.NS,HCL Technologies Ltd.,Information Technology,Stage 4,-4.55,5.38,4615953396.08,Stage 4,watchlist,weekly_watchlist,watchlist,30.08,13.28,22.52,0.0,22.52
+JUBLFOOD.NS,Jubilant Foodworks Ltd.,Consumer Services,Stage 4,-6.13,-18.59,1192329955.37,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,23.49,21.33,22.52,0.0,22.52
+CANFINHOME.NS,Can Fin Homes Ltd.,Financial Services,Stage 3,1.52,15.81,139139689.07,Stage 3,watchlist,weekly_watchlist,watchlist,28.1,4.13,17.31,5.0,22.31
+INDHOTEL.NS,Indian Hotels Co. Ltd.,Consumer Services,Stage 4,-7.4,-11.45,1983171581.44,Stage 4,watchlist,weekly_watchlist,watchlist,29.0,14.0,22.25,0.0,22.25
+GODFRYPHLP.NS,Godfrey Phillips India Ltd.,Fast Moving Consumer Goods,Stage 4,-20.0,-34.56,2080425331.54,Stage 4,watchlist,weekly_watchlist,watchlist,25.28,14.0,20.2,2.0,22.2
+IKS.NS,Inventurus Knowledge Solutions Ltd.,Information Technology,Stage 4,-9.86,-1.27,379597459.36,Stage 4,watchlist,weekly_watchlist,watchlist,22.36,21.33,21.9,0.0,21.9
+PAGEIND.NS,Page Industries Ltd.,Textiles,Stage 4,-0.09,-15.81,742098735.75,Stage 4,watchlist,weekly_watchlist,watchlist,19.25,14.0,16.89,5.0,21.89
+MARICO.NS,Marico Ltd.,Fast Moving Consumer Goods,Stage 3,12.6,14.27,1309348830.7,Stage 3,watchlist,weekly_watchlist,watchlist,23.46,15.49,19.87,2.0,21.87
+COLPAL.NS,Colgate Palmolive (India) Ltd.,Fast Moving Consumer Goods,Stage 4,2.64,-8.84,934207674.44,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,10.7,31.0,19.84,2.0,21.84
+ICICIBANK.NS,ICICI Bank Ltd.,Financial Services,Stage 4,4.07,-1.43,24175229434.13,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,27.22,3.86,16.71,5.0,21.71
+DEVYANI.NS,Devyani International Ltd.,Consumer Services,Stage 4,-18.55,-34.42,350250219.17,Stage 4,watchlist,weekly_watchlist,watchlist,21.97,21.33,21.68,0.0,21.68
+KPITTECH.NS,KPIT Technologies Ltd.,Information Technology,Stage 4,-32.58,-37.34,1473658437.82,Stage 4,watchlist,weekly_watchlist,watchlist,21.75,21.33,21.56,0.0,21.56
+NYKAA.NS,FSN E-Commerce Ventures Ltd.,Consumer Services,Stage 3,5.08,10.43,1119996150.91,Stage 3,watchlist,weekly_watchlist,watchlist,20.29,22.88,21.46,0.0,21.46
+NEWGEN.NS,Newgen Software Technologies Ltd.,Information Technology,Stage 4,-36.97,-42.46,1163424795.76,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,29.0,12.0,21.35,0.0,21.35
+AWL.NS,AWL Agri Business Ltd.,Fast Moving Consumer Goods,Stage 4,-9.05,-17.33,1173327563.76,Stage 4,watchlist,weekly_watchlist,watchlist,24.16,13.2,19.23,2.0,21.23
+IRFC.NS,Indian Railway Finance Corporation Ltd.,Financial Services,Stage 4,-17.38,-15.64,1767919481.68,Stage 4,watchlist,weekly_watchlist,watchlist,17.96,14.0,16.18,5.0,21.18
+AFFLE.NS,Affle 3i Ltd.,Information Technology,Stage 4,-6.14,-19.73,528936191.04,Stage 4,watchlist,weekly_watchlist,watchlist,27.0,14.0,21.15,0.0,21.15
+3MINDIA.NS,3M India Ltd.,Diversified,Stage 1,1.98,12.79,141899242.25,Stage 1,watchlist,weekly_watchlist,watchlist,18.84,19.48,19.13,2.0,21.13
+BAJAJ-AUTO.NS,Bajaj Auto Ltd.,Automobile and Auto Components,Stage 1,10.91,10.04,3320497448.55,Stage 1,watchlist,weekly_watchlist,watchlist,24.34,6.09,16.13,5.0,21.13
+EICHERMOT.NS,Eicher Motors Ltd.,Automobile and Auto Components,Stage 3,5.71,6.48,4418465871.0,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,26.22,3.62,16.05,5.0,21.05
+SIGNATURE.NS,Signatureglobal (India) Ltd.,Realty,Stage 4,-22.18,-23.49,346606374.76,Stage 4,watchlist,weekly_watchlist,watchlist,26.77,14.0,21.02,0.0,21.02
+EMAMILTD.NS,Emami Ltd.,Fast Moving Consumer Goods,Stage 4,-10.0,-21.27,284461269.91,"Stage 4, weekly_vcp_ok",watchlist,weekly_watchlist,watchlist,9.0,31.0,18.9,2.0,20.9
+MOTHERSON.NS,Samvardhana Motherson International Ltd.,Automobile and Auto Components,Stage 3,4.69,10.97,2407963797.6,Stage 3,watchlist,weekly_watchlist,watchlist,24.66,5.17,15.89,5.0,20.89
+AAVAS.NS,Aavas Financiers Ltd.,Financial Services,Stage 4,-12.28,-24.17,320526237.82,Stage 4,watchlist,weekly_watchlist,watchlist,21.94,8.4,15.85,5.0,20.85
+TBOTEK.NS,TBO Tek Ltd.,Consumer Services,Stage 3,-22.32,-20.98,180066458.48,Stage 3,watchlist,weekly_watchlist,watchlist,25.99,14.0,20.59,0.0,20.59
+LTF.NS,L&T Finance Ltd.,Financial Services,Stage 3,-3.77,11.29,2702115164.04,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,27.58,0.75,15.51,5.0,20.51
+PERSISTENT.NS,Persistent Systems Ltd.,Information Technology,Stage 3,-9.24,4.06,3619310209.39,"Stage 3, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,26.45,13.2,20.49,0.0,20.49
+GODREJPROP.NS,Godrej Properties Ltd.,Realty,Stage 4,-12.13,-16.12,2177459348.17,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,19.8,21.33,20.49,0.0,20.49
+DEEPAKFERT.NS,Deepak Fertilisers & Petrochemicals Corp. Ltd.,Chemicals,Stage 4,-11.54,-30.51,652208880.43,Stage 4,watchlist,weekly_watchlist,watchlist,25.37,14.0,20.25,0.0,20.25
+ASAHIINDIA.NS,Asahi India Glass Ltd.,Automobile and Auto Components,Stage 3,-5.21,-1.22,638685903.94,Stage 3,watchlist,weekly_watchlist,watchlist,16.0,14.0,15.1,5.0,20.1
+TATATECH.NS,Tata Technologies Ltd.,Information Technology,Stage 4,-5.27,-13.37,649851799.28,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,33.0,3.6,19.77,0.0,19.77
+PHOENIXLTD.NS,Phoenix Mills Ltd.,Realty,Stage 3,-6.28,1.64,855652700.07,Stage 3,watchlist,weekly_watchlist,watchlist,18.47,21.33,19.76,0.0,19.76
+MANYAVAR.NS,Vedant Fashions Ltd.,Consumer Services,Stage 4,-26.8,-41.23,261133824.7,Stage 4,watchlist,weekly_watchlist,watchlist,27.0,10.8,19.71,0.0,19.71
+ATUL.NS,Atul Ltd.,Chemicals,Stage 3,15.88,8.95,193136492.05,Stage 3,watchlist,weekly_watchlist,watchlist,19.39,20.08,19.7,0.0,19.7
+BANKBARODA.NS,Bank of Baroda,Financial Services,Stage 1,3.03,11.67,3083629740.5,Stage 1,watchlist,weekly_watchlist,watchlist,18.33,10.27,14.7,5.0,19.7
+RITES.NS,RITES Ltd.,Construction,Stage 4,-13.76,-18.14,126684992.01,Stage 4,watchlist,weekly_watchlist,watchlist,18.31,21.33,19.67,0.0,19.67
+TCS.NS,Tata Consultancy Services Ltd.,Information Technology,Stage 4,-13.11,-10.2,9062638293.73,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,35.58,0.0,19.57,0.0,19.57
+NESTLEIND.NS,Nestle India Ltd.,Fast Moving Consumer Goods,Stage 1,6.98,11.12,1498658713.76,Stage 1,watchlist,weekly_watchlist,watchlist,22.89,10.61,17.36,2.0,19.36
+M&MFIN.NS,Mahindra & Mahindra Financial Services Ltd.,Financial Services,Stage 3,-10.68,16.35,488953324.65,Stage 3,watchlist,weekly_watchlist,watchlist,16.69,11.37,14.3,5.0,19.3
+DIXON.NS,Dixon Technologies (India) Ltd.,Consumer Durables,Stage 4,-6.02,-35.5,8058521951.45,Stage 4,watchlist,weekly_watchlist,watchlist,23.3,14.0,19.12,0.0,19.12
+UBL.NS,United Breweries Ltd.,Fast Moving Consumer Goods,Stage 4,8.71,-3.89,357012170.71,Stage 4,watchlist,weekly_watchlist,watchlist,12.86,21.82,16.89,2.0,18.89
+SRF.NS,SRF Ltd.,Chemicals,Stage 4,-6.7,-4.68,1604174315.77,Stage 4,watchlist,weekly_watchlist,watchlist,16.58,21.33,18.72,0.0,18.72
+JKTYRE.NS,JK Tyre & Industries Ltd.,Automobile and Auto Components,Stage 3,-7.22,15.51,748348451.19,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,12.47,14.83,13.53,5.0,18.53
+AMBER.NS,Amber Enterprises India Ltd.,Consumer Durables,Stage 1,11.96,-12.16,2489092951.78,Stage 1,watchlist,weekly_watchlist,watchlist,18.75,18.0,18.41,0.0,18.41
+LEMONTREE.NS,Lemon Tree Hotels Ltd.,Consumer Services,Stage 3,-22.36,-29.59,474659765.14,Stage 3,watchlist,weekly_watchlist,watchlist,16.0,21.33,18.4,0.0,18.4
+M&M.NS,Mahindra & Mahindra Ltd.,Automobile and Auto Components,Stage 1,-3.35,-5.59,12173875011.34,Stage 1,watchlist,weekly_watchlist,watchlist,19.1,6.4,13.39,5.0,18.39
+ETERNAL.NS,Eternal Ltd.,Consumer Services,Stage 3,-5.43,-21.75,13877153695.17,Stage 3,watchlist,weekly_watchlist,watchlist,22.0,13.2,18.04,0.0,18.04
+AMBUJACEM.NS,Ambuja Cements Ltd.,Construction Materials,Stage 4,-13.58,-20.49,1487632198.57,Stage 4,watchlist,weekly_watchlist,watchlist,21.0,14.0,17.85,0.0,17.85
+CENTURYPLY.NS,Century Plyboards (India) Ltd.,Consumer Durables,Stage 3,-3.04,-4.46,62607688.2,Stage 3,watchlist,weekly_watchlist,watchlist,21.0,14.0,17.85,0.0,17.85
+LT.NS,Larsen & Toubro Ltd.,Construction,Stage 1,0.77,6.35,18217286414.23,Stage 1,watchlist,weekly_watchlist,watchlist,16.18,18.71,17.32,0.0,17.32
+UPL.NS,UPL Ltd.,Chemicals,Stage 3,-10.31,-2.54,1699746663.25,"Stage 3, volume_dryup",watchlist,weekly_watchlist,watchlist,13.44,21.33,16.99,0.0,16.99
+MPHASIS.NS,MphasiS Ltd.,Information Technology,Stage 4,-13.03,-13.43,1248046096.0,"Stage 4, daily_vcp_ok",watchlist,weekly_watchlist,watchlist,27.6,3.6,16.8,0.0,16.8
+HINDUNILVR.NS,Hindustan Unilever Ltd.,Fast Moving Consumer Goods,Stage 3,3.48,-8.66,4431343441.75,Stage 3,watchlist,weekly_watchlist,watchlist,15.3,14.0,14.71,2.0,16.71
+SBILIFE.NS,SBI Life Insurance Company Ltd.,Financial Services,Stage 3,3.85,10.61,2121049369.99,Stage 3,watchlist,weekly_watchlist,watchlist,20.09,1.45,11.7,5.0,16.7
+BATAINDIA.NS,Bata India Ltd.,Consumer Durables,Stage 4,-20.79,-38.58,172012097.0,Stage 4,watchlist,weekly_watchlist,watchlist,18.63,14.0,16.55,0.0,16.55
+COFORGE.NS,Coforge Ltd.,Information Technology,Stage 4,-18.72,-19.82,3976633987.0,Stage 4,watchlist,weekly_watchlist,watchlist,25.0,6.0,16.45,0.0,16.45
+SAPPHIRE.NS,Sapphire Foods India Ltd.,Consumer Services,Stage 4,-24.09,-38.94,157681420.53,Stage 4,watchlist,weekly_watchlist,watchlist,17.47,14.0,15.91,0.0,15.91
+SWIGGY.NS,Swiggy Ltd.,Consumer Services,Stage 4,-18.77,-29.41,3456618911.75,Stage 4,watchlist,weekly_watchlist,watchlist,16.76,14.0,15.52,0.0,15.52
+KEC.NS,Kec International Ltd.,Construction,Stage 4,-14.39,-30.21,488863217.82,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,14.0,15.1,0.0,15.1
+SBIN.NS,State Bank of India,Financial Services,Stage 3,18.21,27.03,18476373751.45,Stage 3,watchlist,weekly_watchlist,watchlist,13.98,4.52,9.72,5.0,14.72
+DALBHARAT.NS,Dalmia Bharat Ltd.,Construction Materials,Stage 4,-1.32,-10.48,495143809.46,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,24.18,2.4,14.38,0.0,14.38
+ITC.NS,ITC Ltd.,Fast Moving Consumer Goods,Stage 4,-12.84,-15.63,7262884147.95,Stage 4,watchlist,weekly_watchlist,watchlist,16.0,6.0,11.5,2.0,13.5
+INDIAMART.NS,Indiamart Intermesh Ltd.,Consumer Services,Stage 4,1.63,-7.75,331927195.6,Stage 4,watchlist,weekly_watchlist,watchlist,8.62,14.0,11.04,0.0,11.04
+VMM.NS,Vishal Mega Mart Ltd.,Consumer Services,Stage 4,-9.23,-18.52,6638403112.5,"Stage 4, volume_dryup",watchlist,weekly_watchlist,watchlist,15.03,2.4,9.35,0.0,9.35
