@@ -283,22 +283,20 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     ticker = st.session_state["selected_ticker"]
     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
 
-    # st.markdown("# Snapshot")
-    # compact_metric_grid([
-    #     ("Stage", row.get("stage", "n/a")),
-    #     ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
-    #     # ("Daily", row.get("daily_score", "n/a")),
-    #     # ("Weekly", row.get("weekly_score", "n/a")),
-    # ])
+    st.markdown("### Snapshot")
+    compact_metric_grid([
+        ("Stage", row.get("stage", "n/a")),
+        ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
+        ("Daily", row.get("daily_score", "n/a")),
+        ("Weekly", row.get("weekly_score", "n/a")),
+    ])
 
     company = row.get("Company Name", ticker)
     industry = row.get("Industry", "n/a")
-    stage = row.get("stage", "n/a")
-    final_score = row.get("final_combined_score", row.get("combined_score", "n/a"))
     overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
-    st.markdown(f"{company} • {industry} • {stage} • {overall_setup} • Score {final_score}")
+    st.caption(f"{company} • {industry} • {overall_setup}")
 
-    # st.markdown("### Charts")
+    st.markdown("### Charts")
     c1, c2 = st.columns(2)
     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
     wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
@@ -330,6 +328,80 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
                 "RS 6M": row.get("rs_6m_pct"),
             })
     st.caption("This view highlights technical structure, relative strength, and recent setup status. It is an informational analytics view and not a recommendation.")
+
+
+def normalize_portfolio_ticker(x: str) -> str:
+    x = str(x).strip().upper()
+    if not x or x == "NAN":
+        return ""
+    return x if x.endswith(".NS") else f"{x}.NS"
+
+
+def portfolio_tab(combined):
+    st.subheader("My Portfolio")
+    st.caption("Upload a holdings CSV and choose the column that contains your stock tickers. The app will match those holdings with the current dashboard analytics.")
+
+    uploaded_file = st.file_uploader("Upload portfolio CSV", type=["csv"], key="portfolio_upload")
+    if uploaded_file is None:
+        st.info("Upload a CSV file to view stage, score, and setup information for your holdings.")
+        return
+
+    try:
+        portfolio_raw = pd.read_csv(uploaded_file)
+    except Exception as e:
+        st.error(f"Could not read the uploaded CSV: {e}")
+        return
+
+    if portfolio_raw.empty:
+        st.warning("The uploaded file is empty.")
+        return
+
+    st.markdown("### Choose the ticker column")
+    ticker_col = st.selectbox(
+        "Ticker column",
+        portfolio_raw.columns.tolist(),
+        key="portfolio_ticker_column",
+        help="Choose the column in your uploaded file that contains stock tickers or symbols.",
+    )
+
+    portfolio = portfolio_raw.copy()
+    portfolio["ticker"] = portfolio[ticker_col].apply(normalize_portfolio_ticker)
+    portfolio = portfolio[portfolio["ticker"] != ""].copy()
+
+    if portfolio.empty:
+        st.warning("No valid tickers were found in the selected column.")
+        return
+
+    merged = portfolio.merge(combined, on="ticker", how="left", suffixes=("", "_dashboard"))
+
+    matched = int(merged["stage"].notna().sum()) if "stage" in merged.columns else 0
+    total = len(merged)
+    stage2 = int((merged["stage"] == "Stage 2").sum()) if "stage" in merged.columns else 0
+    avg_score = round(float(merged["final_combined_score"].dropna().mean()), 1) if "final_combined_score" in merged.columns and merged["final_combined_score"].notna().any() else "n/a"
+
+    compact_metric_grid([
+        ("Holdings", total),
+        ("Matched", matched),
+        ("Stage 2", stage2),
+        ("Avg Final Score", avg_score),
+    ])
+
+    st.markdown("### Holdings view")
+    preferred_cols = [
+        ticker_col, "ticker", "Quantity", "Qty", "Buy Price", "Average Price",
+        "stage", "final_combined_score", "daily_score", "weekly_score",
+        "overall_setup_label", "rs_3m_pct", "rs_6m_pct",
+    ]
+    present = [c for c in preferred_cols if c in merged.columns]
+    st.dataframe(pretty_columns(merged[present]), use_container_width=True, hide_index=True, height=430)
+
+    if "stage" in merged.columns:
+        unmatched = merged[merged["stage"].isna()].copy()
+        if not unmatched.empty:
+            with st.expander("Unmatched tickers", expanded=False):
+                cols = [c for c in [ticker_col, "ticker"] if c in unmatched.columns]
+                st.dataframe(unmatched[cols], use_container_width=True, hide_index=True, height=220)
+
 
 def help_tab():
     st.subheader("How to read the dashboard")
@@ -411,24 +483,26 @@ last_updated = get_last_updated(outputs["combined"])
 if combined_df.empty and daily_df.empty and weekly_df.empty:
     st.warning("No output files found yet. Wait for the scheduled GitHub Action to generate the latest scan.")
 
-tabs = st.tabs(["Dashboard", "Overall", "Stock", "Daily", "Weekly", "Changes", "Rotation", "Industries", "Stages", "Help"])
+tabs = st.tabs(["Dashboard", "Overall", "Portfolio", "Stock", "Daily", "Weekly", "Changes", "Rotation", "Industries", "Stages", "Help"])
 with tabs[0]:
     dashboard_tab(combined_df, daily_df, weekly_df, industry_df, regime_df, last_updated)
 with tabs[1]:
     ranked_tab("Overall candidates", combined_df, "final_combined_score", "overall_setup_label", show_search=True)
 with tabs[2]:
-    stock_detail_tab(combined_df, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
+    portfolio_tab(combined_df)
 with tabs[3]:
-    ranked_tab("Daily candidates", daily_df, "final_daily_score", "daily_setup_label", show_search=False)
+    stock_detail_tab(combined_df, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
 with tabs[4]:
-    ranked_tab("Weekly candidates", weekly_df, "final_weekly_score", "weekly_setup_label", show_search=False)
+    ranked_tab("Daily candidates", daily_df, "final_daily_score", "daily_setup_label", show_search=False)
 with tabs[5]:
-    changes_tab(stock_changes_df, top_movers_df)
+    ranked_tab("Weekly candidates", weekly_df, "final_weekly_score", "weekly_setup_label", show_search=False)
 with tabs[6]:
-    industry_rotation_tab(industry_changes_df)
+    changes_tab(stock_changes_df, top_movers_df)
 with tabs[7]:
-    industry_tab(industry_df)
+    industry_rotation_tab(industry_changes_df)
 with tabs[8]:
-    stage_by_industry_tab(combined_df)
+    industry_tab(industry_df)
 with tabs[9]:
+    stage_by_industry_tab(combined_df)
+with tabs[10]:
     help_tab()
