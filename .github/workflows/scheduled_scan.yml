@@ -1,44 +1,57 @@
-name: Scheduled VCP Scan
+name: Auto Update Outputs
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 8 * * *"
-    - cron: "30 17 * * *"
+    - cron: "30 12 * * 1-5"
+
+concurrency:
+  group: vcp-dashboard-main
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
-  run-scan:
+  update-outputs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - run: |
-          pip install -r requirements.txt
-
-      - name: Run scan
+      - name: Install dependencies
         run: |
-          python - <<'PY'
-          from vcp_engine_change_tracking import build_outputs
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
 
-          build_outputs(
-              universe_path="nifty500.csv",
-              outdir="outputs",
-              export_all_ticker_charts=True
-          )
-          PY
+      - name: Run update script
+        run: |
+          python "vcp_engine_change_tracking_fixed.py"
 
-      - name: Commit outputs
+      - name: Commit and push generated files
         run: |
           git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add outputs/
-          git diff --cached --quiet || git commit -m "Auto update outputs"
-          git push
+          git config user.email "github-actions@github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Auto update outputs"
+
+          git pull --rebase origin main
+          git push origin main
