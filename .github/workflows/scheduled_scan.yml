@@ -37,7 +37,7 @@ jobs:
 
       - name: Run update script
         run: |
-          python "vcp_engine_change_tracking_fixed.py"
+          python "vcp_engine_change_tracking.py"
 
       - name: Commit and push generated files
         run: |
