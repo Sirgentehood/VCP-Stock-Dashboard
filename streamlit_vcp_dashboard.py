@@ -167,40 +167,129 @@ def ranked_tab(title, df, score_col, label_col, show_search=True):
     st.caption(f"{len(filtered)} results")
     st.dataframe(pretty_columns(filtered[cols]), use_container_width=True, hide_index=True, height=430)
 
+# def changes_tab(stock_changes, top_movers):
+#     st.subheader("What changed")
+#     st.caption(f"DEBUG → stock_changes rows: {len(stock_changes)} | top_movers rows: {len(top_movers)}")
+#     if stock_changes.empty:
+#         st.info("No change data found yet.")
+#         return
+#     sections = [
+#         ("New daily breakouts", stock_changes[stock_changes["new_daily_breakout"]], ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
+#         ("New weekly breakouts", stock_changes[stock_changes["new_weekly_breakout"]], ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
+#         ("Entered Stage 2", stock_changes[stock_changes["entered_stage_2"]], ["ticker", "Industry", "final_combined_score", "combined_score_change"]),
+#     ]
+#     for title, data, cols in sections:
+#         with st.expander(title, expanded=False):
+#             present = [c for c in cols if c in data.columns]
+#             st.dataframe(pretty_columns(data[present]), use_container_width=True, hide_index=True, height=220)
+#     st.markdown("### Biggest score jumps")
+#     cols = [c for c in ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change", "new_top_10", "new_top_20"] if c in top_movers.columns]
+#     movers = top_movers[top_movers["combined_score_change"].fillna(0) >= 5].sort_values(["combined_score_change", "rank_change"], ascending=[False, False]).head(30)
+#     st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=300)
+
 def changes_tab(stock_changes, top_movers):
     st.subheader("What changed")
+
     st.caption(f"DEBUG → stock_changes rows: {len(stock_changes)} | top_movers rows: {len(top_movers)}")
+
     if stock_changes.empty:
         st.info("No change data found yet.")
         return
+
+    daily_breakouts = stock_changes[stock_changes["new_daily_breakout"]]
+    weekly_breakouts = stock_changes[stock_changes["new_weekly_breakout"]]
+    entered_stage2 = stock_changes[stock_changes["entered_stage_2"]]
+    movers = top_movers[top_movers["combined_score_change"].fillna(0) >= 5].sort_values(
+        ["combined_score_change", "rank_change"], ascending=[False, False]
+    ).head(30)
+
+    st.caption(
+        f"Visible rows → daily breakouts: {len(daily_breakouts)} | "
+        f"weekly breakouts: {len(weekly_breakouts)} | "
+        f"entered Stage 2: {len(entered_stage2)} | "
+        f"big movers: {len(movers)}"
+    )
+
     sections = [
-        ("New daily breakouts", stock_changes[stock_changes["new_daily_breakout"]], ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
-        ("New weekly breakouts", stock_changes[stock_changes["new_weekly_breakout"]], ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
-        ("Entered Stage 2", stock_changes[stock_changes["entered_stage_2"]], ["ticker", "Industry", "final_combined_score", "combined_score_change"]),
+        ("New daily breakouts", daily_breakouts, ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
+        ("New weekly breakouts", weekly_breakouts, ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change"]),
+        ("Entered Stage 2", entered_stage2, ["ticker", "Industry", "final_combined_score", "combined_score_change"]),
     ]
+
     for title, data, cols in sections:
-        with st.expander(title, expanded=False):
+        with st.expander(title, expanded=True):
             present = [c for c in cols if c in data.columns]
-            st.dataframe(pretty_columns(data[present]), use_container_width=True, hide_index=True, height=220)
+            if data.empty:
+                st.caption("0 rows")
+            else:
+                st.dataframe(pretty_columns(data[present]), use_container_width=True, hide_index=True, height=220)
+
     st.markdown("### Biggest score jumps")
-    cols = [c for c in ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change", "new_top_10", "new_top_20"] if c in top_movers.columns]
-    movers = top_movers[top_movers["combined_score_change"].fillna(0) >= 5].sort_values(["combined_score_change", "rank_change"], ascending=[False, False]).head(30)
-    st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=300)
+    cols = [c for c in ["ticker", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change", "new_top_10", "new_top_20"] if c in movers.columns]
+    if movers.empty:
+        st.caption("0 rows")
+    else:
+        st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=300)
+        
+# def industry_rotation_tab(industry_changes):
+#     st.subheader("Industry rotation")
+#     st.caption(f"DEBUG → industry_changes rows: {len(industry_changes)}")
+#     if industry_changes.empty:
+#         st.info("No industry rotation data found yet.")
+#         return
+#     with st.expander("Rising industries", expanded=True):
+#         cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in industry_changes.columns]
+#         rising = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(20)
+#         st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=220)
+#     with st.expander("Falling industries", expanded=False):
+#         cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in industry_changes.columns]
+#         falling = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(20)
+#         st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=220)
 
 def industry_rotation_tab(industry_changes):
     st.subheader("Industry rotation")
+
     st.caption(f"DEBUG → industry_changes rows: {len(industry_changes)}")
+
     if industry_changes.empty:
         st.info("No industry rotation data found yet.")
         return
+
+    rising = industry_changes.sort_values(
+        ["rank_change", "combined_score_change"], ascending=[False, False]
+    ).head(20)
+
+    falling = industry_changes.sort_values(
+        ["rank_change", "combined_score_change"], ascending=[True, True]
+    ).head(20)
+
+    clusters = industry_changes[industry_changes["new_cluster"] == True] if "new_cluster" in industry_changes.columns else industry_changes.iloc[0:0]
+
+    st.caption(
+        f"Visible rows → rising: {len(rising)} | falling: {len(falling)} | new clusters: {len(clusters)}"
+    )
+
     with st.expander("Rising industries", expanded=True):
-        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in industry_changes.columns]
-        rising = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(20)
-        st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=220)
-    with st.expander("Falling industries", expanded=False):
-        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in industry_changes.columns]
-        falling = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(20)
-        st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=220)
+        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in rising.columns]
+        if rising.empty:
+            st.caption("0 rows")
+        else:
+            st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=220)
+
+    with st.expander("Falling industries", expanded=True):
+        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in falling.columns]
+        if falling.empty:
+            st.caption("0 rows")
+        else:
+            st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=220)
+
+    with st.expander("New clusters", expanded=True):
+        cols = [c for c in ["Industry", "avg_combined_score", "combined_score_change", "rs_rank", "rank_change", "strong_combined"] if c in clusters.columns]
+        if clusters.empty:
+            st.caption("0 rows")
+        else:
+            st.dataframe(pretty_columns(clusters[cols]), use_container_width=True, hide_index=True, height=220)
+
 
 def industry_tab(industry):
     st.subheader("Industry strength")
