@@ -410,24 +410,34 @@ def portfolio_tab(combined):
 
     cols = ["Ticker", "Industry", "Stage", "Final Score", "Setup"]
     cols = [c for c in cols if c in display.columns]
-    display = display[cols].reset_index(drop=True)
 
-    delete_idx = None
-    for i, row in display.iterrows():
-        c1, c2, c3, c4, c5, c6 = st.columns([2, 3, 2, 2, 3, 1])
+    table_df = display[cols].reset_index(drop=True)
 
-        c1.markdown(str(row.get("Ticker", "")))
-        c2.markdown(str(row.get("Industry", "")))
-        c3.markdown(str(row.get("Stage", "")))
-        c4.markdown(str(row.get("Final Score", "")))
-        c5.markdown(str(row.get("Setup", "")))
+    st.dataframe(
+        table_df,
+        use_container_width=True,
+        hide_index=True,
+        height=320,
+    )
 
-        if c6.button("✕", key=f"del_{i}"):
-            delete_idx = i
+    st.markdown("### Remove Tickers")
+    remove_choice = st.selectbox(
+        "Select ticker to remove",
+        [""] + table_df["Ticker"].tolist(),
+        key="portfolio_remove_select",
+    )
 
-    if delete_idx is not None:
-        st.session_state["portfolio_tickers"].pop(delete_idx)
-        st.rerun()
+    if st.button("Remove Selected Ticker", key="portfolio_remove_btn", use_container_width=True):
+        if remove_choice:
+            full_ticker = normalize_portfolio_ticker(remove_choice)
+            st.session_state["portfolio_tickers"] = [
+                t for t in st.session_state["portfolio_tickers"] if t != full_ticker
+            ]
+            st.rerun()
+
+    # if delete_idx is not None:
+    #     st.session_state["portfolio_tickers"].pop(delete_idx)
+    #     st.rerun()
 
 
 def help_tab():
