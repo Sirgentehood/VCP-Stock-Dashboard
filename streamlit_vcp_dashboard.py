@@ -169,6 +169,7 @@ def ranked_tab(title, df, score_col, label_col, show_search=True):
 
 def changes_tab(stock_changes, top_movers):
     st.subheader("What changed")
+    st.caption(f"DEBUG → stock_changes rows: {len(stock_changes)} | top_movers rows: {len(top_movers)}")
     if stock_changes.empty:
         st.info("No change data found yet.")
         return
@@ -188,6 +189,7 @@ def changes_tab(stock_changes, top_movers):
 
 def industry_rotation_tab(industry_changes):
     st.subheader("Industry rotation")
+    st.caption(f"DEBUG → industry_changes rows: {len(industry_changes)}")
     if industry_changes.empty:
         st.info("No industry rotation data found yet.")
         return
