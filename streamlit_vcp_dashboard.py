@@ -333,7 +333,7 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
             st.rerun()
     ticker = st.session_state["selected_ticker"]
     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
-    st.caption("Snapshot")
+    # st.caption("Snapshot")
     # compact_metric_grid([
     #     ("Stage", row.get("stage", "n/a")),
     #     ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
