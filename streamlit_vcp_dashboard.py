@@ -345,7 +345,7 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     company = row.get("Company Name", ticker)
     industry = row.get("Industry", "n/a")
     overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
-    st.caption(f"### {company} • {industry} • {stage} • {overall_setup} • {final_score}")
+    st.caption(f"### {company} • {industry} • {stage} • {overall_setup} • Final Score: {final_score}")
     # st.markdown("### Charts")
     c1, c2 = st.columns(2)
     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
