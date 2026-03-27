@@ -283,7 +283,7 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     ticker = st.session_state["selected_ticker"]
     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
 
-    st.markdown("## Snapshot")
+    st.markdown("# Snapshot")
     # compact_metric_grid([
     #     ("Stage", row.get("stage", "n/a")),
     #     ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
@@ -296,7 +296,7 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
     stage = row.get("stage", "n/a")
     final_score = row.get("final_combined_score", row.get("combined_score", "n/a"))
     overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
-    st.caption(f"{company} • {industry} • {stage} • {overall_setup} • {final_score}")
+    st.markdown(f"{company} • {industry} • {stage} • {overall_setup} • {final_score}")
 
     # st.markdown("### Charts")
     c1, c2 = st.columns(2)
