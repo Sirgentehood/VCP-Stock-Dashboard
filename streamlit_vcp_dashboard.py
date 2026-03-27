@@ -190,7 +190,22 @@ def ranked_tab(title, df, score_col, label_col, show_search=True):
 def changes_tab(stock_changes, top_movers):
     st.subheader("What changed")
 
-    st.caption(f"DEBUG → stock_changes rows: {len(stock_changes)} | top_movers rows: {len(top_movers)}")
+    st.caption(
+        "DEBUG sample → "
+        f"entered_stage_2 sum: {int(stock_changes['entered_stage_2'].sum()) if 'entered_stage_2' in stock_changes.columns else 'missing'} | "
+        f"combined_score_change>=5: {int((top_movers['combined_score_change'].fillna(0) >= 5).sum()) if 'combined_score_change' in top_movers.columns else 'missing'}"
+    )
+
+    if "ticker" in top_movers.columns and "combined_score_change" in top_movers.columns:
+        st.caption(
+            "DEBUG top movers sample → " +
+            ", ".join(
+                top_movers.sort_values("combined_score_change", ascending=False)
+                .head(5)
+                .apply(lambda r: f"{r['ticker']} ({r['combined_score_change']})", axis=1)
+                .tolist()
+            )
+        )
 
     if stock_changes.empty:
         st.info("No change data found yet.")
