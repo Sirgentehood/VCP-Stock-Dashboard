@@ -1,0 +1,63 @@
+name: Scheduled VCP Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 8 * * *"
+    - cron: "30 17 * * *"
+
+concurrency:
+  group: vcp-dashboard-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run scan
+        run: |
+          python - <<'PY'
+          from vcp_engine_change_tracking import build_outputs
+
+          build_outputs(
+              universe_path="universe.csv",
+              outdir="outputs",
+              export_all_ticker_charts=True
+          )
+          PY
+
+      - name: Commit outputs
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add outputs/
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Auto update outputs"
+
+          git pull --rebase origin main
+          git push origin main
