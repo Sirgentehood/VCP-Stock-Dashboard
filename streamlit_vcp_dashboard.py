@@ -333,18 +333,20 @@ def stock_detail_tab(combined, daily_charts_dir, weekly_charts_dir):
             st.rerun()
     ticker = st.session_state["selected_ticker"]
     row = filtered_df[filtered_df["ticker"] == ticker].iloc[0]
-    st.markdown("### Snapshot")
-    compact_metric_grid([
-        ("Stage", row.get("stage", "n/a")),
-        ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
-        ("Daily", row.get("final_daily_score", row.get("daily_score", "n/a"))),
-        ("Weekly", row.get("final_weekly_score", row.get("weekly_score", "n/a"))),
-    ])
+    st.caption("### Snapshot")
+    # compact_metric_grid([
+    #     ("Stage", row.get("stage", "n/a")),
+    #     ("Final Score", row.get("final_combined_score", row.get("combined_score", "n/a"))),
+    #     ("Daily", row.get("final_daily_score", row.get("daily_score", "n/a"))),
+    #     ("Weekly", row.get("final_weekly_score", row.get("weekly_score", "n/a"))),
+    # ])
+    stage= row.get("stage", "n/a")
+    final_score = row.get("final_combined_score", row.get("combined_score", "n/a"))
     company = row.get("Company Name", ticker)
     industry = row.get("Industry", "n/a")
     overall_setup = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
-    st.caption(f"{company} • {industry} • {overall_setup}")
-    st.markdown("### Charts")
+    st.caption(f"{company} • {industry} • {stage} • {overall_setup} • {final_score}")
+    # st.markdown("### Charts")
     c1, c2 = st.columns(2)
     dpath = resolve_chart_path(daily_charts_dir, ticker, "_daily.png")
     wpath = resolve_chart_path(weekly_charts_dir, ticker, "_weekly.png")
