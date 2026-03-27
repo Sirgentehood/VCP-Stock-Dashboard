@@ -339,78 +339,76 @@ def normalize_portfolio_ticker(x: str) -> str:
 
 def portfolio_tab(combined):
     st.subheader("My Portfolio")
-    st.caption("Add up to 20 tickers to view current stage, score, setup label, and relative strength for your holdings.")
+    st.caption("Add up to 20 tickers to view current stage, score, setup label, and relative strength for your holdings. This section is informational and analytical only.")
 
-    if "portfolio_tickers" not in st.session_state:
-        st.session_state["portfolio_tickers"] = [""]
-
-    add_c1, add_c2 = st.columns([1, 4])
-    with add_c1:
-        if st.button("＋ Add", key="portfolio_add_ticker_btn", use_container_width=True):
-            if len(st.session_state["portfolio_tickers"]) < 20:
-                st.session_state["portfolio_tickers"].append("")
-                st.rerun()
-    with add_c2:
-        st.caption(f"{len(st.session_state['portfolio_tickers'])} of 20 ticker slots used")
-
-    tickers = []
-    remove_index = None
-
-    for i, current in enumerate(st.session_state["portfolio_tickers"]):
-        c1, c2 = st.columns([5, 1])
-        value = c1.text_input(
-            f"Ticker {i+1}",
-            value=current,
-            key=f"portfolio_ticker_input_{i}",
-            placeholder="Example: RELIANCE or RELIANCE.NS",
-        )
-        st.session_state["portfolio_tickers"][i] = value
-        if c2.button("✕", key=f"portfolio_remove_{i}", use_container_width=True):
-            remove_index = i
-        norm = normalize_portfolio_ticker(value)
-        if norm:
-            tickers.append(norm)
-
-    if remove_index is not None:
-        st.session_state["portfolio_tickers"].pop(remove_index)
-        if not st.session_state["portfolio_tickers"]:
-            st.session_state["portfolio_tickers"] = [""]
-        st.rerun()
-
-    unique_tickers = list(dict.fromkeys([t for t in tickers if t]))
-
-    if not unique_tickers:
-        st.info("Add one or more tickers to view portfolio analytics.")
+    if combined.empty:
+        st.info("No scan outputs found yet.")
         return
 
-    portfolio = pd.DataFrame({"ticker": unique_tickers})
+    all_tickers = sorted(combined["ticker"].dropna().unique().tolist()) if "ticker" in combined.columns else []
+
+    if "portfolio_tickers" not in st.session_state:
+        st.session_state["portfolio_tickers"] = []
+
+    st.markdown("### Add Tickers")
+    a1, a2 = st.columns([4, 1])
+    selected = a1.selectbox(
+        "Search and add ticker",
+        [""] + all_tickers,
+        key="portfolio_ticker_picker",
+        help="Start typing to search and choose a ticker.",
+    )
+    with a2:
+        st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
+        if st.button("＋ Add", key="portfolio_add_btn", use_container_width=True):
+            if selected and selected not in st.session_state["portfolio_tickers"] and len(st.session_state["portfolio_tickers"]) < 20:
+                st.session_state["portfolio_tickers"].append(selected)
+                st.rerun()
+
+    st.caption(f"{len(st.session_state['portfolio_tickers'])} of 20 tickers added")
+
+    if not st.session_state["portfolio_tickers"]:
+        st.info("Add one or more tickers to see portfolio analytics.")
+        return
+
+    st.markdown("### Holdings")
+    remove_idx = None
+    for i, t in enumerate(st.session_state["portfolio_tickers"]):
+        c1, c2 = st.columns([5, 1])
+        c1.markdown(f"**{t}**")
+        if c2.button("Remove", key=f"portfolio_remove_{i}", use_container_width=True):
+            remove_idx = i
+
+    if remove_idx is not None:
+        st.session_state["portfolio_tickers"].pop(remove_idx)
+        st.rerun()
+
+    portfolio = pd.DataFrame({"ticker": st.session_state["portfolio_tickers"]})
     merged = portfolio.merge(combined, on="ticker", how="left")
 
-    matched = int(merged["stage"].notna().sum()) if "stage" in merged.columns else 0
-    total = len(merged)
+    st.markdown("### Portfolio Snapshot")
+    stage1 = int((merged["stage"] == "Stage 1").sum()) if "stage" in merged.columns else 0
     stage2 = int((merged["stage"] == "Stage 2").sum()) if "stage" in merged.columns else 0
+    stage3 = int((merged["stage"] == "Stage 3").sum()) if "stage" in merged.columns else 0
+    stage4 = int((merged["stage"] == "Stage 4").sum()) if "stage" in merged.columns else 0
     avg_score = round(float(merged["final_combined_score"].dropna().mean()), 1) if "final_combined_score" in merged.columns and merged["final_combined_score"].notna().any() else "n/a"
 
     compact_metric_grid([
-        ("Tickers", total),
-        ("Matched", matched),
+        ("Stage 1", stage1),
         ("Stage 2", stage2),
+        ("Stage 3", stage3),
+        ("Stage 4", stage4),
         ("Avg Final Score", avg_score),
     ])
 
-    st.markdown("### Portfolio view")
+    st.markdown("### Portfolio View")
     preferred_cols = [
-        "ticker", "stage", "final_combined_score", "daily_score", "weekly_score",
-        "overall_setup_label", "rs_3m_pct", "rs_6m_pct", "Industry", "Company Name"
+        "ticker", "Company Name", "Industry", "stage", "final_combined_score",
+        "daily_score", "weekly_score", "overall_setup_label", "rs_3m_pct", "rs_6m_pct"
     ]
     present = [c for c in preferred_cols if c in merged.columns]
     st.dataframe(pretty_columns(merged[present]), use_container_width=True, hide_index=True, height=430)
 
-    if "stage" in merged.columns:
-        unmatched = merged[merged["stage"].isna()].copy()
-        if not unmatched.empty:
-            with st.expander("Unmatched tickers", expanded=False):
-                st.dataframe(unmatched[["ticker"]], use_container_width=True, hide_index=True, height=180)
 
 def help_tab():
     st.subheader("How to read the dashboard")
@@ -438,6 +436,9 @@ Shows industries improving or weakening in score/rank terms. This helps identify
 
 **Stages tab**
 Shows how many stocks in each industry sit in each stage, plus the percentage of that industry total in brackets.
+
+**Portfolio tab**
+Lets you track only the tickers you add manually. It summarizes how many of your selected names are in each stage and shows the same dashboard analytics for those holdings.
 
 **Stock tab**
 Best used for one-name review after filtering by stage and industry.
