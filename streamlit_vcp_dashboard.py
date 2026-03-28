@@ -25,8 +25,7 @@ st.markdown(
 .stImage img {border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.08);}
 .element-container, .stDataFrame, .stImage {margin-bottom: 0.5rem;}
 pre {white-space: pre-wrap !important; word-break: break-word !important;}
-
-.hero-card, .summary-card, .status-card, .insight-card, .stock-card, .guide-card, .mini-card, .filter-card {
+.hero-card, .summary-card, .status-card, .insight-card, .stock-card, .guide-card, .mini-card, .filter-card, .learn-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 18px;
@@ -79,16 +78,7 @@ pre {white-space: pre-wrap !important; word-break: break-word !important;}
   font-size: 0.88rem;
 }
 .small-label {font-size: 0.76rem; color: var(--muted);}
-.stock-card-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 0.75rem;
-}
 .section-title {font-size: 1.05rem; font-weight: 700; margin-bottom: 0.55rem;}
-.tab-note {font-size: 0.83rem; color: var(--muted); margin-bottom: 0.45rem;}
-.info-pair {margin-bottom: 0.35rem;}
-.info-key {font-size: 0.76rem; color: var(--muted);}
-.info-value {font-size: 0.96rem; font-weight: 600;}
 .mover-card {
   border: 1px solid var(--card-border);
   background: var(--card-bg);
@@ -111,6 +101,8 @@ pre {white-space: pre-wrap !important; word-break: break-word !important;}
 }
 .mover-change-up {font-weight:800; color:var(--ready);}
 .mover-change-down {font-weight:800; color:var(--avoid);}
+.learn-card {margin-bottom: 0.6rem;}
+.learn-title {font-size: 0.92rem; font-weight: 700; margin-bottom: 0.3rem;}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.45rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   h1 {font-size: 1.4rem !important;}
@@ -118,7 +110,7 @@ pre {white-space: pre-wrap !important; word-break: break-word !important;}
   h3 {font-size: 0.98rem !important;}
   [data-testid="stMetric"] {padding: 0.35rem 0.5rem;}
   [data-testid="stMetricValue"] {font-size: 1rem;}
-  .hero-card, .summary-card, .status-card, .insight-card, .stock-card, .guide-card, .mini-card {padding: 0.75rem 0.75rem;}
+  .hero-card, .summary-card, .status-card, .insight-card, .stock-card, .guide-card, .mini-card, .learn-card {padding: 0.75rem 0.75rem;}
   .stock-title {font-size: 0.95rem;}
   .big-number {font-size: 1.15rem;}
 }
@@ -130,55 +122,55 @@ pre {white-space: pre-wrap !important; word-break: break-word !important;}
 BEGINNER_LABELS = {
     "ready": {
         "title": "Ready",
-        "subtitle": "Strong structure and improving behaviour",
+        "subtitle": "Stronger technical structure in the current scan",
         "css": "status-ready",
         "chip": "ready-chip",
-        "explain": "This stock is showing stronger technical structure than most names in the scan. It may deserve closer tracking.",
-        "action": "Keep it on your watchlist and monitor whether it stays above its key pivot area.",
+        "explain": "The current rule-based inputs show comparatively stronger structure, momentum, and broader context.",
+        "classification": "This stock is currently placed in the stronger setup bucket by the model.",
     },
     "watch": {
         "title": "Watch",
-        "subtitle": "Interesting, but not fully confirmed",
+        "subtitle": "Developing structure with mixed alignment",
         "css": "status-watch",
         "chip": "watch-chip",
-        "explain": "This stock has some positive traits, but the setup is still developing or mixed across timeframes.",
-        "action": "Wait for clearer strength, better alignment, or a cleaner move near the pivot.",
+        "explain": "The current rule-based inputs show some constructive features, but alignment is still mixed or incomplete.",
+        "classification": "This stock is currently placed in the developing setup bucket by the model.",
     },
     "avoid": {
-        "title": "Avoid",
-        "subtitle": "Weak or low-quality structure right now",
+        "title": "Lower strength",
+        "subtitle": "Weaker technical structure in the current scan",
         "css": "status-avoid",
         "chip": "avoid-chip",
-        "explain": "This stock currently looks weaker or less aligned with the rule-based framework used by this dashboard.",
-        "action": "Avoid treating it as a strong setup unless the structure improves materially.",
+        "explain": "The current rule-based inputs show weaker or less aligned technical structure.",
+        "classification": "This stock is currently placed in the lower-strength bucket by the model.",
     },
     "neutral": {
-        "title": "Neutral",
-        "subtitle": "Not enough evidence either way",
+        "title": "Mixed",
+        "subtitle": "Signals are mixed or limited",
         "css": "status-neutral",
         "chip": "neutral-chip",
-        "explain": "The current inputs are mixed or incomplete.",
-        "action": "Review again after the next refresh.",
+        "explain": "The current rule-based inputs do not create a strong classification either way.",
+        "classification": "This stock is currently placed in a mixed bucket by the model.",
     },
 }
 
 DAILY_LABEL_MAP = {
-    "breakout_today": "Breakout day",
-    "near_pivot": "Near pivot",
-    "forming_vcp": "Setup building",
-    "watchlist": "Watchlist",
+    "breakout_today": "Daily breakout condition",
+    "near_pivot": "Daily near-pivot condition",
+    "forming_vcp": "Daily structure building",
+    "watchlist": "Daily watchlist condition",
 }
 WEEKLY_LABEL_MAP = {
-    "weekly_breakout": "Weekly breakout structure",
-    "weekly_near_pivot": "Weekly near pivot",
+    "weekly_breakout": "Weekly breakout condition",
+    "weekly_near_pivot": "Weekly near-pivot condition",
     "weekly_forming": "Weekly structure building",
-    "weekly_watchlist": "Weekly watchlist",
+    "weekly_watchlist": "Weekly watchlist condition",
 }
 COMBINED_LABEL_MAP = {
-    "high_conviction_breakout": "Strong daily and weekly alignment",
-    "high_conviction_near_pivot": "Strong near-pivot alignment",
-    "building_setup": "Structure building",
-    "watchlist": "Watchlist",
+    "high_conviction_breakout": "Stronger daily and weekly alignment",
+    "high_conviction_near_pivot": "Stronger near-pivot alignment",
+    "building_setup": "Structure still building",
+    "watchlist": "Watchlist condition",
 }
 
 @st.cache_data(show_spinner=False)
@@ -298,22 +290,6 @@ def format_num(x) -> str:
         return "n/a"
     return f"{float(x):.1f}"
 
-def format_change_pct(x) -> str:
-    v = pd.to_numeric(x, errors="coerce")
-    if pd.isna(v):
-        return "n/a"
-    return f"{float(v):+.2f}%"
-
-def classify_change_text(x) -> str:
-    v = pd.to_numeric(x, errors="coerce")
-    if pd.isna(v):
-        return "change-flat"
-    if v > 0:
-        return "change-up"
-    if v < 0:
-        return "change-down"
-    return "change-flat"
-
 def get_beginner_status(row: pd.Series) -> Dict[str, str]:
     stage = str(row.get("stage", ""))
     bucket = str(row.get("combined_bucket", ""))
@@ -351,49 +327,55 @@ def momentum_label(row: pd.Series) -> str:
 def structure_label(row: pd.Series) -> str:
     bucket = str(row.get("combined_bucket", ""))
     mapping = {
-        "high_conviction_breakout": "Breakout structure",
-        "high_conviction_near_pivot": "Near pivot structure",
-        "building_setup": "Base still building",
-        "watchlist": "No strong structure yet",
+        "high_conviction_breakout": "Breakout-style structure",
+        "high_conviction_near_pivot": "Near-pivot structure",
+        "building_setup": "Structure still building",
+        "watchlist": "No stronger structure yet",
     }
     return mapping.get(bucket, "Structure mixed")
 
 def stage_label(row: pd.Series) -> str:
     stage = str(row.get("stage", "Unknown"))
     mapping = {
-        "Stage 1": "Base/recovery phase",
-        "Stage 2": "Uptrend phase",
-        "Stage 3": "Topping/unclear phase",
-        "Stage 4": "Downtrend phase",
+        "Stage 1": "Accumulation / recovery phase",
+        "Stage 2": "Uptrend / markup phase",
+        "Stage 3": "Distribution phase",
+        "Stage 4": "Downtrend / markdown phase",
     }
     return mapping.get(stage, stage)
 
-def simple_explanation(row: pd.Series) -> List[str]:
-    lines = []
-    lines.append(structure_label(row))
-    lines.append(momentum_label(row))
-    lines.append(stage_label(row))
-    return lines
+def stage_explanation(stage: str) -> str:
+    mapping = {
+        "Stage 1": "Price is stabilizing after weakness or moving sideways while longer-term trend pressure reduces.",
+        "Stage 2": "Price is showing stronger trend behaviour and sits in the strongest phase within this framework.",
+        "Stage 3": "Price is losing trend quality and moving into a more unstable topping-style phase.",
+        "Stage 4": "Price is in a weaker trend phase and sits below the strongest structural zone.",
+    }
+    return mapping.get(stage, "Stage description not available.")
 
-def guidance_text(row: pd.Series) -> str:
+def simple_explanation(row: pd.Series) -> List[str]:
+    return [
+        structure_label(row),
+        momentum_label(row),
+        stage_label(row),
+    ]
+
+def compliance_safe_interpretation(row: pd.Series) -> str:
     status = get_beginner_status(row)["title"]
-    bucket = str(row.get("combined_bucket", ""))
     if status == "Ready":
-        if bucket == "high_conviction_breakout":
-            return "Track whether the stock can sustain strength after the breakout area instead of reacting to one bar."
-        return "Track whether the stock stays constructive near its pivot and whether industry support remains intact."
+        return "The model currently places this stock in the stronger setup bucket based on structure, momentum, and broader context."
     if status == "Watch":
-        return "Wait for cleaner alignment across structure, momentum, and industry before giving it higher priority."
-    if status == "Avoid":
-        return "Keep it lower priority until technical structure improves materially."
-    return "Review again after the next scan refresh."
+        return "The model currently places this stock in the developing setup bucket because the signals are constructive but not fully aligned."
+    if status == "Lower strength":
+        return "The model currently places this stock in the lower-strength bucket because the current signals are weaker or less aligned."
+    return "The model currently places this stock in a mixed bucket because the available signals do not create a stronger classification."
 
 def change_flags(row: pd.Series) -> List[str]:
     flags = []
     if bool(row.get("new_daily_breakout", False)):
-        flags.append("New daily breakout")
+        flags.append("New daily breakout condition")
     if bool(row.get("new_weekly_breakout", False)):
-        flags.append("New weekly breakout")
+        flags.append("New weekly breakout condition")
     if bool(row.get("entered_stage_2", False)):
         flags.append("Entered Stage 2")
     if bool(row.get("new_top_10", False)):
@@ -410,23 +392,15 @@ def market_summary_text(regime_df: pd.DataFrame, industry_df: pd.DataFrame, comb
         "risk_off": "Market tone is defensive",
     }
     regime_text = regime_map.get(regime, "Market tone unavailable")
-
-    if not industry_df.empty and "Industry" in industry_df.columns:
-        top_industries = ", ".join(industry_df.head(3)["Industry"].astype(str).tolist())
-    else:
-        top_industries = "Not available"
-
-    if not combined_df.empty and "final_combined_score" in combined_df.columns:
-        ready_count = int(((combined_df["stage"] == "Stage 2") & (combined_df["final_combined_score"] >= 60)).sum())
-    else:
-        ready_count = 0
-    return regime_text, top_industries, f"{ready_count} names are showing stronger alignment today"
+    top_industries = ", ".join(industry_df.head(3)["Industry"].astype(str).tolist()) if not industry_df.empty and "Industry" in industry_df.columns else "Not available"
+    ready_count = int(((combined_df["stage"] == "Stage 2") & (combined_df["final_combined_score"] >= 60)).sum()) if not combined_df.empty and "final_combined_score" in combined_df.columns else 0
+    return regime_text, top_industries, f"{ready_count} names currently fall in the stronger setup bucket"
 
 def render_disclosure() -> None:
     st.markdown(
         """
 <div class="disclosure">
-<b>Important:</b> This dashboard is designed as an informational and educational analytics tool. It presents rule-based screening outputs, labels, and summaries. It does not provide personalized investment advice, suitability assessment, target prices, or buy/sell recommendations.
+<b>Important:</b> This dashboard is an informational and educational analytics tool. It presents rule-based screening outputs, classifications, and summaries. It does not provide personalized investment advice, suitability assessment, target prices, buy calls, sell calls, or portfolio recommendations.
 </div>
 """,
         unsafe_allow_html=True,
@@ -444,6 +418,17 @@ def render_summary_card(title: str, value: str, subtitle: str) -> None:
         unsafe_allow_html=True,
     )
 
+def render_learn_card(title: str, body: str) -> None:
+    st.markdown(
+        f"""
+<div class="learn-card">
+  <div class="learn-title">{title}</div>
+  <div>{body}</div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
 def render_stock_card(row: pd.Series, beginner_mode: bool = True, show_change_flags: bool = False) -> None:
     status = get_beginner_status(row)
     ticker = str(row.get("ticker", "")).replace(".NS", "")
@@ -454,7 +439,7 @@ def render_stock_card(row: pd.Series, beginner_mode: bool = True, show_change_fl
     weekly = format_num(row.get("final_weekly_score", row.get("weekly_score")))
     change_flags_list = change_flags(row) if show_change_flags else []
     explanation = simple_explanation(row)
-    guidance = guidance_text(row)
+    interpretation = compliance_safe_interpretation(row)
     overall = row.get("overall_setup_label", row.get("combined_bucket", "n/a"))
     rs3 = format_num(row.get("rs_3m_pct"))
     rs6 = format_num(row.get("rs_6m_pct"))
@@ -495,10 +480,10 @@ def render_stock_card(row: pd.Series, beginner_mode: bool = True, show_change_fl
   <div class="stock-subtitle">{status["subtitle"]}</div>
   <div class="row-wrap">{"".join(chips)}</div>
   {flags_html}
-  <div style="margin-top:0.55rem;" class="small-label">What this means</div>
+  <div style="margin-top:0.55rem;" class="small-label">What the model is seeing</div>
   <ul class="list-tight">{expl_html}</ul>
-  <div style="margin-top:0.5rem;" class="small-label">Suggested interpretation</div>
-  <div>{guidance}</div>
+  <div style="margin-top:0.5rem;" class="small-label">Current classification</div>
+  <div>{interpretation}</div>
   {advanced_html}
 </div>
 """,
@@ -530,7 +515,7 @@ def hero_dashboard(combined: pd.DataFrame, industry: pd.DataFrame, regime: pd.Da
 <div class="hero-card">
   <div class="kicker">Market summary</div>
   <div class="big-number">{regime_text}</div>
-  <div class="muted">Top industries right now: {top_industries}</div>
+  <div class="muted">Leading industries in the latest saved scan: {top_industries}</div>
   <div class="muted" style="margin-top:0.25rem;">{ready_text}</div>
 </div>
 """,
@@ -539,23 +524,35 @@ def hero_dashboard(combined: pd.DataFrame, industry: pd.DataFrame, regime: pd.Da
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         ready_count = int(((combined["stage"] == "Stage 2") & (combined["final_combined_score"].fillna(0) >= 60)).sum()) if not combined.empty else 0
-        render_summary_card("Stronger setups", str(ready_count), "Stage 2 names with higher overall alignment")
+        render_summary_card("Stronger setups", str(ready_count), "Stage 2 names with stronger alignment")
     with c2:
         watch_count = int((combined["final_combined_score"].fillna(0).between(48, 59.99)).sum()) if not combined.empty else 0
-        render_summary_card("Developing setups", str(watch_count), "Interesting names still building or mixed")
+        render_summary_card("Developing setups", str(watch_count), "Names with constructive but mixed alignment")
     with c3:
         industry_count = len(industry) if not industry.empty else 0
-        render_summary_card("Industries tracked", str(industry_count), "Industry rotation is included in final scoring")
+        render_summary_card("Industries tracked", str(industry_count), "Industry rotation is included in the scan")
     with c4:
         render_summary_card("Last refresh", last_updated, "Latest saved scan read from your outputs folder")
 
+def learn_while_using_panel() -> None:
+    st.markdown("### Learn while using")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        render_learn_card("What does Ready mean?", "Ready is a simplified label for stocks that currently rank better on structure, momentum, and broader context within this model.")
+    with c2:
+        render_learn_card("What is Stage 2?", "Stage 2 is the stronger uptrend phase in this framework. It usually means price structure is stronger than Stage 1, 3, or 4.")
+    with c3:
+        render_learn_card("What is industry rotation?", "Industry rotation shows which sectors or industries are gaining or losing strength relative to others in the latest saved scan.")
+
 def render_stock_grid(df: pd.DataFrame, beginner_mode: bool, limit: int = 12, show_change_flags: bool = False) -> None:
-    st.markdown('<div class="stock-grid-note">Labels below are simplified for easier reading. They are not buy/sell instructions.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="small-label">The cards below translate raw scores into simpler labels. They are descriptive classifications, not instructions.</div>', unsafe_allow_html=True)
     for _, row in df.head(limit).iterrows():
         render_stock_card(row, beginner_mode=beginner_mode, show_change_flags=show_change_flags)
 
 def dashboard_tab(combined: pd.DataFrame, daily: pd.DataFrame, weekly: pd.DataFrame, industry: pd.DataFrame, regime: pd.DataFrame, last_updated: str, beginner_mode: bool) -> None:
     hero_dashboard(combined, industry, regime, last_updated)
+    st.divider()
+    learn_while_using_panel()
     st.divider()
 
     top_ready = combined.copy()
@@ -569,26 +566,17 @@ def dashboard_tab(combined: pd.DataFrame, daily: pd.DataFrame, weekly: pd.DataFr
         render_stock_grid(top_ready, beginner_mode=beginner_mode, limit=8)
     with c2:
         st.markdown("### What changed in the market")
-        if not daily.empty and "daily_setup_bucket" in daily.columns:
-            daily_events = int(daily["daily_setup_bucket"].isin(["breakout_today", "near_pivot"]).sum())
-        else:
-            daily_events = 0
-        if not weekly.empty and "weekly_setup_bucket" in weekly.columns:
-            weekly_events = int(weekly["weekly_setup_bucket"].isin(["weekly_breakout", "weekly_near_pivot"]).sum())
-        else:
-            weekly_events = 0
-        if not industry.empty and "Industry" in industry.columns:
-            leading_industries = industry.head(5)["Industry"].astype(str).tolist()
-        else:
-            leading_industries = []
+        daily_events = int(daily["daily_setup_bucket"].isin(["breakout_today", "near_pivot"]).sum()) if not daily.empty and "daily_setup_bucket" in daily.columns else 0
+        weekly_events = int(weekly["weekly_setup_bucket"].isin(["weekly_breakout", "weekly_near_pivot"]).sum()) if not weekly.empty and "weekly_setup_bucket" in weekly.columns else 0
+        leading_industries = industry.head(5)["Industry"].astype(str).tolist() if not industry.empty and "Industry" in industry.columns else []
 
         st.markdown(
             f"""
 <div class="guide-card">
   <div class="section-title">Simple readout</div>
   <ul class="list-tight">
-    <li>{daily_events} names are showing stronger daily behaviour.</li>
-    <li>{weekly_events} names are showing stronger weekly behaviour.</li>
+    <li>{daily_events} names currently show stronger daily behaviour in the latest scan.</li>
+    <li>{weekly_events} names currently show stronger weekly behaviour in the latest scan.</li>
     <li>Leading industries now: {", ".join(leading_industries) if leading_industries else "not available"}.</li>
   </ul>
 </div>
@@ -604,11 +592,7 @@ def ranked_tab(title: str, df: pd.DataFrame, score_col: str, label_col: str, beg
         return
     with st.expander("Filters", expanded=False):
         c1, c2 = st.columns(2)
-        if show_search:
-            search = c1.text_input("Search by ticker, company, or industry", key=f"{title}_search")
-        else:
-            search = ""
-            c1.caption("Search hidden here to keep this view simpler.")
+        search = c1.text_input("Search by ticker, company, or industry", key=f"{title}_search") if show_search else ""
         min_score = c2.slider(f"Minimum {score_col}", 0.0, 100.0, 55.0 if beginner_mode else 0.0, 0.5, key=f"{title}_min")
         c3, c4, c5 = st.columns(3)
         industries = c3.multiselect("Industry", sorted(df["Industry"].dropna().unique().tolist()) if "Industry" in df.columns else [], key=f"{title}_industry")
@@ -617,7 +601,7 @@ def ranked_tab(title: str, df: pd.DataFrame, score_col: str, label_col: str, beg
     filtered = filter_table(df, search, industries, stages, min_score, score_col, label_col, labels)
 
     if beginner_mode:
-        st.caption(f"{len(filtered)} results. Cards below translate the scores into simpler labels.")
+        st.caption(f"{len(filtered)} results. Cards below translate the scan output into simpler labels.")
         render_stock_grid(filtered, beginner_mode=True, limit=min(20, len(filtered)))
     else:
         cols = [c for c in ["ticker", "Company Name", "Industry", "stage", label_col, score_col, "rs_3m_pct", "rs_6m_pct"] if c in filtered.columns]
@@ -650,20 +634,21 @@ def render_stock_snapshot(row: pd.Series, beginner_mode: bool) -> None:
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        render_summary_card("Overall", final_score, "Final rule-based score")
+        render_summary_card("Overall", final_score, "Overall model score")
     with c2:
-        render_summary_card("Daily", daily_score, "Shorter timeframe score")
+        render_summary_card("Daily", daily_score, "Daily model score")
     with c3:
-        render_summary_card("Weekly", weekly_score, "Higher timeframe score")
+        render_summary_card("Weekly", weekly_score, "Weekly model score")
 
     with st.expander("How to read this stock", expanded=True):
         st.markdown(
             f"""
-- **Simple label:** {status["title"]}  
+- **Current bucket:** {status["title"]}  
 - **Structure:** {structure_label(row)}  
 - **Momentum:** {momentum_label(row)}  
 - **Stage:** {stage_label(row)}  
-- **Interpretation:** {guidance_text(row)}
+- **Stage meaning:** {stage_explanation(str(row.get("stage", "")))}  
+- **Current classification:** {compliance_safe_interpretation(row)}
 """
         )
         if not beginner_mode:
@@ -743,7 +728,7 @@ def stock_detail_tab(combined: pd.DataFrame, daily_charts_dir: str, weekly_chart
         else:
             st.info("Weekly chart not available.")
 
-    st.caption("Charts and labels are informational analytics only. They do not provide personalized recommendations or suitability guidance.")
+    st.caption("Charts are descriptive visualizations of the latest saved scan and do not provide personalized recommendations.")
 
 def changes_tab(stock_changes: pd.DataFrame, top_movers: pd.DataFrame, beginner_mode: bool) -> None:
     st.subheader("What changed")
@@ -751,43 +736,27 @@ def changes_tab(stock_changes: pd.DataFrame, top_movers: pd.DataFrame, beginner_
         st.info("No change data found yet.")
         return
     compact_metric_grid([
-        ("New daily breakouts", int(stock_changes["new_daily_breakout"].fillna(False).sum()) if "new_daily_breakout" in stock_changes.columns else 0),
-        ("New weekly breakouts", int(stock_changes["new_weekly_breakout"].fillna(False).sum()) if "new_weekly_breakout" in stock_changes.columns else 0),
+        ("New daily breakout conditions", int(stock_changes["new_daily_breakout"].fillna(False).sum()) if "new_daily_breakout" in stock_changes.columns else 0),
+        ("New weekly breakout conditions", int(stock_changes["new_weekly_breakout"].fillna(False).sum()) if "new_weekly_breakout" in stock_changes.columns else 0),
         ("Entered Stage 2", int(stock_changes["entered_stage_2"].fillna(False).sum()) if "entered_stage_2" in stock_changes.columns else 0),
         ("New Top 10", int(stock_changes["new_top_10"].fillna(False).sum()) if "new_top_10" in stock_changes.columns else 0),
     ])
 
     if beginner_mode:
-        st.caption("These cards highlight names whose rule-based status improved in the latest saved run.")
+        st.caption("These cards highlight names whose model classification improved in the latest saved run.")
         improved = stock_changes.copy()
         if "combined_score_change" in improved.columns:
             improved = improved.sort_values(["new_top_10", "new_top_20", "combined_score_change", "rank_change"], ascending=[False, False, False, False])
-        improved = improved[
-            improved[["new_daily_breakout", "new_weekly_breakout", "entered_stage_2", "new_top_10", "new_top_20"]].fillna(False).any(axis=1)
-        ] if all(col in improved.columns for col in ["new_daily_breakout", "new_weekly_breakout", "entered_stage_2", "new_top_10", "new_top_20"]) else improved.head(15)
+        if all(col in improved.columns for col in ["new_daily_breakout", "new_weekly_breakout", "entered_stage_2", "new_top_10", "new_top_20"]):
+            improved = improved[improved[["new_daily_breakout", "new_weekly_breakout", "entered_stage_2", "new_top_10", "new_top_20"]].fillna(False).any(axis=1)]
         render_stock_grid(improved, beginner_mode=True, limit=min(15, len(improved)), show_change_flags=True)
     else:
-        sections = [
-            ("New daily breakouts", stock_changes[stock_changes["new_daily_breakout"]], ["ticker", "Company Name", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change"]),
-            ("New weekly breakouts", stock_changes[stock_changes["new_weekly_breakout"]], ["ticker", "Company Name", "Industry", "stage", "final_combined_score", "combined_score_change", "rank_change"]),
-            ("Entered Stage 2", stock_changes[stock_changes["entered_stage_2"]], ["ticker", "Company Name", "Industry", "final_combined_score", "combined_score_change", "rank_change"]),
-            ("Fresh entrants into Top 10", stock_changes[stock_changes["new_top_10"]], ["ticker", "Company Name", "Industry", "stage", "current_rank", "prev_rank", "rank_change", "final_combined_score"]),
-        ]
-        for title, data, cols in sections:
-            with st.expander(title, expanded=False):
-                if data.empty:
-                    st.caption("None in this run.")
-                else:
-                    present = [c for c in cols if c in data.columns]
-                    st.dataframe(pretty_columns(data[present]), use_container_width=True, hide_index=True, height=220)
-
-        st.markdown("### Biggest movers")
         cols = [c for c in ["ticker", "Company Name", "Industry", "stage", "current_rank", "prev_rank", "rank_change", "final_combined_score", "combined_score_change", "new_top_10", "new_top_20"] if c in top_movers.columns]
         movers = top_movers.copy()
         if "rank_change" in movers.columns:
             movers = movers[(movers["rank_change"].fillna(0) > 0) | (movers["combined_score_change"].fillna(0) > 0)]
         movers = movers.sort_values(["new_top_10", "new_top_20", "rank_change", "combined_score_change"], ascending=[False, False, False, False]).head(30)
-        st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=320)
+        st.dataframe(pretty_columns(movers[cols]), use_container_width=True, hide_index=True, height=420)
 
 def industry_rotation_tab(industry_changes: pd.DataFrame, beginner_mode: bool) -> None:
     st.subheader("Industry rotation")
@@ -802,23 +771,15 @@ def industry_rotation_tab(industry_changes: pd.DataFrame, beginner_mode: bool) -
     ])
     cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change", "avg_combined_score", "combined_score_change", "strong_combined", "strong_combined_change", "actionable_daily", "actionable_daily_change", "actionable_weekly", "actionable_weekly_change", "new_cluster"] if c in industry_changes.columns]
 
-    if beginner_mode:
-        rising = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(10)
-        falling = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(10)
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("### Industries improving")
-            st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=320)
-        with c2:
-            st.markdown("### Industries weakening")
-            st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=320)
-    else:
-        rising = industry_changes.copy().sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(20)
-        falling = industry_changes.copy().sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(20)
-        with st.expander("Rising industries", expanded=True):
-            st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=240)
-        with st.expander("Falling industries", expanded=False):
-            st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=240)
+    rising = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(10)
+    falling = industry_changes.sort_values(["rank_change", "combined_score_change"], ascending=[True, True]).head(10)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("### Industries improving")
+        st.dataframe(pretty_columns(rising[cols]), use_container_width=True, hide_index=True, height=320)
+    with c2:
+        st.markdown("### Industries weakening")
+        st.dataframe(pretty_columns(falling[cols]), use_container_width=True, hide_index=True, height=320)
 
 def industry_tab(industry: pd.DataFrame) -> None:
     st.subheader("Industry strength")
@@ -850,28 +811,25 @@ def normalize_portfolio_ticker(x: str) -> str:
 
 def portfolio_tab(combined: pd.DataFrame, beginner_mode: bool) -> None:
     st.subheader("My portfolio")
-    st.caption("Personal watchlist analytics only. This is not portfolio advice.")
+    st.caption("This section shows analytics on tickers entered by the user. It does not assess suitability, allocation, or appropriateness.")
     if combined.empty:
         st.info("No scan outputs found yet.")
         return
     if "portfolio_tickers" not in st.session_state:
         st.session_state["portfolio_tickers"] = []
 
-    st.markdown("### Add tickers")
     input_text = st.text_input("Enter tickers (comma separated)", placeholder="Example: RELIANCE, TCS, INFY", key="portfolio_input_text")
-    c1, c2 = st.columns([4, 1])
-    with c2:
-        if st.button("Add", use_container_width=True, key="portfolio_add_btn") and input_text:
-            raw = [x.strip() for x in input_text.split(",")]
-            normalized = [normalize_portfolio_ticker(x) for x in raw]
-            for t in normalized:
-                if t and t not in st.session_state["portfolio_tickers"] and len(st.session_state["portfolio_tickers"]) < 20:
-                    st.session_state["portfolio_tickers"].append(t)
-            st.rerun()
+    if st.button("Add", use_container_width=True, key="portfolio_add_btn") and input_text:
+        raw = [x.strip() for x in input_text.split(",")]
+        normalized = [normalize_portfolio_ticker(x) for x in raw]
+        for t in normalized:
+            if t and t not in st.session_state["portfolio_tickers"] and len(st.session_state["portfolio_tickers"]) < 20:
+                st.session_state["portfolio_tickers"].append(t)
+        st.rerun()
 
     st.caption(f"{len(st.session_state['portfolio_tickers'])}/20 tickers")
     if not st.session_state["portfolio_tickers"]:
-        st.info("Add tickers to see portfolio analytics.")
+        st.info("Add tickers to see analytics for that list.")
         return
 
     portfolio = pd.DataFrame({"ticker": st.session_state["portfolio_tickers"]})
@@ -894,12 +852,9 @@ def portfolio_tab(combined: pd.DataFrame, beginner_mode: bool) -> None:
         display["Ticker"] = display["ticker"].astype(str).str.replace(".NS", "", regex=False)
         display = display.rename(columns={"stage": "Stage", "final_combined_score": "Final Score", "overall_setup_label": "Setup"})
         cols = [c for c in ["Ticker", "Industry", "Stage", "Final Score", "Setup"] if c in display.columns]
-        table_df = display[cols].reset_index(drop=True)
-        st.dataframe(table_df, use_container_width=True, hide_index=True, height=320)
+        st.dataframe(display[cols].reset_index(drop=True), use_container_width=True, hide_index=True, height=320)
 
-    st.markdown("### Remove tickers")
-    choices = [t.replace(".NS", "") for t in st.session_state["portfolio_tickers"]]
-    remove_choice = st.selectbox("Select ticker to remove", [""] + choices, key="portfolio_remove_select")
+    remove_choice = st.selectbox("Remove ticker", [""] + [t.replace(".NS", "") for t in st.session_state["portfolio_tickers"]], key="portfolio_remove_select")
     if st.button("Remove selected ticker", key="portfolio_remove_btn", use_container_width=True) and remove_choice:
         full_ticker = normalize_portfolio_ticker(remove_choice)
         st.session_state["portfolio_tickers"] = [t for t in st.session_state["portfolio_tickers"] if t != full_ticker]
@@ -912,13 +867,11 @@ def render_mover_card(row, period_col: str, positive: bool = True, beginner_mode
     stage = row.get("stage", "")
     score = row.get("final_combined_score")
     change = pd.to_numeric(row.get(period_col), errors="coerce")
-    setup = row.get("overall_setup_label", row.get("combined_bucket", ""))
     status = get_beginner_status(row)
     change_cls = "mover-change-up" if pd.notna(change) and change >= 0 else "mover-change-down"
     shell_cls = "mover-card mover-top" if positive else "mover-card mover-bottom"
     change_text = f"{change:+.2f}%" if pd.notna(change) else "n/a"
     score_text = f"{float(score):.1f}" if pd.notna(pd.to_numeric(score, errors="coerce")) else "n/a"
-    status_chip = status["title"] if beginner_mode else setup
     html = f"""
     <div class="{shell_cls}">
       <div class="mover-head">
@@ -931,7 +884,7 @@ def render_mover_card(row, period_col: str, positive: bool = True, beginner_mode
       <div class="mover-chip-wrap">
         <span class="mover-chip">{industry}</span>
         <span class="mover-chip">{stage}</span>
-        <span class="mover-chip">{status_chip}</span>
+        <span class="mover-chip">{status["title"] if beginner_mode else row.get("overall_setup_label", row.get("combined_bucket", ""))}</span>
         {"<span class='mover-chip'>Score " + score_text + "</span>" if not beginner_mode else ""}
       </div>
     </div>
@@ -939,8 +892,8 @@ def render_mover_card(row, period_col: str, positive: bool = True, beginner_mode
     st.markdown(html, unsafe_allow_html=True)
 
 def moves_tab(price_moves: pd.DataFrame, beginner_mode: bool) -> None:
-    st.subheader("Top and bottom stock moves")
-    st.caption("Fast view of leaders and laggards by time window. Movement alone does not imply quality.")
+    st.subheader("Market movers")
+    st.caption("This section simply shows which names moved most over the selected time window. Price movement and quality classification are different things.")
     if price_moves.empty:
         st.info("No price move data found yet.")
         return
@@ -962,55 +915,105 @@ def moves_tab(price_moves: pd.DataFrame, beginner_mode: bool) -> None:
     df = df.dropna(subset=[col_name]).reset_index(drop=True)
 
     compact_metric_grid([
-        ("Leaders", int((df[col_name] > 0).sum())),
-        ("Laggards", int((df[col_name] < 0).sum())),
+        ("Up moves", int((df[col_name] > 0).sum())),
+        ("Down moves", int((df[col_name] < 0).sum())),
         ("Best move", f"{df[col_name].max():+.2f}%" if not df.empty else "n/a"),
         ("Worst move", f"{df[col_name].min():+.2f}%" if not df.empty else "n/a"),
     ])
 
-    top10 = df.sort_values([col_name, "final_combined_score"], ascending=[False, False]).head(10)
-    bottom10 = df.sort_values([col_name, "final_combined_score"], ascending=[True, False]).head(10)
+    render_learn_card("How to read this section", "A large move only means price moved more than other names over the selected window. It does not mean the stock is automatically a stronger setup.")
+    leaders = df.sort_values([col_name, "final_combined_score"], ascending=[False, False]).head(10)
+    laggards = df.sort_values([col_name, "final_combined_score"], ascending=[True, False]).head(10)
 
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown(f"### Top 10 • {selected_period}")
-        for _, row in top10.iterrows():
+        st.markdown(f"### Fastest upward moves • {selected_period}")
+        for _, row in leaders.iterrows():
             render_mover_card(row, col_name, positive=True, beginner_mode=beginner_mode)
     with c2:
-        st.markdown(f"### Bottom 10 • {selected_period}")
-        for _, row in bottom10.iterrows():
+        st.markdown(f"### Fastest downward moves • {selected_period}")
+        for _, row in laggards.iterrows():
             render_mover_card(row, col_name, positive=False, beginner_mode=beginner_mode)
 
     with st.expander("View as table", expanded=False):
         cols = [c for c in ["ticker", "Company Name", "Industry", "stage", "final_combined_score", "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct"] if c in df.columns]
         st.dataframe(pretty_columns(df[cols].sort_values(col_name, ascending=False)), use_container_width=True, hide_index=True, height=420)
 
-def help_tab(beginner_mode: bool) -> None:
-    st.subheader("How to read the dashboard")
+def help_tab(beginner_mode: bool, help_image_path: str) -> None:
+    st.subheader("Beginner help")
     st.markdown(
         """
-### Beginner labels
-- **Ready**: stronger structure and improving behaviour within this rule-based framework
-- **Watch**: interesting, but not fully confirmed
-- **Avoid**: weak or low-quality structure right now
+This site is designed to help a beginner understand three things from a large stock universe:
 
-### Label wording used in the app
-- **Breakout day**: the model detected a daily breakout condition
-- **Near pivot**: price is close to a recent pivot zone
-- **Setup building**: structure is forming but still incomplete
-- **Strong daily and weekly alignment**: both timeframes look more aligned than usual
+1. which names currently look technically stronger or weaker inside this rule-based scan  
+2. which industries are improving or weakening relative to others  
+3. how market structure changes over time across daily and weekly views  
 
-### Compliance-safe design choices
-- The app does **not** show buy, sell, target, stop-loss, or suitability advice.
-- The app uses **informational labels**, not personalized recommendations.
-- Watchlist guidance is framed as **interpretation** and **monitoring**, not action advice.
-- Portfolio view is analytics only and does not assess appropriateness for any user.
+The site does **not** decide what is suitable for any individual person.
 """
     )
-    if beginner_mode:
-        st.info("Beginner Mode is ON. Scores are translated into simpler labels across the main tabs.")
+
+    st.markdown("### What the main labels mean")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        render_learn_card("Ready", "The model currently sees comparatively stronger structure, momentum, and context.")
+    with c2:
+        render_learn_card("Watch", "The model currently sees developing structure, but alignment is still mixed or incomplete.")
+    with c3:
+        render_learn_card("Lower strength", "The model currently sees weaker or less aligned structure.")
+
+    st.markdown("### What are stages?")
+    st.markdown(
+        """
+Stages are a simple way to describe where a stock appears to sit in a broad market cycle:
+
+- **Stage 1**: accumulation or recovery phase  
+- **Stage 2**: uptrend or markup phase  
+- **Stage 3**: distribution phase  
+- **Stage 4**: downtrend or markdown phase  
+
+Within this framework, Stage 2 is usually the strongest phase and Stage 4 is the weakest.
+"""
+    )
+    help_img = Path(help_image_path)
+    if help_img.exists():
+        st.image(str(help_img), caption="Reference image for the four broad market phases", use_container_width=True)
     else:
-        st.info("Beginner Mode is OFF. Raw scores and labels are shown more often.")
+        st.info("Stage reference image not found.")
+
+    st.markdown("### What each page is trying to show")
+    render_learn_card("Dashboard", "A quick summary of market tone, stronger names, and simple learning cards.")
+    render_learn_card("Overall", "The full ranked universe using the model's overall score and overall classification.")
+    render_learn_card("Market movers", "The largest price moves over 1 day, 1 week, 1 month, or YTD.")
+    render_learn_card("Portfolio", "Analytics for tickers entered by the user. This is descriptive only.")
+    render_learn_card("Stock", "A deep look at one stock using labels, charts, and explanatory text.")
+    render_learn_card("Changes", "Names whose model classification improved in the latest saved run.")
+    render_learn_card("Rotation", "Industries moving up or down relative to others.")
+    render_learn_card("Industries", "Industry-level strength snapshot.")
+    render_learn_card("Stages", "Stage distribution by industry.")
+
+    st.markdown("### How to read the site in a simple way")
+    st.markdown(
+        """
+- Start with **Dashboard** to understand the broad market tone.  
+- Use **Overall** to see which names currently rank better in the model.  
+- Use **Market movers** to separate pure price movement from quality classification.  
+- Use **Stock** to understand why a specific name got its current label.  
+- Use **Rotation** to see which industries are gaining or losing strength.  
+"""
+    )
+
+    st.markdown("### Compliance-safe interpretation")
+    st.markdown(
+        """
+The classifications and summaries on this site are descriptive outputs from a rule-based model. They do not evaluate personal goals, financial situation, suitability, or risk tolerance. They are not buy calls, sell calls, or allocation advice.
+"""
+    )
+
+    if beginner_mode:
+        st.info("Beginner Mode is ON. Simpler labels appear more often across the site.")
+    else:
+        st.info("Beginner Mode is OFF. Raw scores and detailed labels appear more often across the site.")
 
 st.title("VCP Market Analytics Dashboard")
 render_disclosure()
@@ -1018,8 +1021,9 @@ render_disclosure()
 with st.sidebar:
     st.header("Dashboard settings")
     outdir = st.text_input("Output folder", value="outputs")
-    beginner_mode = st.toggle("Beginner Mode", value=True, help="Simplifies labels and hides some raw complexity.")
-    st.caption("This dashboard reads the latest saved scan outputs from your outputs folder.")
+    beginner_mode = st.toggle("Beginner Mode", value=True, help="Shows simpler labels more often.")
+    help_image_path = st.text_input("Help page stage image", value="market_phases_reference.png")
+    st.caption("This dashboard reads the latest saved scan outputs from the outputs folder.")
 
 outputs = {
     "daily": str(Path(outdir) / "vcp_daily_ranked.csv"),
@@ -1047,10 +1051,10 @@ price_moves_df = add_safe_labels(safe_read(outputs["price_moves"]))
 last_updated = get_last_updated(outputs["combined"])
 
 if combined_df.empty and daily_df.empty and weekly_df.empty:
-    st.warning("No output files found yet. Wait for the scheduled scan to generate the latest files.")
+    st.warning("No output files found yet. Wait for the saved scan to generate the latest files.")
 
 tabs = st.tabs([
-    "Dashboard", "Overall", "Moves", "Portfolio", "Stock",
+    "Dashboard", "Overall", "Market movers", "Portfolio", "Stock",
     "Daily", "Weekly", "Changes", "Rotation", "Industries", "Stages", "Help"
 ])
 
@@ -1077,4 +1081,4 @@ with tabs[9]:
 with tabs[10]:
     stage_by_industry_tab(combined_df)
 with tabs[11]:
-    help_tab(beginner_mode)
+    help_tab(beginner_mode, help_image_path)
