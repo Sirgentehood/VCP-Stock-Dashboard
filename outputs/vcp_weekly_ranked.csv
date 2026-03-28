@@ -189,7 +189,7 @@ CHALET.NS,Chalet Hotels Ltd.,Consumer Services,Stage 4,-3.63,-18.94,130573676.94
 CAMPUS.NS,Campus Activewear Ltd.,Consumer Durables,Stage 4,-1.73,-7.7,74420911.8,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,273.3,-18.13,"[9.82, 15.19, 7.92, 7.56]","[4, 4, 9, 5]",0.67,24.0,strong
 VENTIVE.NS,Ventive Hospitality Ltd.,Consumer Services,Stage 4,-5.96,-13.1,69013842.69,"Stage 4, daily_vcp_ok, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,776.85,-24.57,"[11.22, 14.17, 7.6, 7.06]","[4, 6, 3, 8]",0.67,29.0,strong
 CERA.NS,Cera Sanitaryware Ltd,Consumer Durables,Stage 4,1.1,-15.57,115119031.38,"Stage 4, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,5167.1,-10.19,"[10.48, 10.34, 8.6, 20.68]","[8, 3, 7, 12]",0.67,32.0,strong
-IRB.NS,IRB Infrastructure Developers Ltd.,Construction,Stage 4,-38.77,-42.33,353912497.92,"Stage 4, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,43.98,-53.47,"[20.53, 5.66, 8.19, 7.22]","[16, 13, 7, 3]",0.67,33.0,strong
+IRB.NS,IRB Infrastructure Developers Ltd.,Construction,Stage 4,-38.73,-42.25,353912497.92,"Stage 4, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,43.95,-53.43,"[20.47, 5.59, 8.12, 7.22]","[16, 13, 7, 3]",0.67,33.0,strong
 ABREL.NS,Aditya Birla Real Estate Ltd.,Forest Materials,Stage 4,-20.05,-29.38,339832927.52,"Stage 4, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,1386.8,-18.47,"[28.63, 14.18, 32.52, 28.6]","[11, 2, 13, 9]",0.67,33.0,strong
 SOBHA.NS,Sobha Ltd.,Realty,Stage 4,-4.21,-12.88,160651857.35,"Stage 4, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,1524.9,-19.5,"[16.97, 8.98, 14.79, 11.26]","[7, 3, 5, 2]",0.67,27.0,strong
 SONATSOFTW.NS,Sonata Software Ltd.,Information Technology,Stage 4,-27.3,-32.1,250202129.17,"Stage 4, weekly_vcp_ok, weekly_strong",weekly_watchlist,40.67,40.67,315.93,-30.68,"[7.85, 20.45, 11.29, 7.58]","[7, 3, 2, 5]",0.67,33.0,strong
@@ -394,10 +394,10 @@ FINPIPE.NS,Finolex Industries Ltd.,Capital Goods,Stage 4,6.02,-16.13,142160858.5
 ELECON.NS,Elecon Engineering Co. Ltd.,Capital Goods,Stage 4,-9.48,-28.12,187252764.67,Stage 4,weekly_watchlist,14.0,19.0,442.35,-15.84,"[21.9, 23.59, 25.15]","[9, 11, 3]",0.0,33.0,weak
 ADANIENT.NS,Adani Enterprises Ltd.,Metals & Mining,Stage 4,-5.54,-21.08,3965525275.52,Stage 4,weekly_watchlist,14.0,19.0,2226.4,-18.12,"[17.69, 28.02]","[6, 16]",0.0,30.0,weak
 TITAGARH.NS,Titagarh Rail Systems Ltd.,Capital Goods,Stage 4,-20.95,-24.28,466389627.76,Stage 4,weekly_watchlist,14.0,19.0,821.0,-27.45,"[7.97, 14.69, 18.52]","[2, 5, 12]",0.0,27.0,weak
-VEDL.NS,Vedanta Ltd.,Metals & Mining,Stage 3,22.58,56.56,10036416318.74,Stage 3,weekly_watchlist,13.91,18.91,709.16,-8.43,[8.47],[5],0.0,5.0,weak
 NMDC.NS,NMDC Ltd.,Metals & Mining,Stage 3,9.0,12.38,1885437964.9,Stage 3,weekly_watchlist,13.74,18.74,81.74,-5.55,[9.67],[3],0.0,3.0,weak
 LT.NS,Larsen & Toubro Ltd.,Construction,Stage 1,0.77,6.35,18217480301.28,Stage 1,weekly_watchlist,18.71,18.71,4380.6,-18.64,"[6.42, 7.12, 10.08]","[4, 12, 3]",0.0,30.0,weak
 UNIONBANK.NS,Union Bank of India,Financial Services,Stage 3,29.52,35.43,3654086402.6,Stage 3,weekly_watchlist,16.1,18.6,202.27,-13.24,"[6.39, 13.49]","[2, 4]",0.0,8.0,weak
+VEDL.NS,Vedanta Ltd.,Metals & Mining,Stage 3,20.77,54.15,10194691558.41,Stage 3,weekly_watchlist,13.49,18.49,721.0,-9.93,[8.47],[5],0.0,5.0,weak
 BLUEJET.NS,Blue Jet Healthcare Ltd.,Healthcare,Stage 4,-22.31,-39.54,238095147.24,Stage 4,weekly_watchlist,13.2,18.2,432.45,-20.5,"[9.31, 33.89]","[2, 6]",0.0,11.0,weak
 NAM-INDIA.NS,Nippon Life India Asset Management Ltd.,Financial Services,Stage 3,8.65,8.04,540834098.33,"Stage 3, volume_dryup",weekly_watchlist,15.67,18.17,957.05,-13.07,"[6.74, 6.98, 7.64, 7.66]","[6, 2, 2, 3]",0.0,27.0,weak
 TVSMOTOR.NS,TVS Motor Company Ltd.,Automobile and Auto Components,Stage 3,7.51,9.11,3998217806.44,Stage 3,weekly_watchlist,15.66,18.16,3869.7,-10.97,"[6.29, 7.32, 7.74]","[2, 4, 3]",0.0,30.0,weak
@@ -421,7 +421,7 @@ MRF.NS,MRF Ltd.,Automobile and Auto Components,Stage 3,-1.72,-7.56,1096730385.5,
 FIVESTAR.NS,Five-Star Business Finance Ltd.,Financial Services,Stage 4,-19.13,-18.58,570484094.22,Stage 4,weekly_watchlist,14.0,16.5,512.7,-26.53,"[15.57, 33.63]","[2, 12]",0.0,22.0,weak
 BAJAJFINSV.NS,Bajaj Finserv Ltd.,Financial Services,Stage 3,-3.29,-8.76,2894574275.46,Stage 3,weekly_watchlist,14.0,16.5,2058.5,-17.67,"[6.25, 7.04]","[5, 7]",0.0,30.0,weak
 INDIGO.NS,InterGlobe Aviation Ltd.,Services,Stage 4,-6.5,-18.57,9013634913.62,Stage 4,weekly_watchlist,14.0,16.5,4929.2,-16.83,"[5.4, 8.63, 17.74]","[4, 5, 4]",0.0,30.0,weak
-HUDCO.NS,Housing & Urban Development Corporation Ltd.,Financial Services,Stage 4,-10.47,-17.14,673801027.92,Stage 4,weekly_watchlist,14.0,16.5,194.39,-13.54,"[9.26, 10.49, 11.71, 17.19]","[11, 7, 3, 4]",0.0,17.0,weak
+HUDCO.NS,Housing & Urban Development Corporation Ltd.,Financial Services,Stage 4,-11.01,-17.66,678128996.46,Stage 4,weekly_watchlist,14.0,16.5,195.77,-14.15,"[9.26, 10.49, 11.71, 17.19]","[11, 7, 3, 4]",0.0,17.0,weak
 EXIDEIND.NS,Exide Industries Ltd.,Automobile and Auto Components,Stage 4,-4.9,-15.38,456263577.32,Stage 4,weekly_watchlist,14.0,16.5,336.8,-10.67,"[7.11, 19.79]","[2, 15]",0.0,20.0,weak
 UNOMINDA.NS,UNO Minda Ltd.,Automobile and Auto Components,Stage 3,-4.75,-10.48,1195752839.89,Stage 3,weekly_watchlist,14.0,16.5,1244.0,-15.7,"[5.94, 9.68, 14.16]","[5, 5, 3]",0.0,30.0,weak
 JMFINANCIL.NS,JM Financial Ltd.,Financial Services,Stage 4,-4.3,-20.05,405437588.92,Stage 4,weekly_watchlist,14.0,16.5,136.5,-12.28,"[10.25, 15.4, 17.52, 17.99]","[2, 5, 4, 5]",0.0,29.0,weak
