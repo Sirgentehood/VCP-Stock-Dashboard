@@ -63,7 +63,7 @@ AFCONS.NS,Afcons Infrastructure Ltd.,Construction,Stage 4,watchlist,22.85,-0.19,
 MSUMI.NS,Motherson Sumi Wiring India Ltd.,Automobile and Auto Components,Stage 1,watchlist,40.47,-0.21,1.69,-13.09,-22.53,37.9
 HINDALCO.NS,Hindalco Industries Ltd.,Metals & Mining,Stage 3,watchlist,44.23,-0.22,-3.38,-6.08,-3.16,866.7
 FACT.NS,Fertilisers and Chemicals Travancore Ltd.,Chemicals,Stage 3,watchlist,35.99,-0.22,0.07,4.13,-12.74,788.5
-HFCL.NS,HFCL Ltd.,Telecommunication,Stage 3,watchlist,40.07,-0.24,0.11,1.96,2.67,70.76
+HFCL.NS,HFCL Ltd.,Telecommunication,Stage 3,watchlist,40.24,-0.24,0.11,1.96,2.67,70.76
 NEULANDLAB.NS,Neuland Laboratories Ltd.,Healthcare,Stage 1,watchlist,37.3,-0.24,-0.28,-9.72,-19.87,12067.0
 DIVISLAB.NS,Divi's Laboratories Ltd.,Healthcare,Stage 4,watchlist,37.82,-0.28,0.42,-4.12,-5.46,5997.5
 MRF.NS,MRF Ltd.,Automobile and Auto Components,Stage 3,watchlist,26.07,-0.3,-0.74,-9.99,-14.49,129575.0
@@ -82,7 +82,7 @@ GVT&D.NS,GE Vernova T&D India Ltd.,Capital Goods,Stage 2,watchlist,66.28,-0.46,-
 SAPPHIRE.NS,Sapphire Foods India Ltd.,Consumer Services,Stage 4,watchlist,15.91,-0.46,-2.38,-25.97,-39.39,159.23
 NUVAMA.NS,Nuvama Wealth Management Ltd.,Financial Services,Stage 4,watchlist,37.32,-0.47,3.86,-6.3,-18.04,1195.4
 FIRSTCRY.NS,Brainbees Solutions Ltd.,Consumer Services,Stage 4,watchlist,29.98,-0.47,6.53,5.23,-22.04,223.78
-IRB.NS,IRB Infrastructure Developers Ltd.,Construction,Stage 4,watchlist,38.35,-0.49,-1.68,1.92,-2.76,40.93
+IRB.NS,IRB Infrastructure Developers Ltd.,Construction,Stage 4,watchlist,33.15,-0.49,-1.68,-49.04,-51.42,20.47
 CENTURYPLY.NS,Century Plyboards (India) Ltd.,Consumer Durables,Stage 3,watchlist,17.85,-0.51,5.88,-7.46,-15.47,698.45
 LUPIN.NS,Lupin Ltd.,Healthcare,Stage 2,watchlist,64.75,-0.55,3.7,3.76,11.03,2334.8
 PERSISTENT.NS,Persistent Systems Ltd.,Information Technology,Stage 3,watchlist,20.49,-0.59,6.45,5.1,-21.73,4899.8
@@ -126,8 +126,8 @@ SBFC.NS,SBFC Finance Ltd.,Financial Services,Stage 4,watchlist,37.08,-1.17,-2.57
 TECHM.NS,Tech Mahindra Ltd.,Information Technology,Stage 3,watchlist,29.9,-1.2,3.8,3.43,-13.44,1391.6
 NUVOCO.NS,Nuvoco Vistas Corporation Ltd.,Construction Materials,Stage 4,watchlist,27.29,-1.22,5.18,-10.54,-14.46,299.55
 HCLTECH.NS,HCL Technologies Ltd.,Information Technology,Stage 4,watchlist,22.52,-1.22,4.01,1.88,-15.92,1364.4
-TATAELXSI.NS,Tata Elxsi Ltd.,Information Technology,Stage 4,watchlist,27.34,-1.25,3.01,-7.5,-20.16,4160.8
-TATAPOWER.NS,Tata Power Co. Ltd.,Power,Stage 3,watchlist,49.04,-1.28,-3.21,1.57,1.01,385.7
+TATAELXSI.NS,Tata Elxsi Ltd.,Information Technology,Stage 4,watchlist,27.35,-1.25,3.01,-7.5,-20.16,4160.8
+TATAPOWER.NS,Tata Power Co. Ltd.,Power,Stage 3,watchlist,49.05,-1.28,-3.21,1.57,1.01,385.7
 MANYAVAR.NS,Vedant Fashions Ltd.,Consumer Services,Stage 4,watchlist,19.71,-1.31,-2.52,-14.03,-39.19,350.1
 ICICIGI.NS,ICICI Lombard General Insurance Company Ltd.,Financial Services,Stage 4,watchlist,23.34,-1.32,-2.52,-8.24,-10.73,1747.0
 MAXHEALTH.NS,Max Healthcare Institute Ltd.,Healthcare,Stage 4,watchlist,31.13,-1.33,2.31,-10.24,-7.08,975.1
@@ -142,7 +142,7 @@ VEDL.NS,Vedanta Ltd.,Metals & Mining,Stage 3,watchlist,29.1,-1.4,-0.77,-5.01,9.5
 DALBHARAT.NS,Dalmia Bharat Ltd.,Construction Materials,Stage 4,watchlist,14.38,-1.41,1.39,-10.24,-13.05,1857.4
 TITAN.NS,Titan Company Ltd.,Consumer Durables,Stage 3,watchlist,36.61,-1.43,-1.4,-7.29,-1.67,3981.5
 LAURUSLABS.NS,Laurus Labs Ltd.,Healthcare,Stage 3,watchlist,37.81,-1.44,6.76,-1.92,-9.15,1008.8
-GAIL.NS,GAIL (India) Ltd.,Oil Gas & Consumable Fuels,Stage 4,watchlist,32.32,-1.44,-4.91,-18.27,-17.64,137.19
+GAIL.NS,GAIL (India) Ltd.,Oil Gas & Consumable Fuels,Stage 4,watchlist,32.33,-1.44,-4.91,-18.27,-17.64,137.19
 USHAMART.NS,Usha Martin Ltd.,Capital Goods,Stage 3,watchlist,46.13,-1.45,2.73,0.48,-8.09,408.0
 DRREDDY.NS,Dr. Reddy's Laboratories Ltd.,Healthcare,Stage 3,watchlist,54.93,-1.46,0.56,-1.42,2.26,1281.7
 PETRONET.NS,Petronet LNG Ltd.,Oil Gas & Consumable Fuels,Stage 3,watchlist,29.8,-1.46,-9.1,-20.05,-14.54,246.2
@@ -155,7 +155,7 @@ POONAWALLA.NS,Poonawalla Fincorp Ltd.,Financial Services,Stage 1,watchlist,38.99
 CONCOR.NS,Container Corporation of India Ltd.,Services,Stage 4,watchlist,36.31,-1.56,-0.56,-13.31,-15.85,438.2
 LALPATHLAB.NS,Dr. Lal Path Labs Ltd.,Healthcare,Stage 3,watchlist,40.41,-1.57,0.0,-5.94,-11.99,1325.4
 COFORGE.NS,Coforge Ltd.,Information Technology,Stage 4,watchlist,16.45,-1.58,4.8,-5.57,-30.7,1144.7
-GSPL.NS,Gujarat State Petronet Ltd.,Oil Gas & Consumable Fuels,Stage 4,watchlist,43.3,-1.59,-8.69,-22.65,-24.84,234.45
+GSPL.NS,Gujarat State Petronet Ltd.,Oil Gas & Consumable Fuels,Stage 4,watchlist,43.31,-1.59,-8.69,-22.65,-24.84,234.45
 EIDPARRY.NS,E.I.D. Parry (India) Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,30.54,-1.59,-0.05,-8.25,-21.86,795.45
 MAHABANK.NS,Bank of Maharashtra,Financial Services,Stage 3,watchlist,28.45,-1.6,2.91,-10.3,2.84,64.46
 THERMAX.NS,Thermax Ltd.,Capital Goods,Stage 3,watchlist,51.88,-1.61,-1.25,1.55,4.36,3196.9
@@ -205,7 +205,7 @@ IOC.NS,Indian Oil Corporation Ltd.,Oil Gas & Consumable Fuels,Stage 1,watchlist,
 LICI.NS,Life Insurance Corporation of India,Financial Services,Stage 4,watchlist,32.41,-1.98,-0.05,-13.19,-10.22,765.65
 KSB.NS,KSB Ltd.,Capital Goods,Stage 3,watchlist,51.05,-1.99,-0.5,12.03,6.65,795.85
 KIMS.NS,Krishna Institute of Medical Sciences Ltd.,Healthcare,Stage 1,watchlist,39.78,-2.0,-3.22,-13.51,3.29,636.4
-NSLNISP.NS,NMDC Steel Ltd.,Metals & Mining,Stage 3,watchlist,34.51,-2.01,-4.19,-10.68,-21.68,34.53
+NSLNISP.NS,NMDC Steel Ltd.,Metals & Mining,Stage 3,watchlist,34.52,-2.01,-4.19,-10.68,-21.68,34.53
 KPITTECH.NS,KPIT Technologies Ltd.,Information Technology,Stage 4,watchlist,21.56,-2.01,0.17,-13.21,-43.13,660.05
 JIOFIN.NS,Jio Financial Services Ltd.,Financial Services,Stage 4,watchlist,36.24,-2.02,-2.88,-8.89,-21.36,232.55
 NIVABUPA.NS,Niva Bupa Health Insurance Company Ltd.,Financial Services,Stage 4,watchlist,37.75,-2.05,0.04,-8.59,-6.86,69.93
@@ -223,7 +223,7 @@ WELCORP.NS,Welspun Corp Ltd.,Capital Goods,Stage 3,watchlist,55.04,-2.18,2.81,5.
 NETWEB.NS,Netweb Technologies India Ltd.,Information Technology,Stage 3,watchlist,37.52,-2.19,-2.16,-10.75,3.39,3180.1
 ECLERX.NS,eClerx Services Ltd.,Services,Stage 3,watchlist,26.82,-2.19,0.41,-12.55,-39.32,1462.8
 HAL.NS,Hindustan Aeronautics Ltd.,Capital Goods,Stage 4,watchlist,45.53,-2.2,-5.63,-9.21,-17.72,3588.6
-SUPREMEIND.NS,Supreme Industries Ltd.,Capital Goods,Stage 4,watchlist,39.15,-2.2,-2.49,-5.39,7.56,3747.7
+SUPREMEIND.NS,Supreme Industries Ltd.,Capital Goods,Stage 4,watchlist,39.16,-2.2,-2.49,-5.39,7.56,3747.7
 AAVAS.NS,Aavas Financiers Ltd.,Financial Services,Stage 4,watchlist,20.85,-2.21,0.42,-12.51,-23.9,1110.4
 BALRAMCHIN.NS,Balrampur Chini Mills Ltd.,Fast Moving Consumer Goods,Stage 3,watchlist,51.04,-2.22,2.81,8.81,13.44,497.2
 JSWSTEEL.NS,JSW Steel Ltd.,Metals & Mining,Stage 1,watchlist,30.88,-2.22,-0.05,-9.9,-3.52,1130.3
@@ -246,11 +246,11 @@ DEVYANI.NS,Devyani International Ltd.,Consumer Services,Stage 4,watchlist,21.68,
 CEATLTD.NS,Ceat Ltd.,Automobile and Auto Components,Stage 3,watchlist,36.75,-2.43,-0.51,-6.99,-8.26,3462.9
 360ONE.NS,360 ONE WAM Ltd.,Financial Services,Stage 1,watchlist,40.65,-2.46,-6.06,-12.21,-17.15,977.4
 VIJAYA.NS,Vijaya Diagnostic Centre Ltd.,Healthcare,Stage 4,watchlist,27.51,-2.48,-5.69,-11.73,-16.51,870.3
-ADANIGREEN.NS,Adani Green Energy Ltd.,Power,Stage 4,watchlist,39.75,-2.49,-2.62,-15.17,-18.85,832.5
+ADANIGREEN.NS,Adani Green Energy Ltd.,Power,Stage 4,watchlist,39.74,-2.49,-2.62,-15.17,-18.85,832.5
 AJANTPHARM.NS,Ajanta Pharmaceuticals Ltd.,Healthcare,Stage 3,watchlist,49.42,-2.5,-4.62,-4.78,-4.44,2807.9
-GODREJAGRO.NS,Godrej Agrovet Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,38.83,-2.5,-4.78,-14.4,-3.84,546.45
+GODREJAGRO.NS,Godrej Agrovet Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,38.85,-2.5,-4.78,-14.4,-3.84,546.45
 IRCTC.NS,Indian Railway Catering And Tourism Corporation Ltd.,Consumer Services,Stage 4,watchlist,31.98,-2.51,-2.9,-16.9,-25.11,510.6
-SJVN.NS,SJVN Ltd.,Power,Stage 4,watchlist,47.33,-2.52,-3.72,-10.81,-10.09,66.17
+SJVN.NS,SJVN Ltd.,Power,Stage 4,watchlist,47.34,-2.52,-3.72,-10.81,-10.09,66.17
 BIOCON.NS,Biocon Ltd.,Healthcare,Stage 1,watchlist,47.11,-2.52,0.42,-5.28,-4.55,370.1
 PREMIERENE.NS,Premier Energies Ltd.,Capital Goods,Stage 3,watchlist,41.45,-2.52,3.41,15.02,5.5,893.8
 LEMONTREE.NS,Lemon Tree Hotels Ltd.,Consumer Services,Stage 3,watchlist,18.4,-2.52,-1.44,-7.7,-33.13,104.92
@@ -274,7 +274,7 @@ UNIONBANK.NS,Union Bank of India,Financial Services,Stage 3,watchlist,27.44,-2.6
 MCX.NS,Multi Commodity Exchange of India Ltd.,Financial Services,Stage 3,watchlist,47.72,-2.71,-5.22,0.1,9.12,2398.2
 BLUEJET.NS,Blue Jet Healthcare Ltd.,Healthcare,Stage 4,watchlist,28.06,-2.72,-5.94,-16.02,-35.01,343.8
 RBLBANK.NS,RBL Bank Ltd.,Financial Services,Stage 3,watchlist,27.5,-2.73,1.22,-9.31,-6.23,295.65
-RCF.NS,Rashtriya Chemicals & Fertilizers Ltd.,Chemicals,Stage 4,watchlist,27.86,-2.74,-3.14,-12.17,-22.68,112.08
+RCF.NS,Rashtriya Chemicals & Fertilizers Ltd.,Chemicals,Stage 4,watchlist,27.87,-2.74,-3.14,-12.17,-22.68,112.08
 BHEL.NS,Bharat Heavy Electricals Ltd.,Capital Goods,Stage 1,watchlist,48.05,-2.75,1.23,-2.65,-12.56,254.85
 GILLETTE.NS,Gillette India Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,43.25,-2.75,-6.43,-11.24,-6.45,7471.0
 ZENTEC.NS,Zen Technologies Ltd.,Capital Goods,Stage 3,watchlist,52.71,-2.77,-4.3,2.35,-0.03,1356.2
@@ -307,8 +307,8 @@ UBL.NS,United Breweries Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,18.89,
 APLLTD.NS,Alembic Pharmaceuticals Ltd.,Healthcare,Stage 4,watchlist,43.36,-2.97,2.76,-10.29,-19.59,673.55
 GODREJCP.NS,Godrej Consumer Products Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,39.17,-2.97,-1.32,-18.3,-18.52,1008.7
 FINPIPE.NS,Finolex Industries Ltd.,Capital Goods,Stage 4,watchlist,32.8,-2.97,-9.78,-13.69,-10.31,157.64
-ZEEL.NS,Zee Entertainment Enterprises Ltd.,Media Entertainment & Publication,Stage 4,watchlist,34.66,-2.99,-0.34,-16.3,-18.56,73.69
-MOTHERSON.NS,Samvardhana Motherson International Ltd.,Automobile and Auto Components,Stage 3,watchlist,20.89,-3.01,-1.82,-16.6,-10.45,109.38
+ZEEL.NS,Zee Entertainment Enterprises Ltd.,Media Entertainment & Publication,Stage 4,watchlist,34.67,-2.99,-0.34,-16.3,-18.56,73.69
+MOTHERSON.NS,Samvardhana Motherson International Ltd.,Automobile and Auto Components,Stage 3,watchlist,20.9,-3.01,-1.82,-16.6,-10.45,109.38
 BBTC.NS,Bombay Burmah Trading Corporation Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,35.07,-3.02,-9.22,-22.16,-25.67,1375.0
 DBREALTY.NS,Valor Estate Ltd.,Consumer Services,Stage 4,watchlist,31.05,-3.02,-5.19,-18.69,-22.03,91.77
 BANKINDIA.NS,Bank of India,Financial Services,Stage 3,watchlist,30.24,-3.02,-0.54,-17.38,-1.36,144.99
@@ -331,18 +331,18 @@ J&KBANK.NS,Jammu & Kashmir Bank Ltd.,Financial Services,Stage 3,watchlist,52.93,
 AADHARHFC.NS,Aadhar Housing Finance Ltd.,Financial Services,Stage 1,watchlist,39.36,-3.17,-1.38,0.88,-5.2,456.35
 TATACHEM.NS,Tata Chemicals Ltd.,Chemicals,Stage 4,watchlist,26.66,-3.17,-4.95,-14.74,-19.41,605.35
 BSOFT.NS,Birlasoft Ltd.,Information Technology,Stage 3,watchlist,24.2,-3.17,-7.54,-8.18,-22.13,336.4
-CLEAN.NS,Clean Science and Technology Ltd.,Chemicals,Stage 4,watchlist,22.66,-3.17,-2.4,-6.44,-20.76,679.0
+CLEAN.NS,Clean Science and Technology Ltd.,Chemicals,Stage 4,watchlist,22.67,-3.17,-2.4,-6.44,-20.76,679.0
 ABREL.NS,Aditya Birla Real Estate Ltd.,Forest Materials,Stage 4,watchlist,33.04,-3.18,-4.04,-10.81,-32.72,1130.7
 JYOTICNC.NS,Jyoti CNC Automation Ltd.,Capital Goods,Stage 4,watchlist,40.4,-3.19,1.2,-11.34,-24.28,751.9
 ENGINERSIN.NS,Engineers India Ltd.,Construction,Stage 4,watchlist,28.96,-3.19,1.06,-11.42,-5.7,189.73
 JSWINFRA.NS,JSW Infrastructure Ltd.,Services,Stage 4,watchlist,42.03,-3.2,-1.3,-2.55,-11.76,249.95
 MANAPPURAM.NS,Manappuram Finance Ltd.,Financial Services,Stage 1,watchlist,39.33,-3.2,-3.86,-16.82,-19.01,253.95
 SUMICHEM.NS,Sumitomo Chemical India Ltd.,Chemicals,Stage 4,watchlist,30.91,-3.2,-2.0,-7.46,-20.2,374.65
-AARTIIND.NS,Aarti Industries Ltd.,Chemicals,Stage 3,watchlist,43.75,-3.21,1.35,-7.2,11.1,417.4
+AARTIIND.NS,Aarti Industries Ltd.,Chemicals,Stage 3,watchlist,43.8,-3.21,1.35,-7.2,11.1,417.4
 ARE&M.NS,Amara Raja Energy & Mobility Ltd.,Automobile and Auto Components,Stage 4,watchlist,46.47,-3.22,-8.77,-18.29,-24.37,701.7
 KIRLOSENG.NS,Kirloskar Oil Eng Ltd.,Capital Goods,Stage 2,watchlist,73.36,-3.23,-5.2,-3.26,9.69,1347.4
 INOXWIND.NS,Inox Wind Ltd.,Capital Goods,Stage 4,watchlist,42.93,-3.23,1.54,-16.58,-35.47,79.27
-LINDEINDIA.NS,Linde India Ltd.,Chemicals,Stage 3,watchlist,46.44,-3.24,1.52,7.26,20.48,7118.0
+LINDEINDIA.NS,Linde India Ltd.,Chemicals,Stage 3,watchlist,46.45,-3.24,1.52,7.26,20.48,7118.0
 INOXINDIA.NS,INOX India Ltd.,Capital Goods,Stage 3,watchlist,64.54,-3.25,1.35,3.76,7.7,1198.6
 PIIND.NS,PI Industries Ltd.,Chemicals,Stage 4,watchlist,36.48,-3.26,-2.77,-9.54,-12.54,2810.8
 MMTC.NS,MMTC Ltd.,Services,Stage 4,watchlist,26.7,-3.26,-8.74,-10.57,-16.06,55.16
@@ -372,7 +372,7 @@ HYUNDAI.NS,Hyundai Motor India Ltd.,Automobile and Auto Components,Stage 1,watch
 SOLARINDS.NS,Solar Industries India Ltd.,Chemicals,Stage 4,watchlist,31.43,-3.66,-5.63,-6.48,2.07,12418.0
 HBLENGINE.NS,HBL Engineering Ltd.,Capital Goods,Stage 3,watchlist,33.62,-3.68,-2.67,-8.35,-29.98,642.05
 LTF.NS,L&T Finance Ltd.,Financial Services,Stage 3,watchlist,20.51,-3.69,-1.95,-15.4,-20.68,251.65
-RITES.NS,RITES Ltd.,Construction,Stage 4,watchlist,19.67,-3.7,-3.38,-15.08,-23.63,184.23
+RITES.NS,RITES Ltd.,Construction,Stage 4,watchlist,19.68,-3.7,-3.38,-15.08,-23.63,184.23
 ETERNAL.NS,Eternal Ltd.,Consumer Services,Stage 3,watchlist,18.04,-3.72,1.94,-8.2,-17.84,233.17
 HSCL.NS,Himadri Speciality Chemical Ltd.,Chemicals,Stage 4,watchlist,36.34,-3.73,-1.92,-9.08,-8.56,443.85
 SBICARD.NS,SBI Cards and Payment Services Ltd.,Financial Services,Stage 4,watchlist,41.45,-3.75,-2.92,-13.25,-21.31,673.95
@@ -386,7 +386,7 @@ IGIL.NS,International Gemmological Institute (India) Ltd.,Services,Stage 4,watch
 SUNTV.NS,Sun TV Network Ltd.,Media Entertainment & Publication,Stage 3,watchlist,28.27,-3.82,-2.23,-0.23,0.43,586.0
 BDL.NS,Bharat Dynamics Ltd.,Capital Goods,Stage 4,watchlist,31.69,-3.83,-9.61,-8.32,-22.99,1136.9
 POWERINDIA.NS,Hitachi Energy India Ltd.,Capital Goods,Stage 2,watchlist,76.1,-3.84,0.14,-0.88,33.56,24685.0
-SONATSOFTW.NS,Sonata Software Ltd.,Information Technology,Stage 4,watchlist,32.15,-3.84,-5.56,-18.93,-39.39,219.0
+SONATSOFTW.NS,Sonata Software Ltd.,Information Technology,Stage 4,watchlist,32.16,-3.84,-5.56,-18.93,-39.39,219.0
 JMFINANCIL.NS,JM Financial Ltd.,Financial Services,Stage 4,watchlist,23.4,-3.85,-2.23,-9.89,-18.85,119.74
 ELECON.NS,Elecon Engineering Co. Ltd.,Capital Goods,Stage 4,watchlist,31.79,-3.86,-2.88,-11.29,-22.55,372.3
 NAVA.NS,Nava Ltd.,Power,Stage 3,watchlist,46.89,-3.87,1.01,-4.77,-2.65,550.05
@@ -422,7 +422,7 @@ CROMPTON.NS,Crompton Greaves Consumer Electricals Ltd.,Consumer Durables,Stage 4
 BAJAJHLDNG.NS,Bajaj Holdings & Investment Ltd.,Financial Services,Stage 4,watchlist,36.38,-4.23,-5.42,-19.24,-19.33,9150.0
 EMAMILTD.NS,Emami Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,20.9,-4.23,-3.11,-17.19,-24.22,393.1
 BATAINDIA.NS,Bata India Ltd.,Consumer Durables,Stage 4,watchlist,16.55,-4.23,-2.44,-20.89,-33.23,632.15
-BLUEDART.NS,Blue Dart Express Ltd.,Services,Stage 4,watchlist,29.55,-4.25,-4.55,-12.77,-14.7,4841.5
+BLUEDART.NS,Blue Dart Express Ltd.,Services,Stage 4,watchlist,29.56,-4.25,-4.55,-12.77,-14.7,4841.5
 INDHOTEL.NS,Indian Hotels Co. Ltd.,Consumer Services,Stage 4,watchlist,22.25,-4.28,-3.71,-12.61,-20.0,590.9
 TIINDIA.NS,Tube Investments of India Ltd.,Automobile and Auto Components,Stage 3,watchlist,36.07,-4.33,1.43,0.14,-2.08,2566.3
 NAM-INDIA.NS,Nippon Life India Asset Management Ltd.,Financial Services,Stage 3,watchlist,28.03,-4.33,-2.84,-14.86,-4.93,831.95
@@ -445,14 +445,14 @@ APTUS.NS,Aptus Value Housing Finance India Ltd.,Financial Services,Stage 4,watch
 TECHNOE.NS,Techno Electric & Engineering Company Ltd.,Construction,Stage 4,watchlist,24.37,-4.57,-5.8,-11.76,-3.05,1031.9
 LODHA.NS,Lodha Developers Ltd.,Realty,Stage 4,watchlist,29.85,-4.59,-14.4,-32.72,-34.73,700.2
 ASHOKLEY.NS,Ashok Leyland Ltd.,Capital Goods,Stage 3,watchlist,53.72,-4.6,-3.25,-22.4,-11.79,163.09
-RELIANCE.NS,Reliance Industries Ltd.,Oil Gas & Consumable Fuels,Stage 3,watchlist,38.8,-4.6,-2.65,-5.65,-14.44,1348.1
+RELIANCE.NS,Reliance Industries Ltd.,Oil Gas & Consumable Fuels,Stage 3,watchlist,38.81,-4.6,-2.65,-5.65,-14.44,1348.1
 COCHINSHIP.NS,Cochin Shipyard Ltd.,Capital Goods,Stage 4,watchlist,36.03,-4.6,-7.68,-15.65,-22.36,1256.8
 MAHSCOOTER.NS,Maharashtra Scooters Ltd.,Financial Services,Stage 3,watchlist,41.52,-4.62,-6.28,-11.82,-17.65,11698.0
 ACE.NS,Action Construction Equipment Ltd.,Capital Goods,Stage 4,watchlist,45.86,-4.64,-6.47,-9.8,-17.29,780.7
 IDBI.NS,IDBI Bank Ltd.,Financial Services,Stage 3,watchlist,27.38,-4.68,-8.77,-43.42,-38.31,64.01
 UPL.NS,UPL Ltd.,Chemicals,Stage 3,watchlist,16.99,-4.7,-2.61,-5.5,-26.01,595.85
 NBCC.NS,NBCC (India) Ltd.,Construction,Stage 4,watchlist,27.32,-4.72,-3.14,-14.71,-33.96,80.53
-SWANCORP.NS,Swan Corp Ltd.,Chemicals,Stage 4,watchlist,24.59,-4.82,-4.6,-19.65,-33.48,309.95
+SWANCORP.NS,Swan Corp Ltd.,Chemicals,Stage 4,watchlist,24.61,-4.82,-4.6,-19.65,-33.48,309.95
 DEEPAKFERT.NS,Deepak Fertilisers & Petrochemicals Corp. Ltd.,Chemicals,Stage 4,watchlist,20.25,-4.85,4.03,-4.39,-23.56,950.55
 MRPL.NS,Mangalore Refinery & Petrochemicals Ltd.,Oil Gas & Consumable Fuels,Stage 3,watchlist,38.96,-4.86,-4.16,-10.04,15.39,177.1
 JYOTHYLAB.NS,Jyothy Labs Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,33.05,-4.94,-2.04,-20.3,-26.62,203.85
@@ -460,24 +460,24 @@ FORCEMOT.NS,Force Motors Ltd.,Automobile and Auto Components,Stage 3,watchlist,4
 REDINGTON.NS,Redington Ltd.,Services,Stage 4,watchlist,44.37,-4.99,-8.52,-16.36,-27.0,200.7
 GRSE.NS,Garden Reach Shipbuilders & Engineers Ltd.,Capital Goods,Stage 4,watchlist,43.71,-4.99,-9.91,-14.4,-15.07,2068.4
 BHARTIHEXA.NS,Bharti Hexacom Ltd.,Telecommunication,Stage 4,watchlist,35.15,-4.99,-5.48,-9.04,-16.91,1504.2
-TTML.NS,Tata Teleservices (Maharashtra) Ltd.,Telecommunication,Stage 4,watchlist,38.51,-5.04,-12.65,-21.73,-33.15,33.13
-NIACL.NS,The New India Assurance Company Ltd.,Financial Services,Stage 4,watchlist,28.71,-5.04,-6.31,-18.51,-21.68,121.81
+TTML.NS,Tata Teleservices (Maharashtra) Ltd.,Telecommunication,Stage 4,watchlist,38.53,-5.04,-12.65,-21.73,-33.15,33.13
+NIACL.NS,The New India Assurance Company Ltd.,Financial Services,Stage 4,watchlist,28.72,-5.04,-6.31,-18.51,-21.68,121.81
 EIHOTEL.NS,EIH Ltd.,Consumer Services,Stage 4,watchlist,27.2,-5.09,-9.52,-11.28,-22.34,284.3
 PTCIL.NS,PTC Industries Ltd.,Capital Goods,Stage 3,watchlist,45.42,-5.11,-10.62,-12.82,-14.98,15602.0
 FSL.NS,Firstsource Solutions Ltd.,Services,Stage 4,watchlist,27.93,-5.12,-3.34,-6.59,-34.88,212.87
 RHIM.NS,RHI MAGNESITA INDIA LTD.,Capital Goods,Stage 4,watchlist,33.26,-5.13,-8.75,-24.12,-26.5,334.1
 PCBL.NS,PCBL Chemical Ltd.,Chemicals,Stage 4,watchlist,24.73,-5.26,4.05,-17.7,-13.74,255.55
-TITAGARH.NS,Titagarh Rail Systems Ltd.,Capital Goods,Stage 4,watchlist,27.36,-5.27,-4.19,-18.84,-32.45,595.6
-MAPMYINDIA.NS,C.E. Info Systems Ltd.,Information Technology,Stage 4,watchlist,39.13,-5.34,-2.3,-21.55,-51.26,843.6
+TITAGARH.NS,Titagarh Rail Systems Ltd.,Capital Goods,Stage 4,watchlist,27.37,-5.27,-4.19,-18.84,-32.45,595.6
+MAPMYINDIA.NS,C.E. Info Systems Ltd.,Information Technology,Stage 4,watchlist,39.14,-5.34,-2.3,-21.55,-51.26,843.6
 PGHH.NS,Procter & Gamble Hygiene & Health Care Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,29.75,-5.34,-7.87,-20.49,-28.46,9138.0
 PAYTM.NS,One 97 Communications Ltd.,Financial Services,Stage 3,watchlist,31.24,-5.36,-3.17,-10.86,-21.9,1008.8
 BLS.NS,BLS International Services Ltd.,Consumer Services,Stage 4,watchlist,25.0,-5.43,3.97,-12.63,-20.59,250.0
 SHRIRAMFIN.NS,Shriram Finance Ltd.,Financial Services,Stage 3,watchlist,37.61,-5.46,-4.84,-14.87,-11.37,903.8
 POLYMED.NS,Poly Medicure Ltd.,Healthcare,Stage 4,watchlist,45.39,-5.57,-0.84,-4.43,-29.41,1230.1
-PGEL.NS,PG Electroplast Ltd.,Consumer Durables,Stage 3,watchlist,27.14,-5.65,-3.29,-20.44,-15.71,488.0
+PGEL.NS,PG Electroplast Ltd.,Consumer Durables,Stage 3,watchlist,27.15,-5.65,-3.29,-20.44,-15.71,488.0
 KIRLOSBROS.NS,Kirloskar Brothers Ltd.,Capital Goods,Stage 4,watchlist,35.7,-5.67,-7.84,-8.87,-11.44,1426.5
 ASTRAZEN.NS,AstraZenca Pharma India Ltd.,Healthcare,Stage 1,watchlist,47.15,-5.75,-5.25,-9.88,-9.64,7931.0
-FLUOROCHEM.NS,Gujarat Fluorochemicals Ltd.,Chemicals,Stage 4,watchlist,35.81,-5.79,-2.91,-13.3,-16.52,3067.9
+FLUOROCHEM.NS,Gujarat Fluorochemicals Ltd.,Chemicals,Stage 4,watchlist,35.82,-5.79,-2.91,-13.3,-16.52,3067.9
 RPOWER.NS,Reliance Power Ltd.,Power,Stage 4,watchlist,51.58,-5.82,-2.06,-16.08,-38.51,21.35
 ALOKINDS.NS,Alok Industries Ltd.,Textiles,Stage 4,watchlist,30.5,-6.15,-7.32,-18.14,-26.12,11.91
 ALKYLAMINE.NS,Alkyl Amines Chemicals Ltd.,Chemicals,Stage 4,watchlist,25.5,-6.23,0.57,-13.61,-20.14,1292.5
