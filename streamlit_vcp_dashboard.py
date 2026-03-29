@@ -19,11 +19,19 @@ st.markdown(
   --up-bg: rgba(30,201,119,0.08);
   --down-bg: rgba(255,107,107,0.08);
 }
-.block-container {padding-top: 0.7rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
+.block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 .stImage img {border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.08);}
 [data-testid="stMetric"] {background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.45rem 0.6rem; border-radius: 0.85rem;}
-[data-testid="stMetricLabel"] {font-size: 0.78rem;}
-[data-testid="stMetricValue"] {font-size: 1.08rem;}
+[data-testid="stMetricLabel"] {font-size: 0.82rem;}
+[data-testid="stMetricValue"] {font-size: 1.14rem;}
+button[kind="primary"], button[kind="secondary"] {font-size: 0.98rem !important;}
+.stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
+.stTabs [data-baseweb="tab"] {
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
 .hero-card, .stock-card, .learn-card, .list-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -45,40 +53,34 @@ st.markdown(
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
-.stock-title {font-size: 1.05rem; font-weight: 700; margin-bottom: 0.04rem; line-height: 1.2;}
-.stock-subtitle {font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; line-height: 1.1;}
-.stock-card {margin-bottom: 0.45rem;}
+.stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
+.stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-bottom: 0.1rem; line-height: 1.2;}
+.stock-card {margin-bottom: 0.42rem;}
 .disclosure {
   border-left: 4px solid rgba(240,180,41,0.55);
   background: rgba(240,180,41,0.08);
   border-radius: 12px;
   padding: 0.7rem 0.85rem;
   font-size: 0.86rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.7rem;
 }
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
 .list-tight li {margin: 0.18rem 0;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
-.meta-grid {
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.22rem 0.6rem;
-  margin-top: 0.15rem;
-}
-.meta-label {font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em;}
-.meta-value {font-size: 0.88rem; font-weight: 600; line-height: 1.2;}
+.meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.25; margin-top: 0.1rem;}
 .stock-card.up-highlight {background: var(--up-bg);}
 .stock-card.down-highlight {background: var(--down-bg);}
-.change-badge {font-size: 0.92rem; font-weight: 800; margin-top: 0.22rem;}
+.change-badge {font-size: 0.94rem; font-weight: 800; margin-top: 0.18rem;}
 @media (max-width: 768px) {
-  .block-container {padding-top: 0.45rem; padding-left: 0.35rem; padding-right: 0.35rem;}
-  h1 {font-size: 1.35rem !important;}
-  h2 {font-size: 1.06rem !important;}
+  .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
+  .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
+  h1 {font-size: 1.32rem !important;}
+  h2 {font-size: 1.04rem !important;}
   h3 {font-size: 0.96rem !important;}
   .hero-card, .stock-card, .learn-card, .list-card {padding: 0.72rem 0.75rem;}
-  .stock-title {font-size: 0.98rem;}
-  .meta-value {font-size: 0.84rem;}
+  .stock-title {font-size: 0.95rem;}
+  .meta-line {font-size: 0.86rem;}
 }
 </style>
 """,
@@ -156,7 +158,7 @@ def add_labels(df: pd.DataFrame) -> pd.DataFrame:
         "final_combined_score", "final_daily_score", "final_weekly_score",
         "combined_score", "daily_score", "weekly_score", "rs_3m_pct", "rs_6m_pct",
         "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct",
-        "current_rank", "rs_rank"
+        "current_rank", "prev_rank", "rank_change", "rs_rank", "avg_combined_score"
     ]
     for col in numeric_cols:
         if col in out.columns:
@@ -173,15 +175,6 @@ def stage_display(stage: str) -> str:
         "Stage 4": "Downtrend",
     }
     return mapping.get(stage, stage or "Unknown")
-
-def stage_help_text(stage: str) -> str:
-    mapping = {
-        "Stage 1": "Stage 1 means the stock is stabilizing or recovering after a weaker phase.",
-        "Stage 2": "Stage 2 means the stock is in the strongest uptrend phase within this framework.",
-        "Stage 3": "Stage 3 means the stock is losing trend quality and moving into a topping phase.",
-        "Stage 4": "Stage 4 means the stock is in a weaker downward phase.",
-    }
-    return mapping.get(stage, "Stage meaning not available.")
 
 def trend_text(row: pd.Series) -> str:
     label = str(row.get("classification", "Developing"))
@@ -244,9 +237,8 @@ def render_stock_card(row: pd.Series, show_change_pct: str = "", highlight: str 
     company = row.get("Company Name", row.get("ticker", "Stock"))
     ticker = str(row.get("ticker", "")).replace(".NS", "")
     stage_raw = str(row.get("stage", "Unknown"))
-    stage_name = stage_display(stage_raw)
-    industry = row.get("Industry", "Unknown")
     trend = trend_text(row)
+    phase = stage_display(stage_raw)
     change_html = f"<div class='change-badge'>{show_change_pct}</div>" if show_change_pct else ""
     highlight_cls = "up-highlight" if highlight == "up" else ("down-highlight" if highlight == "down" else "")
     st.markdown(
@@ -254,29 +246,12 @@ def render_stock_card(row: pd.Series, show_change_pct: str = "", highlight: str 
 <div class="stock-card {highlight_cls}">
   <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
     <div style="min-width:0;">
-      <div class="stock-title">{company}</div>
-      <div class="stock-subtitle">{ticker}</div>
+      <div class="stock-title">{company} ({ticker})</div>
+      <div class="meta-line">{stage_raw} * {trend} * {phase}</div>
     </div>
     <div class="status-pill {style["css"]}">{label}</div>
   </div>
-  <div class="meta-grid">
-    <div>
-      <div class="meta-label">Stage</div>
-      <div class="meta-value">{stage_raw}</div>
-    </div>
-    <div>
-      <div class="meta-label">Phase</div>
-      <div class="meta-value">{stage_name}</div>
-    </div>
-    <div>
-      <div class="meta-label">Trend</div>
-      <div class="meta-value">{trend}</div>
-    </div>
-    <div>
-      <div class="meta-label">Industry</div>
-      <div class="meta-value">{industry}</div>
-    </div>
-  </div>
+  <div class="stock-subtitle" style="margin-top:0.2rem;">{row.get("Industry", "Unknown")}</div>
   {change_html}
 </div>
 """,
@@ -336,7 +311,7 @@ def home_tab(combined_df: pd.DataFrame, industry_df: pd.DataFrame, regime_df: pd
             items = [{"title": "No major changes found", "message": "The latest saved run did not show large classification changes."}]
         render_simple_list(pd.DataFrame(items))
 
-def stocks_tab(combined_df: pd.DataFrame, company_map: Dict[str, str], daily_dir: str, weekly_dir: str):
+def stocks_tab(combined_df: pd.DataFrame, daily_dir: str, weekly_dir: str):
     st.markdown("### Stocks")
     ranked = combined_df.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
     names = ranked["Company Name"].dropna().astype(str).tolist()
@@ -365,55 +340,77 @@ def stocks_tab(combined_df: pd.DataFrame, company_map: Dict[str, str], daily_dir
             st.rerun()
 
     row = ranked[ranked["Company Name"] == st.session_state["selected_stock_name"]].iloc[0]
-    left, right = st.columns([0.95, 1.05])
-    with left:
-        render_stock_card(row)
-        stage_raw = str(row.get("stage", ""))
-        with st.expander(f"What does {stage_raw} mean?", expanded=False):
-            st.write(stage_help_text(stage_raw))
-    with right:
-        dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
-        wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("#### Daily")
-            if dpath:
-                st.image(safe_image_bytes(dpath), use_container_width=True)
-            else:
-                st.info("Daily chart not available.")
-        with c2:
-            st.markdown("#### Weekly")
-            if wpath:
-                st.image(safe_image_bytes(wpath), use_container_width=True)
-            else:
-                st.info("Weekly chart not available.")
+
+    st.markdown("#### Selected charts")
+    dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
+    wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("##### Daily")
+        if dpath:
+            st.image(safe_image_bytes(dpath), use_container_width=True)
+        else:
+            st.info("Daily chart not available.")
+    with c2:
+        st.markdown("##### Weekly")
+        if wpath:
+            st.image(safe_image_bytes(wpath), use_container_width=True)
+        else:
+            st.info("Weekly chart not available.")
+
+    st.markdown("#### Selected stock")
+    render_stock_card(row)
 
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
         render_stock_card(r)
 
-def market_tab(industry_df: pd.DataFrame, combined_df: pd.DataFrame):
+def market_tab(industry_df: pd.DataFrame, combined_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
     st.markdown("### Market")
-    st.caption("Industry strength with simple ranks and number of Stage 2 stocks.")
+    st.caption("Industry strength and industry rank changes.")
     if industry_df.empty:
         st.info("Industry data not available.")
         return
+
     view = industry_df.copy()
     stage2 = stage2_count_by_industry(combined_df)
     if "Industry" in view.columns:
         view = view.merge(stage2, on="Industry", how="left")
-    rank_col = "current_rank" if "current_rank" in view.columns else ("rs_rank" if "rs_rank" in view.columns else None)
-    cols = ["Industry"]
-    if rank_col:
-        view[rank_col] = pd.to_numeric(view[rank_col], errors="coerce")
-        view = view.sort_values(rank_col, ascending=True, na_position="last").reset_index(drop=True)
+
+    sort_col = None
+    for candidate in ["avg_combined_score", "current_rank", "rs_rank"]:
+        if candidate in view.columns:
+            sort_col = candidate
+            break
+
+    if sort_col is not None:
+        view[sort_col] = pd.to_numeric(view[sort_col], errors="coerce")
+        ascending = False if sort_col == "avg_combined_score" else True
+        view = view.sort_values(sort_col, ascending=ascending, na_position="last").reset_index(drop=True)
         view["Rank"] = range(1, len(view) + 1)
-        cols.append("Rank")
+
     if "Stage 2 Stocks" in view.columns:
         view["Stage 2 Stocks"] = view["Stage 2 Stocks"].fillna(0).astype(int)
-        cols.append("Stage 2 Stocks")
-    st.dataframe(view[cols], use_container_width=True, hide_index=True, height=520)
+
+    left, right = st.columns(2)
+    with left:
+        cols = [c for c in ["Industry", "Rank", "Stage 2 Stocks"] if c in view.columns]
+        st.markdown("#### Industry strength")
+        st.dataframe(view[cols], use_container_width=True, hide_index=True, height=520)
+
+    with right:
+        st.markdown("#### Industry changes")
+        if industry_changes_df.empty:
+            st.info("Industry changes data not available.")
+        else:
+            ch = industry_changes_df.copy()
+            for c in ["current_rank", "prev_rank", "rank_change"]:
+                if c in ch.columns:
+                    ch[c] = pd.to_numeric(ch[c], errors="coerce")
+            cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in ch.columns]
+            rename = {"current_rank": "Current Rank", "prev_rank": "Previous Rank", "rank_change": "Rank Change"}
+            st.dataframe(ch[cols].rename(columns=rename), use_container_width=True, hide_index=True, height=520)
 
 def movers_tab(price_moves_df: pd.DataFrame):
     st.markdown("### Movers")
@@ -532,8 +529,9 @@ def advanced_tab(daily_df: pd.DataFrame, weekly_df: pd.DataFrame, combined_df: p
     with st.expander("Stock changes", expanded=False):
         st.dataframe(keep_simple(changes_df), use_container_width=True, hide_index=True, height=320)
     with st.expander("Industry changes", expanded=False):
-        simple_cols = [c for c in ["Industry"] if c in industry_changes_df.columns]
-        st.dataframe(industry_changes_df[simple_cols] if simple_cols else industry_changes_df, use_container_width=True, hide_index=True, height=320)
+        simple_cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in industry_changes_df.columns]
+        renamed = industry_changes_df[simple_cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}) if simple_cols else industry_changes_df
+        st.dataframe(renamed, use_container_width=True, hide_index=True, height=320)
 
 st.title("VCP Market Analytics")
 render_disclosure()
@@ -577,9 +575,9 @@ tabs = st.tabs(["Home", "Stocks", "Market", "Movers", "Learn", "Portfolio", "Adv
 with tabs[0]:
     home_tab(combined_df, industry_df, regime_df, changes_df)
 with tabs[1]:
-    stocks_tab(combined_df, company_map, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
+    stocks_tab(combined_df, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
 with tabs[2]:
-    market_tab(industry_df, combined_df)
+    market_tab(industry_df, combined_df, industry_changes_df)
 with tabs[3]:
     movers_tab(price_moves_df)
 with tabs[4]:
