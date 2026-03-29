@@ -16,36 +16,38 @@ st.markdown(
   --strong: #1ec977;
   --developing: #f0b429;
   --weak: #ff6b6b;
+  --up-bg: rgba(30,201,119,0.08);
+  --down-bg: rgba(255,107,107,0.08);
 }
-.block-container {padding-top: 0.7rem; padding-bottom: 1.4rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
+.block-container {padding-top: 0.7rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 .stImage img {border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.08);}
 [data-testid="stMetric"] {background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.45rem 0.6rem; border-radius: 0.85rem;}
 [data-testid="stMetricLabel"] {font-size: 0.78rem;}
 [data-testid="stMetricValue"] {font-size: 1.08rem;}
-.card, .hero-card, .stock-card, .learn-card, .list-card {
+.hero-card, .stock-card, .learn-card, .list-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 16px;
-  padding: 0.85rem 0.95rem;
+  padding: 0.8rem 0.9rem;
 }
-.hero-card {padding: 1rem 1rem;}
+.hero-card {padding: 0.95rem 1rem;}
 .kicker {font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);}
-.big-number {font-size: 1.38rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
+.big-number {font-size: 1.34rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
 .muted {color: var(--muted);}
 .status-pill {
   display:inline-block;
-  font-size:0.78rem;
+  font-size:0.74rem;
   font-weight:700;
-  padding:0.20rem 0.56rem;
+  padding:0.18rem 0.5rem;
   border-radius:999px;
-  margin-bottom:0.45rem;
+  white-space:nowrap;
 }
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
-.stock-title {font-size: 1.18rem; font-weight: 700; margin-bottom: 0.08rem;}
-.stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-bottom: 0.35rem;}
-.stock-card {margin-bottom: 0.5rem;}
+.stock-title {font-size: 1.05rem; font-weight: 700; margin-bottom: 0.04rem; line-height: 1.2;}
+.stock-subtitle {font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; line-height: 1.1;}
+.stock-card {margin-bottom: 0.45rem;}
 .disclosure {
   border-left: 4px solid rgba(240,180,41,0.55);
   background: rgba(240,180,41,0.08);
@@ -58,12 +60,25 @@ st.markdown(
 .list-tight li {margin: 0.18rem 0;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
+.meta-grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.22rem 0.6rem;
+  margin-top: 0.15rem;
+}
+.meta-label {font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em;}
+.meta-value {font-size: 0.88rem; font-weight: 600; line-height: 1.2;}
+.stock-card.up-highlight {background: var(--up-bg);}
+.stock-card.down-highlight {background: var(--down-bg);}
+.change-badge {font-size: 0.92rem; font-weight: 800; margin-top: 0.22rem;}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.45rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   h1 {font-size: 1.35rem !important;}
   h2 {font-size: 1.06rem !important;}
   h3 {font-size: 0.96rem !important;}
-  .card, .hero-card, .stock-card, .learn-card, .list-card {padding: 0.72rem 0.75rem;}
+  .hero-card, .stock-card, .learn-card, .list-card {padding: 0.72rem 0.75rem;}
+  .stock-title {font-size: 0.98rem;}
+  .meta-value {font-size: 0.84rem;}
 }
 </style>
 """,
@@ -223,25 +238,46 @@ def render_summary_card(title: str, value: str, subtitle: str):
         unsafe_allow_html=True,
     )
 
-def render_stock_card(row: pd.Series, show_change_pct: str = ""):
+def render_stock_card(row: pd.Series, show_change_pct: str = "", highlight: str = ""):
     label = row.get("classification", "Developing")
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
     ticker = str(row.get("ticker", "")).replace(".NS", "")
-    stage = stage_display(str(row.get("stage", "")))
+    stage_raw = str(row.get("stage", "Unknown"))
+    stage_name = stage_display(stage_raw)
     industry = row.get("Industry", "Unknown")
     trend = trend_text(row)
-    pct_html = f"<div style='font-size:1.0rem;font-weight:800;margin-top:0.2rem;'>{show_change_pct}</div>" if show_change_pct else ""
+    change_html = f"<div class='change-badge'>{show_change_pct}</div>" if show_change_pct else ""
+    highlight_cls = "up-highlight" if highlight == "up" else ("down-highlight" if highlight == "down" else "")
     st.markdown(
         f"""
-<div class="stock-card">
-  <div class="stock-title">{company}</div>
-  <div class="stock-subtitle">{ticker}</div>
-  <div class="status-pill {style["css"]}">{label}</div>
-  <div style="font-size:1rem; margin-top:0.14rem;"><b>{stage}</b></div>
-  <div style="font-size:0.96rem; margin-top:0.1rem;">{trend}</div>
-  <div style="font-size:0.96rem; margin-top:0.1rem;">{industry}</div>
-  {pct_html}
+<div class="stock-card {highlight_cls}">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
+    <div style="min-width:0;">
+      <div class="stock-title">{company}</div>
+      <div class="stock-subtitle">{ticker}</div>
+    </div>
+    <div class="status-pill {style["css"]}">{label}</div>
+  </div>
+  <div class="meta-grid">
+    <div>
+      <div class="meta-label">Stage</div>
+      <div class="meta-value">{stage_raw}</div>
+    </div>
+    <div>
+      <div class="meta-label">Phase</div>
+      <div class="meta-value">{stage_name}</div>
+    </div>
+    <div>
+      <div class="meta-label">Trend</div>
+      <div class="meta-value">{trend}</div>
+    </div>
+    <div>
+      <div class="meta-label">Industry</div>
+      <div class="meta-value">{industry}</div>
+    </div>
+  </div>
+  {change_html}
 </div>
 """,
         unsafe_allow_html=True,
@@ -359,7 +395,7 @@ def stocks_tab(combined_df: pd.DataFrame, company_map: Dict[str, str], daily_dir
 
 def market_tab(industry_df: pd.DataFrame, combined_df: pd.DataFrame):
     st.markdown("### Market")
-    st.caption("Industry strength with current rank and number of Stage 2 stocks.")
+    st.caption("Industry strength with simple ranks and number of Stage 2 stocks.")
     if industry_df.empty:
         st.info("Industry data not available.")
         return
@@ -370,14 +406,14 @@ def market_tab(industry_df: pd.DataFrame, combined_df: pd.DataFrame):
     rank_col = "current_rank" if "current_rank" in view.columns else ("rs_rank" if "rs_rank" in view.columns else None)
     cols = ["Industry"]
     if rank_col:
-        view = view.rename(columns={rank_col: "Current Rank"})
-        cols.append("Current Rank")
+        view[rank_col] = pd.to_numeric(view[rank_col], errors="coerce")
+        view = view.sort_values(rank_col, ascending=True, na_position="last").reset_index(drop=True)
+        view["Rank"] = range(1, len(view) + 1)
+        cols.append("Rank")
     if "Stage 2 Stocks" in view.columns:
+        view["Stage 2 Stocks"] = view["Stage 2 Stocks"].fillna(0).astype(int)
         cols.append("Stage 2 Stocks")
-    display = view[cols].copy()
-    if "Current Rank" in display.columns:
-        display = display.sort_values("Current Rank", ascending=True)
-    st.dataframe(display, use_container_width=True, hide_index=True, height=520)
+    st.dataframe(view[cols], use_container_width=True, hide_index=True, height=520)
 
 def movers_tab(price_moves_df: pd.DataFrame):
     st.markdown("### Movers")
@@ -404,11 +440,11 @@ def movers_tab(price_moves_df: pd.DataFrame):
     with c1:
         st.markdown(f"#### Fastest upward moves • {selected}")
         for _, row in df.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
-            render_stock_card(row, show_change_pct=f"{float(row[col]):+.2f}%")
+            render_stock_card(row, show_change_pct=f"{float(row[col]):+.2f}%", highlight="up")
     with c2:
         st.markdown(f"#### Fastest downward moves • {selected}")
         for _, row in df.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
-            render_stock_card(row, show_change_pct=f"{float(row[col]):+.2f}%")
+            render_stock_card(row, show_change_pct=f"{float(row[col]):+.2f}%", highlight="down")
 
 def portfolio_tab(combined_df: pd.DataFrame, company_map: Dict[str, str]):
     st.markdown("### Portfolio")
