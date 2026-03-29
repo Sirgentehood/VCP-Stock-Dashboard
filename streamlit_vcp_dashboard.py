@@ -48,8 +48,8 @@ st.markdown("""
 .stage-border-2 {border-left: 5px solid var(--stage2);}
 .stage-border-3 {border-left: 5px solid var(--stage3);}
 .stage-border-4 {border-left: 5px solid var(--stage4);}
-.change-badge-up {font-size: 0.98rem; font-weight: 800; margin-top: 0.18rem; color: var(--up);}
-.change-badge-down {font-size: 0.98rem; font-weight: 800; margin-top: 0.18rem; color: var(--down);}
+.change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
+.change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
 .change-side-up {border-left: 5px solid var(--up);}
 .change-side-down {border-left: 5px solid var(--down);}
 .disclosure {
@@ -222,24 +222,26 @@ def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
     phase = stage_display(stage_raw)
     border_cls = _stage_border_class(stage_raw) if use_stage_color else ""
     if highlight == "up":
-        border_cls = "change-side-up"
+        border_cls = f"{border_cls} change-side-up".strip()
     elif highlight == "down":
-        border_cls = "change-side-down"
+        border_cls = f"{border_cls} change-side-down".strip()
     change_html = ""
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
     st.markdown(f"""
 <div class="stock-card {border_cls}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
-    <div style="min-width:0;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem;">
+    <div style="min-width:0; flex:1;">
       <div class="stock-title">{company} ({ticker})</div>
       <div class="meta-line">{stage_raw} * {trend} * {phase}</div>
+      <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
     </div>
-    <div class="status-pill {style["css"]}">{label}</div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;">
+      <div class="status-pill {style["css"]}">{label}</div>
+      {change_html}
+    </div>
   </div>
-  <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
-  {change_html}
 </div>
 """, unsafe_allow_html=True)
 
@@ -317,28 +319,15 @@ with tabs[1]:
     if "selected_stock_index" not in st.session_state:
         st.session_state["selected_stock_index"] = 0
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
-    csel, cprev, cnext = st.columns([4, 1, 1])
-
-    # Buttons first so clicked state is applied before selectbox renders
-    with cprev:
-        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        prev_clicked = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn")
-    with cnext:
-        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        next_clicked = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn")
-
-    if prev_clicked and st.session_state["selected_stock_index"] > 0:
-        st.session_state["selected_stock_index"] -= 1
-    if next_clicked and st.session_state["selected_stock_index"] < len(names) - 1:
-        st.session_state["selected_stock_index"] += 1
-
-    current_index = st.session_state["selected_stock_index"]
-    selected_name = csel.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
+    selected_name = st.selectbox("Select stock", names, index=st.session_state["selected_stock_index"], key="stocks_select_name_ordered")
     selected_index = names.index(selected_name)
     if selected_index != st.session_state["selected_stock_index"]:
         st.session_state["selected_stock_index"] = selected_index
-
     row = ranked.iloc[st.session_state["selected_stock_index"]]
+
+    st.markdown("#### Selected stock")
+    card(row, use_stage_color=True)
+
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -351,8 +340,20 @@ with tabs[1]:
         st.markdown("##### Weekly")
         if wpath: st.image(safe_image_bytes(wpath), use_container_width=True)
         else: st.info("Weekly chart not available.")
-    st.markdown("#### Selected stock")
-    card(row, use_stage_color=True)
+
+    nav1, nav2 = st.columns(2)
+    with nav1:
+        prev_clicked = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn")
+    with nav2:
+        next_clicked = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn")
+
+    if prev_clicked and st.session_state["selected_stock_index"] > 0:
+        st.session_state["selected_stock_index"] -= 1
+        st.rerun()
+    if next_clicked and st.session_state["selected_stock_index"] < len(names) - 1:
+        st.session_state["selected_stock_index"] += 1
+        st.rerun()
+
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
@@ -374,11 +375,11 @@ with tabs[2]:
         with c1:
             st.markdown(f"#### Fastest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), highlight="up")
+                card(r, pct=float(r[col]), highlight="up", use_stage_color=True)
         with c2:
             st.markdown(f"#### Fastest downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), highlight="down")
+                card(r, pct=float(r[col]), highlight="down", use_stage_color=True)
     render_disclosure()
 
 with tabs[3]:
