@@ -165,56 +165,121 @@ def recent_breakout_volume_ratio(volume: pd.Series, window: int = 50) -> float:
         return np.nan
     return float(volume.iloc[-1] / baseline)
 
-def local_peaks_troughs(close: pd.Series, order: int) -> Tuple[List[int], List[int]]:
-    arr = close.values
+
+def slope_pct(series: pd.Series, window: int = 20) -> float:
+    s = series.dropna()
+    if len(s) < window:
+        return np.nan
+    level = float(np.nanmean(s.iloc[-window:].values))
+    if level == 0:
+        return np.nan
+    return float(rolling_slope(s, window) / level)
+
+def local_peaks_troughs(high: pd.Series, low: pd.Series, order: int) -> Tuple[List[int], List[int]]:
+    high_arr = high.values
+    low_arr = low.values
     peaks: List[int] = []
     troughs: List[int] = []
-    for i in range(order, len(arr) - order):
-        window = arr[i-order:i+order+1]
-        center = arr[i]
-        if np.isfinite(center):
-            if center == np.max(window) and np.sum(window == center) == 1:
-                peaks.append(i)
-            if center == np.min(window) and np.sum(window == center) == 1:
-                troughs.append(i)
+    for i in range(order, len(high_arr) - order):
+        high_window = high_arr[i-order:i+order+1]
+        low_window = low_arr[i-order:i+order+1]
+        center_high = high_arr[i]
+        center_low = low_arr[i]
+        if np.isfinite(center_high) and center_high == np.max(high_window) and np.sum(high_window == center_high) == 1:
+            peaks.append(i)
+        if np.isfinite(center_low) and center_low == np.min(low_window) and np.sum(low_window == center_low) == 1:
+            troughs.append(i)
     return peaks, troughs
 
-def detect_vcp_contractions(close: pd.Series, order: int, max_pairs: int, min_duration_bars: int, min_depth_pct: float) -> Tuple[List[float], List[int], float]:
-    peaks, troughs = local_peaks_troughs(close, order=order)
-    pairs = []
-    for p in peaks:
-        next_troughs = [t for t in troughs if t > p and (t - p) >= min_duration_bars]
-        if not next_troughs:
+def _candidate_contractions(high: pd.Series, low: pd.Series, order: int, min_duration_bars: int, min_depth_pct: float) -> List[Tuple[int, int, float, int]]:
+    peaks, troughs = local_peaks_troughs(high, low, order=order)
+    if not peaks or not troughs:
+        return []
+
+    pairs: List[Tuple[int, int, float, int]] = []
+    for peak_idx, p in enumerate(peaks):
+        next_peak = peaks[peak_idx + 1] if peak_idx + 1 < len(peaks) else len(high)
+        valid_troughs = [t for t in troughs if p + min_duration_bars <= t < next_peak]
+        if not valid_troughs:
+            valid_troughs = [t for t in troughs if t > p and (t - p) >= min_duration_bars]
+        if not valid_troughs:
             continue
-        t = next_troughs[0]
-        peak = close.iloc[p]
-        trough = close.iloc[t]
-        if peak > 0 and trough > 0:
-            depth = (peak - trough) / peak * 100
-            duration = t - p
-            if depth >= min_depth_pct:
-                pairs.append((p, t, depth, duration))
+        t = min(valid_troughs, key=lambda idx: float(low.iloc[idx]))
+        peak_price = float(high.iloc[p])
+        trough_price = float(low.iloc[t])
+        if peak_price <= 0 or trough_price <= 0:
+            continue
+        depth = (peak_price - trough_price) / peak_price * 100
+        duration = t - p
+        if depth >= min_depth_pct:
+            pairs.append((p, t, depth, duration))
+
+    filtered: List[Tuple[int, int, float, int]] = []
+    for pair in pairs:
+        if not filtered:
+            filtered.append(pair)
+            continue
+        prev = filtered[-1]
+        if pair[0] <= prev[1]:
+            if pair[2] < prev[2]:
+                filtered[-1] = pair
+            continue
+        filtered.append(pair)
+    return filtered
+
+def detect_vcp_contractions(high: pd.Series, low: pd.Series, close: pd.Series, order: int, max_pairs: int, min_duration_bars: int, min_depth_pct: float) -> Tuple[List[float], List[int], float]:
+    pairs = _candidate_contractions(high, low, order=order, min_duration_bars=min_duration_bars, min_depth_pct=min_depth_pct)
     if not pairs:
         return [], [], 0.0
-    pairs = pairs[-max_pairs:]
-    depths = [round(float(x[2]), 2) for x in pairs]
-    durations = [int(x[3]) for x in pairs]
-    base_duration = float(pairs[-1][1] - pairs[0][0])
+
+    seq: List[Tuple[int, int, float, int]] = []
+    for pair in pairs:
+        if not seq:
+            seq.append(pair)
+            continue
+        prev = seq[-1]
+        prev_peak = float(high.iloc[prev[0]])
+        curr_peak = float(high.iloc[pair[0]])
+        depth_contracting = pair[2] <= prev[2] * 1.15
+        price_tightening = curr_peak <= prev_peak * 1.10
+        if depth_contracting and price_tightening:
+            seq.append(pair)
+        else:
+            seq = [pair]
+
+    seq = seq[-max_pairs:]
+    depths = [round(float(x[2]), 2) for x in seq]
+    durations = [int(x[3]) for x in seq]
+    base_duration = float(seq[-1][1] - seq[0][0])
+
+    if len(seq) >= 2:
+        highest_peak = float(high.iloc[seq[0][0]])
+        lowest_trough = float(min(float(low.iloc[t]) for _, t, _, _ in seq))
+        total_depth = (highest_peak - lowest_trough) / highest_peak * 100 if highest_peak > 0 else np.nan
+        if np.isfinite(total_depth) and total_depth < min_depth_pct:
+            return [], [], 0.0
     return depths, durations, base_duration
 
 def contraction_score(depths: List[float]) -> float:
     if len(depths) < 2:
         return 0.0
-    wins = sum(1 for i in range(1, len(depths)) if depths[i] < depths[i-1])
-    return wins / (len(depths) - 1)
+    wins = sum(1 for i in range(1, len(depths)) if depths[i] <= depths[i-1] * 1.05)
+    size_bonus = min(1.0, len(depths) / 4)
+    return round((wins / (len(depths) - 1)) * 0.8 + size_bonus * 0.2, 4)
 
-def compute_pivot(close: pd.Series, lookback: int) -> float:
-    s = close.iloc[-lookback:-1]
+def compute_pivot(high: pd.Series, lookback: int, base_duration: Optional[float] = None) -> float:
+    if high.empty:
+        return np.nan
+    dynamic_window = lookback
+    if base_duration and np.isfinite(base_duration) and base_duration > 0:
+        dynamic_window = max(lookback, int(np.ceil(base_duration)) + 5)
+    s = high.iloc[-dynamic_window:-1]
     if len(s) == 0:
         return np.nan
     return float(s.max())
 
-def market_regime(index_df: pd.DataFrame, index_symbol: str, ma_fast: int, ma_slow: int) -> MarketRegime:
+def market_regime(
+index_df: pd.DataFrame, index_symbol: str, ma_fast: int, ma_slow: int) -> MarketRegime:
     close = index_df["Close"].dropna()
     last_close = float(close.iloc[-1])
     fast = float(close.rolling(ma_fast).mean().iloc[-1])
@@ -225,21 +290,77 @@ def market_regime(index_df: pd.DataFrame, index_symbol: str, ma_fast: int, ma_sl
     label = "risk_on" if (above_fast and above_slow and trend_up) else ("mixed" if above_slow else "risk_off")
     return MarketRegime(index_symbol, round(last_close, 2), round(fast, 2), round(slow, 2), bool(trend_up), bool(above_fast), bool(above_slow), label)
 
+
 def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -> str:
     if len(close) < 260:
         return "Unknown"
+
     last = float(close.iloc[-1])
-    ma200_slope = rolling_slope(close.rolling(200).mean(), 20)
+    ma50_series = close.rolling(50).mean()
+    ma150_series = close.rolling(150).mean()
+    ma200_series = close.rolling(200).mean()
+
+    ma50_slope_pct = slope_pct(ma50_series, 20)
+    ma150_slope_pct = slope_pct(ma150_series, 20)
+    ma200_slope_pct = slope_pct(ma200_series, 20)
+
     high_52w = float(close.iloc[-252:].max())
     low_52w = float(close.iloc[-252:].min())
     dist_from_high = (last / high_52w - 1) * 100 if high_52w > 0 else np.nan
-    dist_from_low = (last / low_52w - 1) * 100 if low_52w > 0 else np.nan
-    if last > ma50 > ma150 > ma200 and ma200_slope > 0 and dist_from_high >= -15:
+    advance_from_low = (last / low_52w - 1) * 100 if low_52w > 0 else np.nan
+
+    ret_13w = pct_return(close, 63)
+    ret_26w = pct_return(close, 126)
+    range_10w = ((close.iloc[-50:].max() / close.iloc[-50:].min()) - 1) * 100 if close.iloc[-50:].min() > 0 else np.nan
+    range_26w = ((close.iloc[-126:].max() / close.iloc[-126:].min()) - 1) * 100 if close.iloc[-126:].min() > 0 else np.nan
+
+    strong_trend = (
+        last > ma50 > ma150 > ma200
+        and pd.notna(ma50_slope_pct) and ma50_slope_pct > 0
+        and pd.notna(ma150_slope_pct) and ma150_slope_pct >= 0
+        and pd.notna(ma200_slope_pct) and ma200_slope_pct >= -0.0002
+        and pd.notna(dist_from_high) and dist_from_high >= -20
+        and pd.notna(advance_from_low) and advance_from_low >= 30
+        and pd.notna(ret_13w) and ret_13w > 0
+    )
+    if strong_trend:
         return "Stage 2"
-    if last < ma50 < ma150 < ma200 and ma200_slope < 0:
+
+    clear_downtrend = (
+        last < ma50 < ma150 < ma200
+        and pd.notna(ma50_slope_pct) and ma50_slope_pct < 0
+        and pd.notna(ma150_slope_pct) and ma150_slope_pct <= 0
+        and pd.notna(ma200_slope_pct) and ma200_slope_pct < 0
+        and pd.notna(advance_from_low) and advance_from_low <= 35
+    )
+    if clear_downtrend:
         return "Stage 4"
-    if ma200_slope < 0 and last < ma150 and dist_from_high <= -20:
+
+    basing = (
+        pd.notna(ma200_slope_pct) and -0.0012 <= ma200_slope_pct <= 0.0015
+        and pd.notna(range_10w) and range_10w <= 35
+        and pd.notna(range_26w) and range_26w <= 80
+        and 0.9 * ma200 <= last <= 1.15 * high_52w
+        and last >= 0.85 * ma150
+        and pd.notna(dist_from_high) and dist_from_high <= 0
+        and pd.notna(ret_26w) and ret_26w > -20
+    )
+    if basing and last <= ma50 * 1.12:
+        return "Stage 1"
+
+    topping_or_distribution = (
+        (last < ma50 and pd.notna(dist_from_high) and dist_from_high <= -10 and pd.notna(ret_13w) and ret_13w <= 5)
+        or (pd.notna(ma50_slope_pct) and ma50_slope_pct <= 0 and last < ma50 and last >= ma200 * 0.9)
+        or (pd.notna(range_10w) and range_10w > 20 and pd.notna(dist_from_high) and dist_from_high <= -8 and last > ma200 * 0.9)
+    )
+    if topping_or_distribution:
         return "Stage 3"
+
+    if last > ma150 and pd.notna(ma200_slope_pct) and ma200_slope_pct >= 0:
+        return "Stage 2"
+    if last < ma200 and pd.notna(ma200_slope_pct) and ma200_slope_pct < 0:
+        return "Stage 4"
+    return "Stage 1"
     if ma200_slope >= 0 and dist_from_low <= 25 and last <= ma150:
         return "Stage 1"
     return "Stage 3"
@@ -353,10 +474,12 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     trend_template_ok = stage == "Stage 2" and close_now > ma50 > ma150 > ma200 and rolling_slope(close.rolling(200).mean(), 20) > 0 and dist_from_high >= -15 and advance_from_low >= 30
     market_regime_ok = regime.regime_label != "risk_off"
 
-    daily_depths, daily_durations, daily_base_duration = detect_vcp_contractions(close.iloc[-140:], config["swing_order_daily"], config["max_contractions"], config["min_contraction_days_daily"], config["min_contraction_depth_pct_daily"])
+    daily_window = df.iloc[-140:]
+    daily_depths, daily_durations, daily_base_duration = detect_vcp_contractions(daily_window["High"], daily_window["Low"], daily_window["Close"], config["swing_order_daily"], config["max_contractions"], config["min_contraction_days_daily"], config["min_contraction_depth_pct_daily"])
     daily_contraction_score_val = contraction_score(daily_depths)
 
-    weekly_depths, weekly_durations, weekly_base_duration = detect_vcp_contractions(weekly_close.iloc[-52:], config["swing_order_weekly"], config["max_contractions"], config["min_contraction_days_weekly"], config["min_contraction_depth_pct_weekly"])
+    weekly_window = weekly_df.iloc[-52:]
+    weekly_depths, weekly_durations, weekly_base_duration = detect_vcp_contractions(weekly_window["High"], weekly_window["Low"], weekly_window["Close"], config["swing_order_weekly"], config["max_contractions"], config["min_contraction_days_weekly"], config["min_contraction_depth_pct_weekly"])
     weekly_contraction_score_val = contraction_score(weekly_depths)
     weekly_quality = vcp_quality_label(weekly_contraction_score_val, weekly_base_duration, weekly_depths, config["min_base_duration_weeks"])
 
@@ -372,12 +495,12 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     rs_3m = stock_3m - bm_3m if pd.notna(stock_3m) and pd.notna(bm_3m) else np.nan
     rs_6m = stock_6m - bm_6m if pd.notna(stock_6m) and pd.notna(bm_6m) else np.nan
 
-    daily_pivot = compute_pivot(close, config["pivot_lookback_daily"])
+    daily_pivot = compute_pivot(df["High"], config["pivot_lookback_daily"], daily_base_duration)
     daily_breakout_distance = (close_now / daily_pivot - 1) * 100 if pd.notna(daily_pivot) and daily_pivot > 0 else np.nan
     near_pivot_ok = pd.notna(daily_breakout_distance) and config["near_pivot_min_pct"] <= daily_breakout_distance <= config["near_pivot_max_pct"]
     breakout_today = bool(pd.notna(daily_breakout_distance) and daily_breakout_distance > 0 and pd.notna(breakout_volume_ratio) and breakout_volume_ratio >= config["breakout_volume_ratio"])
 
-    weekly_pivot = compute_pivot(weekly_close, config["pivot_lookback_weekly"])
+    weekly_pivot = compute_pivot(weekly_df["High"], config["pivot_lookback_weekly"], weekly_base_duration)
     weekly_breakout_distance = (float(weekly_close.iloc[-1]) / weekly_pivot - 1) * 100 if pd.notna(weekly_pivot) and weekly_pivot > 0 else np.nan
 
     recent_range_pct = (close.iloc[-config["recent_range_days"]:].max() - close.iloc[-config["recent_range_days"]:].min()) / close.iloc[-config["recent_range_days"]:].max() * 100
