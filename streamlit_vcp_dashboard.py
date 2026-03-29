@@ -50,8 +50,6 @@ st.markdown("""
 .stage-border-4 {border-left: 5px solid var(--stage4);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
-.change-side-up {box-shadow: inset 5px 0 0 0 var(--up);}
-.change-side-down {box-shadow: inset 5px 0 0 0 var(--down);}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
@@ -226,41 +224,35 @@ def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
         stage_cls = _stage_border_class(stage_raw)
         if stage_cls:
             classes.append(stage_cls)
-    if highlight == "up":
-        classes = ["change-side-up"]  # use only one color in movers
-    elif highlight == "down":
-        classes = ["change-side-down"]
-    class_attr = " ".join(classes)
     change_html = ""
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
-    html = f"""
-<div class="stock-card {class_attr}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
-    <div style="min-width:0;">
-      <div class="stock-title">{company} ({ticker})</div>
-      <div class="meta-line">{stage_raw} * {trend} * {phase}</div>
-    </div>
-    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;">
-      <div class="status-pill {style["css"]}">{label}</div>
-      {change_html}
-    </div>
-  </div>
-  <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
-</div>
-"""
+    class_attr = " ".join(classes)
+    status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
+    html = (
+        f"<div class='stock-card {class_attr}'>"
+        f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
+        f"<div style='min-width:0;'>"
+        f"<div class='stock-title'>{company} ({ticker})</div>"
+        f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
+        f"</div>"
+        f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
+        f"{status_html}{change_html}"
+        f"</div>"
+        f"</div>"
+        f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
+        f"</div>"
+    )
     st.markdown(html, unsafe_allow_html=True)
 
 def render_simple_list(rows: pd.DataFrame):
     st.markdown("<div class='list-card'>", unsafe_allow_html=True)
     for _, row in rows.iterrows():
-        st.markdown(f"""
-<div class="simple-list-item">
-  <div><b>{row.get('title','')}</b></div>
-  <div class="muted">{row.get('message','')}</div>
-</div>
-""", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='simple-list-item'><div><b>{row.get('title','')}</b></div><div class='muted'>{row.get('message','')}</div></div>",
+            unsafe_allow_html=True,
+        )
     st.markdown("</div>", unsafe_allow_html=True)
 
 def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
@@ -349,6 +341,8 @@ with tabs[1]:
         st.rerun()
 
     row = ranked.iloc[st.session_state["selected_stock_index"]]
+    st.markdown("#### Selected stock")
+    card(row, use_stage_color=True)
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -361,8 +355,18 @@ with tabs[1]:
         st.markdown("##### Weekly")
         if wpath: st.image(safe_image_bytes(wpath), use_container_width=True)
         else: st.info("Weekly chart not available.")
-    st.markdown("#### Selected stock")
-    card(row, use_stage_color=True)
+    nav1, nav2 = st.columns(2)
+    with nav1:
+        prev2 = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key=f"stocks_prev_bottom_{st.session_state['selected_stock_index']}")
+    with nav2:
+        next2 = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key=f"stocks_next_bottom_{st.session_state['selected_stock_index']}")
+    if prev2 and st.session_state["selected_stock_index"] > 0:
+        st.session_state["selected_stock_index"] -= 1
+        st.rerun()
+    if next2 and st.session_state["selected_stock_index"] < len(names) - 1:
+        st.session_state["selected_stock_index"] += 1
+        st.rerun()
+
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
@@ -384,11 +388,11 @@ with tabs[2]:
         with c1:
             st.markdown(f"#### Fastest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), highlight="up", use_stage_color=False)
+                card(r, pct=float(r[col]), use_stage_color=True)
         with c2:
             st.markdown(f"#### Fastest downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), highlight="down", use_stage_color=False)
+                card(r, pct=float(r[col]), use_stage_color=True)
     render_disclosure()
 
 with tabs[3]:
@@ -442,7 +446,7 @@ with tabs[4]:
   <ul class="list-tight">
     <li><b>Strong</b>: the model sees stronger structure right now.</li>
     <li><b>Developing</b>: the model sees mixed or still-building structure.</li>
-    <li><b>Cautious</b>: the model sees a high score but in Stage 3, so extra care is needed.</li>
+    <li><b>Cautious</b>: the model sees a high score but in Stage 3.</li>
     <li><b>Weak</b>: the model sees weaker structure right now.</li>
   </ul>
 </div>
