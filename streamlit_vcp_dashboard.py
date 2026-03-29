@@ -45,7 +45,7 @@ st.markdown(
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
 .stock-title {font-size: 1.18rem; font-weight: 700; margin-bottom: 0.08rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-bottom: 0.35rem;}
-.stock-card {margin-bottom: 0.65rem;}
+.stock-card {margin-bottom: 0.5rem;}
 .disclosure {
   border-left: 4px solid rgba(240,180,41,0.55);
   background: rgba(240,180,41,0.08);
