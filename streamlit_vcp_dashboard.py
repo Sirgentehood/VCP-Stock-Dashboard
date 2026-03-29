@@ -54,6 +54,7 @@ st.markdown("""
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
+.change-text {font-size: 0.88rem; margin-top: 0.12rem;}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
@@ -119,7 +120,7 @@ def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
     out = normalize_columns(df)
     numeric_cols = [
         "final_combined_score", "avg_combined_score", "current_rank", "prev_rank", "rank_change",
-        "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct", "rs_rank"
+        "combined_score_change", "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct", "rs_rank"
     ]
     for col in numeric_cols:
         if col in out.columns:
@@ -211,7 +212,7 @@ def _stage_border_class(stage_raw: str) -> str:
         "Stage 4": "stage-border-4",
     }.get(stage_raw, "")
 
-def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = ""):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
@@ -228,6 +229,7 @@ def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
+    extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     html = (
@@ -242,6 +244,7 @@ def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
         f"</div>"
         f"</div>"
         f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
+        f"{extra_change}"
         f"</div>"
     )
     st.markdown(html, unsafe_allow_html=True)
@@ -259,6 +262,58 @@ def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
     if combined_df.empty or "Industry" not in combined_df.columns or "stage" not in combined_df.columns:
         return pd.DataFrame(columns=["Industry", "Stage 2 Stocks"])
     return combined_df.groupby("Industry", dropna=True)["stage"].apply(lambda s: int((s == "Stage 2").sum())).reset_index(name="Stage 2 Stocks")
+
+def build_today_changes(changes_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
+    summary = {"New Strong": 0, "Entered Stage 2": 0, "New Breakouts": 0, "Industries Improving": 0}
+    if changes_df.empty:
+        return pd.DataFrame(), summary
+    df = changes_df.copy()
+    if "label" not in df.columns:
+        df["label"] = df.apply(classify_stock, axis=1)
+
+    if "entered_stage_2" in df.columns:
+        summary["Entered Stage 2"] = int(df["entered_stage_2"].fillna(False).sum())
+    if "new_daily_breakout" in df.columns:
+        summary["New Breakouts"] += int(df["new_daily_breakout"].fillna(False).sum())
+    if "new_weekly_breakout" in df.columns:
+        summary["New Breakouts"] += int(df["new_weekly_breakout"].fillna(False).sum())
+    if not industry_changes_df.empty and "rank_change" in industry_changes_df.columns:
+        summary["Industries Improving"] = int((pd.to_numeric(industry_changes_df["rank_change"], errors="coerce").fillna(0) > 0).sum())
+
+    df["change_priority_score"] = 0.0
+    weights = {"new_top_10": 60, "new_top_20": 40, "entered_stage_2": 90, "new_daily_breakout": 70, "new_weekly_breakout": 80}
+    for col, wt in weights.items():
+        if col in df.columns:
+            df["change_priority_score"] += df[col].fillna(False).astype(int) * wt
+    if "rank_change" in df.columns:
+        df["change_priority_score"] += pd.to_numeric(df["rank_change"], errors="coerce").clip(lower=0, upper=20).fillna(0) * 2
+    if "combined_score_change" in df.columns:
+        df["change_priority_score"] += pd.to_numeric(df["combined_score_change"], errors="coerce").clip(lower=0).fillna(0) * 3
+
+    entered_strong = (df["label"] == "Strong") & (df["change_priority_score"] >= 60)
+    summary["New Strong"] = int(entered_strong.sum())
+    df["change_priority_score"] += entered_strong.astype(int) * 100
+
+    def what_changed(row):
+        parts = []
+        if bool(row.get("entered_stage_2", False)):
+            parts.append("Entered Stage 2")
+        if bool(row.get("new_weekly_breakout", False)):
+            parts.append("Weekly breakout")
+        if bool(row.get("new_daily_breakout", False)):
+            parts.append("Daily breakout")
+        if bool(row.get("new_top_10", False)):
+            parts.append("Entered Top 10")
+        elif bool(row.get("new_top_20", False)):
+            parts.append("Entered Top 20")
+        rc = pd.to_numeric(row.get("rank_change"), errors="coerce")
+        if pd.notna(rc) and rc > 0:
+            parts.append(f"Rank improved by {int(rc)}")
+        return ", ".join(parts[:3]) if parts else "Score improved"
+
+    df["what_changed"] = df.apply(what_changed, axis=1)
+    top_changed = df.sort_values(["change_priority_score", "final_combined_score"], ascending=[False, False]).head(5).copy()
+    return top_changed, summary
 
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
@@ -278,6 +333,7 @@ if combined.empty:
 daily_dir = f"{outdir}/charts/daily"
 weekly_dir = f"{outdir}/charts/weekly"
 company_map = company_choices(combined)
+top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
 
 st.title("Market Structure Radar")
 tabs = st.tabs(["Home","Stocks","Movers","Market","Learn","Portfolio","Advanced","Disclaimer"])
@@ -291,24 +347,25 @@ with tabs[0]:
     with c3:
         render_summary_card("Setups", str(int((combined["label"] == "Strong").sum())), "Stocks currently in the top classification")
     st.divider()
+    st.markdown("### Today’s Changes")
+    st.caption("The most important changes since the previous scan")
+    s1, s2, s3, s4 = st.columns(4)
+    with s1: render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stocks that improved materially")
+    with s2: render_summary_card("Entered Stage 2", str(changes_summary["Entered Stage 2"]), "Moved into uptrend phase")
+    with s3: render_summary_card("New Breakouts", str(changes_summary["New Breakouts"]), "Daily or weekly breakout conditions")
+    with s4: render_summary_card("Industries Improving", str(changes_summary["Industries Improving"]), "Industries moving higher")
     left, right = st.columns([1.25, 1])
     with left:
-        st.markdown("### Top stocks today")
+        st.markdown("#### Top names that changed")
+        if top_changed_df.empty:
+            st.info("No major stock changes found in the latest run.")
+        else:
+            for _, r in top_changed_df.iterrows():
+                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}")
+    with right:
+        st.markdown("#### Top stocks today")
         for _, r in combined.sort_values("final_combined_score", ascending=False).head(5).iterrows():
             card(r, use_stage_color=True)
-    with right:
-        st.markdown("### What changed today")
-        items = []
-        if not changes.empty:
-            if "new_top_10" in changes.columns:
-                items.append({"title": f"{int(changes['new_top_10'].fillna(False).sum())} names entered Top 10", "message": "These names moved into the top-ranked group in the latest saved run."})
-            if "new_daily_breakout" in changes.columns:
-                items.append({"title": f"{int(changes['new_daily_breakout'].fillna(False).sum())} new daily breakout conditions", "message": "These names newly met the daily breakout rule in the latest run."})
-            if "entered_stage_2" in changes.columns:
-                items.append({"title": f"{int(changes['entered_stage_2'].fillna(False).sum())} names entered Stage 2", "message": "These names moved into the uptrend phase in the latest run."})
-        if not items:
-            items = [{"title": "No major changes found", "message": "The latest saved run did not show large classification changes."}]
-        render_simple_list(pd.DataFrame(items))
     render_disclosure()
 
 with tabs[1]:
@@ -319,30 +376,16 @@ with tabs[1]:
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
     current_index = st.session_state["selected_stock_index"]
 
-    csel, cprev, cnext = st.columns([4, 1, 1])
-    with csel:
-        selected_name = st.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
-    with cprev:
-        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        prev_clicked = st.button("Previous", use_container_width=True, disabled=(current_index == 0), key=f"stocks_prev_btn_{current_index}")
-    with cnext:
-        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        next_clicked = st.button("Next", use_container_width=True, disabled=(current_index >= len(names) - 1), key=f"stocks_next_btn_{current_index}")
-
-    new_index = names.index(selected_name)
-    if prev_clicked and current_index > 0:
-        st.session_state["selected_stock_index"] = current_index - 1
-        st.rerun()
-    elif next_clicked and current_index < len(names) - 1:
-        st.session_state["selected_stock_index"] = current_index + 1
-        st.rerun()
-    elif new_index != current_index:
-        st.session_state["selected_stock_index"] = new_index
+    selected_name = st.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
+    selected_index = names.index(selected_name)
+    if selected_index != current_index:
+        st.session_state["selected_stock_index"] = selected_index
         st.rerun()
 
     row = ranked.iloc[st.session_state["selected_stock_index"]]
     st.markdown("#### Selected stock")
     card(row, use_stage_color=True)
+
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -355,6 +398,7 @@ with tabs[1]:
         st.markdown("##### Weekly")
         if wpath: st.image(safe_image_bytes(wpath), use_container_width=True)
         else: st.info("Weekly chart not available.")
+
     nav1, nav2 = st.columns(2)
     with nav1:
         prev2 = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key=f"stocks_prev_bottom_{st.session_state['selected_stock_index']}")
