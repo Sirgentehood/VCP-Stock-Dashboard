@@ -519,12 +519,18 @@ with tabs[4]:
 with tabs[5]:
     if "portfolio_names" not in st.session_state:
         st.session_state["portfolio_names"] = []
+    if "portfolio_chart_index" not in st.session_state:
+        st.session_state["portfolio_chart_index"] = 0
+
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
     selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name")
     if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn") and selected_to_add:
         st.session_state["portfolio_names"].append(selected_to_add)
+        if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
+            st.session_state["portfolio_chart_index"] = max(0, len(st.session_state["portfolio_names"]) - 1)
         st.rerun()
+
     if not st.session_state["portfolio_names"]:
         st.info("No stocks added yet.")
     else:
@@ -536,14 +542,70 @@ with tabs[5]:
         with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Uptrend")
         with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Distribution")
         with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Downtrend")
+
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             card(r, use_stage_color=True)
+
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
         if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
             st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
+            st.session_state["portfolio_chart_index"] = min(
+                st.session_state["portfolio_chart_index"],
+                max(0, len(st.session_state["portfolio_names"]) - 1)
+            )
             st.rerun()
+
+        portfolio_ordered = current.sort_values("final_combined_score", ascending=False).reset_index(drop=True)
+        if not portfolio_ordered.empty:
+            st.divider()
+            st.markdown("### Portfolio charts")
+            st.session_state["portfolio_chart_index"] = max(
+                0, min(st.session_state["portfolio_chart_index"], len(portfolio_ordered) - 1)
+            )
+            prow = portfolio_ordered.iloc[st.session_state["portfolio_chart_index"]]
+            pticker_short = str(prow["ticker"]).replace(".NS", "")
+
+            pc1, pc2 = st.columns(2)
+            with pc1:
+                st.markdown(f"#### Daily * {pticker_short} * {prow.get('stage', '')}")
+                pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
+                if pdpath:
+                    st.image(safe_image_bytes(pdpath), use_container_width=True)
+                else:
+                    st.info("Daily chart not available.")
+            with pc2:
+                st.markdown(f"#### Weekly * {pticker_short} * {prow.get('stage', '')}")
+                pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
+                if pwpath:
+                    st.image(safe_image_bytes(pwpath), use_container_width=True)
+                else:
+                    st.info("Weekly chart not available.")
+
+            nav1, nav2 = st.columns(2)
+            with nav1:
+                pprev = st.button(
+                    "Previous",
+                    use_container_width=True,
+                    disabled=(st.session_state["portfolio_chart_index"] == 0),
+                    key=f"portfolio_prev_{st.session_state['portfolio_chart_index']}"
+                )
+            with nav2:
+                pnext = st.button(
+                    "Next",
+                    use_container_width=True,
+                    disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1),
+                    key=f"portfolio_next_{st.session_state['portfolio_chart_index']}"
+                )
+
+            if pprev and st.session_state["portfolio_chart_index"] > 0:
+                st.session_state["portfolio_chart_index"] -= 1
+                st.rerun()
+            if pnext and st.session_state["portfolio_chart_index"] < len(portfolio_ordered) - 1:
+                st.session_state["portfolio_chart_index"] += 1
+                st.rerun()
+
     render_disclosure()
 
 with tabs[6]:
