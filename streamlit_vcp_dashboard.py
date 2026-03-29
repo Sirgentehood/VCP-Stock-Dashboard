@@ -50,8 +50,8 @@ st.markdown("""
 .stage-border-4 {border-left: 5px solid var(--stage4);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
-.change-side-up {box-shadow: inset 5px 0 0 0 var(--up);}
-.change-side-down {box-shadow: inset 5px 0 0 0 var(--down);}
+.change-side-up {border-left: 5px solid var(--up);}
+.change-side-down {border-left: 5px solid var(--down);}
 .disclosure {
   border-left: 4px solid rgba(240,180,41,0.55);
   background: rgba(240,180,41,0.08);
@@ -220,36 +220,30 @@ def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
     stage_raw = str(row.get("stage", "Unknown"))
     trend = trend_text(row)
     phase = stage_display(stage_raw)
-    classes = []
-    if use_stage_color:
-        stage_cls = _stage_border_class(stage_raw)
-        if stage_cls:
-            classes.append(stage_cls)
+    border_cls = _stage_border_class(stage_raw) if use_stage_color else ""
     if highlight == "up":
-        classes.append("change-side-up")
+        border_cls = f"{border_cls} change-side-up".strip()
     elif highlight == "down":
-        classes.append("change-side-down")
-    class_attr = " ".join(classes)
+        border_cls = f"{border_cls} change-side-down".strip()
     change_html = ""
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
-    html = f"""
-<div class="stock-card {class_attr}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
-    <div style="min-width:0;">
+    st.markdown(f"""
+<div class="stock-card {border_cls}">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem;">
+    <div style="min-width:0; flex:1;">
       <div class="stock-title">{company} ({ticker})</div>
       <div class="meta-line">{stage_raw} * {trend} * {phase}</div>
+      <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
     </div>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;">
       <div class="status-pill {style["css"]}">{label}</div>
       {change_html}
     </div>
   </div>
-  <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
 </div>
-"""
-    st.markdown(html, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 def render_simple_list(rows: pd.DataFrame):
     st.markdown("<div class='list-card'>", unsafe_allow_html=True)
@@ -267,6 +261,7 @@ def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["Industry", "Stage 2 Stocks"])
     return combined_df.groupby("Industry", dropna=True)["stage"].apply(lambda s: int((s == "Stage 2").sum())).reset_index(name="Stage 2 Stocks")
 
+# defaults
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 
@@ -324,30 +319,15 @@ with tabs[1]:
     if "selected_stock_index" not in st.session_state:
         st.session_state["selected_stock_index"] = 0
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
-    current_index = st.session_state["selected_stock_index"]
-
-    csel, cprev, cnext = st.columns([4, 1, 1])
-    with csel:
-        selected_name = st.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
-    with cprev:
-        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        prev_clicked = st.button("Previous", use_container_width=True, disabled=(current_index == 0), key=f"stocks_prev_btn_{current_index}")
-    with cnext:
-        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        next_clicked = st.button("Next", use_container_width=True, disabled=(current_index >= len(names) - 1), key=f"stocks_next_btn_{current_index}")
-
-    new_index = names.index(selected_name)
-    if prev_clicked and current_index > 0:
-        st.session_state["selected_stock_index"] = current_index - 1
-        st.rerun()
-    elif next_clicked and current_index < len(names) - 1:
-        st.session_state["selected_stock_index"] = current_index + 1
-        st.rerun()
-    elif new_index != current_index:
-        st.session_state["selected_stock_index"] = new_index
-        st.rerun()
-
+    selected_name = st.selectbox("Select stock", names, index=st.session_state["selected_stock_index"], key="stocks_select_name_ordered")
+    selected_index = names.index(selected_name)
+    if selected_index != st.session_state["selected_stock_index"]:
+        st.session_state["selected_stock_index"] = selected_index
     row = ranked.iloc[st.session_state["selected_stock_index"]]
+
+    st.markdown("#### Selected stock")
+    card(row, use_stage_color=True)
+
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -360,8 +340,20 @@ with tabs[1]:
         st.markdown("##### Weekly")
         if wpath: st.image(safe_image_bytes(wpath), use_container_width=True)
         else: st.info("Weekly chart not available.")
-    st.markdown("#### Selected stock")
-    card(row, use_stage_color=True)
+
+    nav1, nav2 = st.columns(2)
+    with nav1:
+        prev_clicked = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn")
+    with nav2:
+        next_clicked = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn")
+
+    if prev_clicked and st.session_state["selected_stock_index"] > 0:
+        st.session_state["selected_stock_index"] -= 1
+        st.rerun()
+    if next_clicked and st.session_state["selected_stock_index"] < len(names) - 1:
+        st.session_state["selected_stock_index"] += 1
+        st.rerun()
+
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
@@ -466,13 +458,10 @@ with tabs[5]:
         st.info("No stocks added yet.")
     else:
         current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy()
-        stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
-        c1, c2, c3, c4, c5 = st.columns(5)
+        c1, c2, c3 = st.columns(3)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
-        with c2: render_summary_card("Stage 1", str(int(stage_counts.get("Stage 1", 0))), "Accumulation")
-        with c3: render_summary_card("Stage 2", str(int(stage_counts.get("Stage 2", 0))), "Uptrend")
-        with c4: render_summary_card("Stage 3", str(int(stage_counts.get("Stage 3", 0))), "Distribution")
-        with c5: render_summary_card("Stage 4", str(int(stage_counts.get("Stage 4", 0))), "Downtrend")
+        with c2: render_summary_card("Strong", str(int((current["label"] == "Strong").sum())), "Current Strong classifications")
+        with c3: render_summary_card("Developing", str(int((current["label"] == "Developing").sum())), "Current Developing classifications")
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             card(r, use_stage_color=True)
