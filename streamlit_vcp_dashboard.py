@@ -22,7 +22,7 @@ st.markdown("""
 }
 .block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {display:none;}
-.stTabs [data-baseweb="tab"] {font-size: 1.15rem; font-weight: 1700;}
+.stTabs [data-baseweb="tab"] {font-size: 2.15rem; font-weight: 1700;}
 .stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
 .hero-card, .stock-card, .list-card, .learn-card {
   background: var(--card-bg);
