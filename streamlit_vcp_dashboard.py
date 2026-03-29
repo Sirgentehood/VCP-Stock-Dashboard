@@ -295,7 +295,7 @@ with tabs[0]:
     with left:
         st.markdown("### Top stocks today")
         for _, r in combined.sort_values("final_combined_score", ascending=False).head(5).iterrows():
-            card(r)
+            card(r, use_stage_color=True)
     with right:
         st.markdown("### What changed today")
         items = []
@@ -318,21 +318,26 @@ with tabs[1]:
         st.session_state["selected_stock_index"] = 0
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
     csel, cprev, cnext = st.columns([4, 1, 1])
-    selected_name = csel.selectbox("Select stock", names, index=st.session_state["selected_stock_index"], key="stocks_select_name_ordered")
-    new_idx = names.index(selected_name)
-    if new_idx != st.session_state["selected_stock_index"]:
-        st.session_state["selected_stock_index"] = new_idx
-        st.rerun()
+
+    # Buttons first so clicked state is applied before selectbox renders
     with cprev:
         st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        if st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn"):
-            st.session_state["selected_stock_index"] -= 1
-            st.rerun()
+        prev_clicked = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn")
     with cnext:
         st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        if st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn"):
-            st.session_state["selected_stock_index"] += 1
-            st.rerun()
+        next_clicked = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn")
+
+    if prev_clicked and st.session_state["selected_stock_index"] > 0:
+        st.session_state["selected_stock_index"] -= 1
+    if next_clicked and st.session_state["selected_stock_index"] < len(names) - 1:
+        st.session_state["selected_stock_index"] += 1
+
+    current_index = st.session_state["selected_stock_index"]
+    selected_name = csel.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
+    selected_index = names.index(selected_name)
+    if selected_index != st.session_state["selected_stock_index"]:
+        st.session_state["selected_stock_index"] = selected_index
+
     row = ranked.iloc[st.session_state["selected_stock_index"]]
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
