@@ -13,6 +13,7 @@ st.markdown("""
   --strong: #1ec977;
   --developing: #f0b429;
   --weak: #ff6b6b;
+  --cautious: #ff9f43;
   --up: #1ec977;
   --down: #ff6b6b;
   --stage1: #6c5ce7;
@@ -34,12 +35,11 @@ st.markdown("""
 .kicker {font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);}
 .big-number {font-size: 1.34rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
 .muted {color: var(--muted);}
-.status-pill {
-  display:inline-block; font-size:0.74rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap;
-}
+.status-pill {display:inline-block; font-size:0.74rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap;}
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
+.status-cautious {background: rgba(255,159,67,0.14); color: var(--cautious); border:1px solid rgba(255,159,67,0.35);}
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.25; margin-top: 0.1rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.2;}
@@ -50,13 +50,9 @@ st.markdown("""
 .stage-border-4 {border-left: 5px solid var(--stage4);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
-.change-side-up {border-left: 5px solid var(--up);}
-.change-side-down {border-left: 5px solid var(--down);}
-.disclosure {
-  border-left: 4px solid rgba(240,180,41,0.55);
-  background: rgba(240,180,41,0.08);
-  border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;
-}
+.change-side-up {box-shadow: inset 5px 0 0 0 var(--up);}
+.change-side-down {box-shadow: inset 5px 0 0 0 var(--down);}
+.disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
@@ -71,6 +67,7 @@ LABELS = {
     "Strong": {"css": "status-strong"},
     "Developing": {"css": "status-developing"},
     "Weak": {"css": "status-weak"},
+    "Cautious": {"css": "status-cautious"},
 }
 
 @st.cache_data(show_spinner=False)
@@ -110,6 +107,8 @@ def classify_stock(row: pd.Series) -> str:
     score = pd.to_numeric(row.get("final_combined_score", row.get("combined_score")), errors="coerce")
     rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
     rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
+    if stage == "Stage 3" and pd.notna(score) and score >= 60:
+        return "Cautious"
     if stage == "Stage 2" and pd.notna(score) and score >= 60:
         return "Strong"
     if stage in {"Stage 3", "Stage 4"}:
@@ -161,6 +160,8 @@ def trend_text(row: pd.Series) -> str:
         return "Strong trend"
     if label == "Weak":
         return "Weak trend"
+    if label == "Cautious":
+        return "Cautious trend"
     return "Developing trend"
 
 def market_tone(regime_df: pd.DataFrame, combined_df: pd.DataFrame) -> str:
@@ -220,30 +221,36 @@ def card(row: pd.Series, pct=None, highlight=None, use_stage_color=False):
     stage_raw = str(row.get("stage", "Unknown"))
     trend = trend_text(row)
     phase = stage_display(stage_raw)
-    border_cls = _stage_border_class(stage_raw) if use_stage_color else ""
+    classes = []
+    if use_stage_color:
+        stage_cls = _stage_border_class(stage_raw)
+        if stage_cls:
+            classes.append(stage_cls)
     if highlight == "up":
-        border_cls = f"{border_cls} change-side-up".strip()
+        classes = ["change-side-up"]  # use only one color in movers
     elif highlight == "down":
-        border_cls = f"{border_cls} change-side-down".strip()
+        classes = ["change-side-down"]
+    class_attr = " ".join(classes)
     change_html = ""
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
-    st.markdown(f"""
-<div class="stock-card {border_cls}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem;">
-    <div style="min-width:0; flex:1;">
+    html = f"""
+<div class="stock-card {class_attr}">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
+    <div style="min-width:0;">
       <div class="stock-title">{company} ({ticker})</div>
       <div class="meta-line">{stage_raw} * {trend} * {phase}</div>
-      <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
     </div>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;">
       <div class="status-pill {style["css"]}">{label}</div>
       {change_html}
     </div>
   </div>
+  <div class="stock-subtitle">{row.get("Industry", "Unknown")}</div>
 </div>
-""", unsafe_allow_html=True)
+"""
+    st.markdown(html, unsafe_allow_html=True)
 
 def render_simple_list(rows: pd.DataFrame):
     st.markdown("<div class='list-card'>", unsafe_allow_html=True)
@@ -261,7 +268,6 @@ def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["Industry", "Stage 2 Stocks"])
     return combined_df.groupby("Industry", dropna=True)["stage"].apply(lambda s: int((s == "Stage 2").sum())).reset_index(name="Stage 2 Stocks")
 
-# defaults
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 
@@ -319,15 +325,30 @@ with tabs[1]:
     if "selected_stock_index" not in st.session_state:
         st.session_state["selected_stock_index"] = 0
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
-    selected_name = st.selectbox("Select stock", names, index=st.session_state["selected_stock_index"], key="stocks_select_name_ordered")
-    selected_index = names.index(selected_name)
-    if selected_index != st.session_state["selected_stock_index"]:
-        st.session_state["selected_stock_index"] = selected_index
+    current_index = st.session_state["selected_stock_index"]
+
+    csel, cprev, cnext = st.columns([4, 1, 1])
+    with csel:
+        selected_name = st.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
+    with cprev:
+        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
+        prev_clicked = st.button("Previous", use_container_width=True, disabled=(current_index == 0), key=f"stocks_prev_btn_{current_index}")
+    with cnext:
+        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
+        next_clicked = st.button("Next", use_container_width=True, disabled=(current_index >= len(names) - 1), key=f"stocks_next_btn_{current_index}")
+
+    new_index = names.index(selected_name)
+    if prev_clicked and current_index > 0:
+        st.session_state["selected_stock_index"] = current_index - 1
+        st.rerun()
+    elif next_clicked and current_index < len(names) - 1:
+        st.session_state["selected_stock_index"] = current_index + 1
+        st.rerun()
+    elif new_index != current_index:
+        st.session_state["selected_stock_index"] = new_index
+        st.rerun()
+
     row = ranked.iloc[st.session_state["selected_stock_index"]]
-
-    st.markdown("#### Selected stock")
-    card(row, use_stage_color=True)
-
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -340,20 +361,8 @@ with tabs[1]:
         st.markdown("##### Weekly")
         if wpath: st.image(safe_image_bytes(wpath), use_container_width=True)
         else: st.info("Weekly chart not available.")
-
-    nav1, nav2 = st.columns(2)
-    with nav1:
-        prev_clicked = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn")
-    with nav2:
-        next_clicked = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn")
-
-    if prev_clicked and st.session_state["selected_stock_index"] > 0:
-        st.session_state["selected_stock_index"] -= 1
-        st.rerun()
-    if next_clicked and st.session_state["selected_stock_index"] < len(names) - 1:
-        st.session_state["selected_stock_index"] += 1
-        st.rerun()
-
+    st.markdown("#### Selected stock")
+    card(row, use_stage_color=True)
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
@@ -375,11 +384,11 @@ with tabs[2]:
         with c1:
             st.markdown(f"#### Fastest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), highlight="up", use_stage_color=True)
+                card(r, pct=float(r[col]), highlight="up", use_stage_color=False)
         with c2:
             st.markdown(f"#### Fastest downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), highlight="down", use_stage_color=True)
+                card(r, pct=float(r[col]), highlight="down", use_stage_color=False)
     render_disclosure()
 
 with tabs[3]:
@@ -433,6 +442,7 @@ with tabs[4]:
   <ul class="list-tight">
     <li><b>Strong</b>: the model sees stronger structure right now.</li>
     <li><b>Developing</b>: the model sees mixed or still-building structure.</li>
+    <li><b>Cautious</b>: the model sees a high score but in Stage 3, so extra care is needed.</li>
     <li><b>Weak</b>: the model sees weaker structure right now.</li>
   </ul>
 </div>
@@ -458,10 +468,13 @@ with tabs[5]:
         st.info("No stocks added yet.")
     else:
         current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy()
-        c1, c2, c3 = st.columns(3)
+        stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
+        c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
-        with c2: render_summary_card("Strong", str(int((current["label"] == "Strong").sum())), "Current Strong classifications")
-        with c3: render_summary_card("Developing", str(int((current["label"] == "Developing").sum())), "Current Developing classifications")
+        with c2: render_summary_card("Stage 1", str(int(stage_counts.get("Stage 1", 0))), "Accumulation")
+        with c3: render_summary_card("Stage 2", str(int(stage_counts.get("Stage 2", 0))), "Uptrend")
+        with c4: render_summary_card("Stage 3", str(int(stage_counts.get("Stage 3", 0))), "Distribution")
+        with c5: render_summary_card("Stage 4", str(int(stage_counts.get("Stage 4", 0))), "Downtrend")
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             card(r, use_stage_color=True)
