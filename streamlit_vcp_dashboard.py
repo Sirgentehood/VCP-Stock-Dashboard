@@ -7,7 +7,6 @@ st.set_page_config(page_title="Market Structure Radar", layout="wide", initial_s
 st.markdown("""
 <style>
 :root {
-  --card-bg: rgba(255,255,255,0.03);
   --card-border: rgba(128,128,128,0.16);
   --muted: rgba(255,255,255,0.72);
   --strong: #1ec977;
@@ -16,22 +15,25 @@ st.markdown("""
   --cautious: #ff9f43;
   --up: #1ec977;
   --down: #ff6b6b;
-  --stage1: #6c5ce7;
-  --stage2: #00b3b3;
-  --stage3: #d4a017;
-  --stage4: #8e7dff;
+  --stage1-bg: rgba(108,92,231,0.12);
+  --stage2-bg: rgba(0,179,179,0.12);
+  --stage3-bg: rgba(212,160,23,0.12);
+  --stage4-bg: rgba(142,125,255,0.12);
+  --stage1-border: rgba(108,92,231,0.28);
+  --stage2-border: rgba(0,179,179,0.28);
+  --stage3-border: rgba(212,160,23,0.28);
+  --stage4-border: rgba(142,125,255,0.28);
 }
 .block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {display:none;}
 .stTabs [data-baseweb="tab"] {font-size: 1.15rem; font-weight: 700;}
 .stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
 .hero-card, .stock-card, .list-card, .learn-card {
-  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 16px;
   padding: 0.8rem 0.9rem;
 }
-.hero-card {padding: 0.95rem 1rem;}
+.hero-card {padding: 0.95rem 1rem; background: rgba(255,255,255,0.03);}
 .kicker {font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);}
 .big-number {font-size: 1.34rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
 .muted {color: var(--muted);}
@@ -43,11 +45,11 @@ st.markdown("""
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.25; margin-top: 0.1rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.2;}
-.stock-card {margin-bottom: 0.42rem;}
-.stage-border-1 {border-left: 5px solid var(--stage1);}
-.stage-border-2 {border-left: 5px solid var(--stage2);}
-.stage-border-3 {border-left: 5px solid var(--stage3);}
-.stage-border-4 {border-left: 5px solid var(--stage4);}
+.stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03);}
+.stage-card-1 {background: var(--stage1-bg); border-color: var(--stage1-border);}
+.stage-card-2 {background: var(--stage2-bg); border-color: var(--stage2-border);}
+.stage-card-3 {background: var(--stage3-bg); border-color: var(--stage3-border);}
+.stage-card-4 {background: var(--stage4-bg); border-color: var(--stage4-border);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
@@ -204,12 +206,12 @@ def render_summary_card(title: str, value: str, subtitle: str):
 </div>
 """, unsafe_allow_html=True)
 
-def _stage_border_class(stage_raw: str) -> str:
+def _stage_card_class(stage_raw: str) -> str:
     return {
-        "Stage 1": "stage-border-1",
-        "Stage 2": "stage-border-2",
-        "Stage 3": "stage-border-3",
-        "Stage 4": "stage-border-4",
+        "Stage 1": "stage-card-1",
+        "Stage 2": "stage-card-2",
+        "Stage 3": "stage-card-3",
+        "Stage 4": "stage-card-4",
     }.get(stage_raw, "")
 
 def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = ""):
@@ -222,7 +224,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     phase = stage_display(stage_raw)
     classes = []
     if use_stage_color:
-        stage_cls = _stage_border_class(stage_raw)
+        stage_cls = _stage_card_class(stage_raw)
         if stage_cls:
             classes.append(stage_cls)
     change_html = ""
@@ -249,14 +251,14 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     )
     st.markdown(html, unsafe_allow_html=True)
 
-def render_simple_list(rows: pd.DataFrame):
-    st.markdown("<div class='list-card'>", unsafe_allow_html=True)
-    for _, row in rows.iterrows():
-        st.markdown(
-            f"<div class='simple-list-item'><div><b>{row.get('title','')}</b></div><div class='muted'>{row.get('message','')}</div></div>",
-            unsafe_allow_html=True,
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
+def stage_count_summary(combined_df: pd.DataFrame):
+    counts = combined_df["stage"].value_counts() if "stage" in combined_df.columns else pd.Series(dtype=int)
+    return {
+        "Stage 1": int(counts.get("Stage 1", 0)),
+        "Stage 2": int(counts.get("Stage 2", 0)),
+        "Stage 3": int(counts.get("Stage 3", 0)),
+        "Stage 4": int(counts.get("Stage 4", 0)),
+    }
 
 def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
     if combined_df.empty or "Industry" not in combined_df.columns or "stage" not in combined_df.columns:
@@ -264,7 +266,7 @@ def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
     return combined_df.groupby("Industry", dropna=True)["stage"].apply(lambda s: int((s == "Stage 2").sum())).reset_index(name="Stage 2 Stocks")
 
 def build_today_changes(changes_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
-    summary = {"New Strong": 0, "Entered Stage 2": 0, "New Breakouts": 0, "Industries Improving": 0}
+    summary = {"New Strong": 0, "Entered Stage 2": 0, "New Breakouts": 0}
     if changes_df.empty:
         return pd.DataFrame(), summary
     df = changes_df.copy()
@@ -277,8 +279,6 @@ def build_today_changes(changes_df: pd.DataFrame, industry_changes_df: pd.DataFr
         summary["New Breakouts"] += int(df["new_daily_breakout"].fillna(False).sum())
     if "new_weekly_breakout" in df.columns:
         summary["New Breakouts"] += int(df["new_weekly_breakout"].fillna(False).sum())
-    if not industry_changes_df.empty and "rank_change" in industry_changes_df.columns:
-        summary["Industries Improving"] = int((pd.to_numeric(industry_changes_df["rank_change"], errors="coerce").fillna(0) > 0).sum())
 
     df["change_priority_score"] = 0.0
     weights = {"new_top_10": 60, "new_top_20": 40, "entered_stage_2": 90, "new_daily_breakout": 70, "new_weekly_breakout": 80}
@@ -334,6 +334,9 @@ daily_dir = f"{outdir}/charts/daily"
 weekly_dir = f"{outdir}/charts/weekly"
 company_map = company_choices(combined)
 top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
+changed_tickers = set(top_changed_df["ticker"].dropna().tolist()) if not top_changed_df.empty and "ticker" in top_changed_df.columns else set()
+top_stocks_today = combined[~combined["ticker"].isin(changed_tickers)].sort_values("final_combined_score", ascending=False).head(5).copy()
+stage_counts = stage_count_summary(combined)
 
 st.title("Market Structure Radar")
 tabs = st.tabs(["Home","Stocks","Movers","Market","Learn","Portfolio","Advanced","Disclaimer"])
@@ -345,15 +348,14 @@ with tabs[0]:
     with c2:
         render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
     with c3:
-        render_summary_card("Setups", str(int((combined["label"] == "Strong").sum())), "Stocks currently in the top classification")
+        render_summary_card("Entered Stage 2", str(changes_summary["Entered Stage 2"]), "Moved into uptrend phase")
     st.divider()
     st.markdown("### Today’s Changes")
     st.caption("The most important changes since the previous scan")
-    s1, s2, s3, s4 = st.columns(4)
+    s1, s2, s3 = st.columns(3)
     with s1: render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stocks that improved materially")
     with s2: render_summary_card("Entered Stage 2", str(changes_summary["Entered Stage 2"]), "Moved into uptrend phase")
     with s3: render_summary_card("New Breakouts", str(changes_summary["New Breakouts"]), "Daily or weekly breakout conditions")
-    with s4: render_summary_card("Industries Improving", str(changes_summary["Industries Improving"]), "Industries moving higher")
     left, right = st.columns([1.25, 1])
     with left:
         st.markdown("#### Top names that changed")
@@ -364,7 +366,7 @@ with tabs[0]:
                 card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}")
     with right:
         st.markdown("#### Top stocks today")
-        for _, r in combined.sort_values("final_combined_score", ascending=False).head(5).iterrows():
+        for _, r in top_stocks_today.iterrows():
             card(r, use_stage_color=True)
     render_disclosure()
 
@@ -383,21 +385,25 @@ with tabs[1]:
         st.rerun()
 
     row = ranked.iloc[st.session_state["selected_stock_index"]]
+    ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
     card(row, use_stage_color=True)
 
-    st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
     a, b = st.columns(2)
     with a:
-        st.markdown("##### Daily")
-        if dpath: st.image(safe_image_bytes(dpath), use_container_width=True)
-        else: st.info("Daily chart not available.")
+        st.markdown(f"#### Daily * {ticker_short} * {row.get('stage', '')}")
+        if dpath:
+            st.image(safe_image_bytes(dpath), use_container_width=True)
+        else:
+            st.info("Daily chart not available.")
     with b:
-        st.markdown("##### Weekly")
-        if wpath: st.image(safe_image_bytes(wpath), use_container_width=True)
-        else: st.info("Weekly chart not available.")
+        st.markdown(f"#### Weekly * {ticker_short} * {row.get('stage', '')}")
+        if wpath:
+            st.image(safe_image_bytes(wpath), use_container_width=True)
+        else:
+            st.info("Weekly chart not available.")
 
     nav1, nav2 = st.columns(2)
     with nav1:
@@ -419,6 +425,7 @@ with tabs[1]:
 
 with tabs[2]:
     st.markdown("### Movers")
+    st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
     if moves.empty:
         st.info("Price move data not found yet.")
     else:
@@ -441,6 +448,12 @@ with tabs[2]:
 
 with tabs[3]:
     st.markdown("### Market")
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Accumulation")
+    with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Uptrend")
+    with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Distribution")
+    with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Downtrend")
+
     if industry.empty:
         st.info("Industry data not available.")
     else:
@@ -516,13 +529,13 @@ with tabs[5]:
         st.info("No stocks added yet.")
     else:
         current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy()
-        stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
+        p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
-        with c2: render_summary_card("Stage 1", str(int(stage_counts.get("Stage 1", 0))), "Accumulation")
-        with c3: render_summary_card("Stage 2", str(int(stage_counts.get("Stage 2", 0))), "Uptrend")
-        with c4: render_summary_card("Stage 3", str(int(stage_counts.get("Stage 3", 0))), "Distribution")
-        with c5: render_summary_card("Stage 4", str(int(stage_counts.get("Stage 4", 0))), "Downtrend")
+        with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Accumulation")
+        with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Uptrend")
+        with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Distribution")
+        with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Downtrend")
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             card(r, use_stage_color=True)
