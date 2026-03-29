@@ -58,8 +58,8 @@ pre {white-space: pre-wrap !important; word-break: break-word !important;}
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
-.stock-title {font-size: 1rem; font-weight: 700; margin-bottom: 0.08rem;}
-.stock-subtitle {font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem;}
+.stock-title {font-size: 1.14rem; font-weight: 700; margin-bottom: 0.08rem;}
+.stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-bottom: 0.4rem;}
 .stock-card {margin-bottom: 0.65rem;}
 .small-label {font-size: 0.75rem; color: var(--muted);}
 .disclosure {
@@ -190,6 +190,30 @@ def stage_description(stage: str) -> str:
     }
     return mapping.get(stage, "Description not available.")
 
+
+def stage_help_text(stage: str) -> str:
+    mapping = {
+        "Stage 1": "Stage 1 means the stock is stabilizing or recovering after a weaker phase.",
+        "Stage 2": "Stage 2 means the stock is in the strongest uptrend phase within this framework.",
+        "Stage 3": "Stage 3 means the stock is losing trend quality and moving into a topping phase.",
+        "Stage 4": "Stage 4 means the stock is in a weaker downward phase.",
+    }
+    return mapping.get(stage, "Stage meaning not available.")
+
+def trend_text(row: pd.Series) -> str:
+    label = str(row.get("classification", "Developing"))
+    if label == "Strong":
+        return "Strong trend"
+    if label == "Weak":
+        return "Weak trend"
+    return "Developing trend"
+
+def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
+    if combined_df.empty or "Industry" not in combined_df.columns or "stage" not in combined_df.columns:
+        return pd.DataFrame(columns=["Industry", "Current Rank", "Stage 2 Stocks"])
+    grp = combined_df.groupby("Industry", dropna=True)["stage"].apply(lambda s: int((s == "Stage 2").sum())).reset_index(name="Stage 2 Stocks")
+    return grp
+
 def market_tone(regime_df: pd.DataFrame, combined_df: pd.DataFrame) -> str:
     if not regime_df.empty and "regime_label" in regime_df.columns:
         label = str(regime_df.iloc[0]["regime_label"])
@@ -239,27 +263,26 @@ def render_summary_card(title: str, value: str, subtitle: str):
         unsafe_allow_html=True,
     )
 
-def render_stock_card(row: pd.Series, show_scores: bool = False):
+def render_stock_card(row: pd.Series, show_scores: bool = False, show_change_pct: str = ""):
     label = row.get("classification", "Developing")
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
     ticker = str(row.get("ticker", "")).replace(".NS", "")
-    reason = stock_reason(row)
-    stage = stage_display(str(row.get("stage", "")))
-    score = format_num(row.get("final_combined_score"))
+    stage_raw = str(row.get("stage", ""))
+    stage = stage_display(stage_raw)
+    industry = row.get("Industry", "Unknown")
+    trend = trend_text(row)
+    pct_html = f"<div style='font-size:1.0rem;font-weight:800;margin-top:0.2rem;'>{show_change_pct}</div>" if show_change_pct else ""
     st.markdown(
         f"""
 <div class="stock-card">
-  <div class="status-pill {style["css"]}">{label}</div>
   <div class="stock-title">{company}</div>
   <div class="stock-subtitle">{ticker}</div>
-  <div>{reason}</div>
-  <div class="row-wrap">
-    <span class="chip {style["chip"]}">{label}</span>
-    <span class="chip neutral-chip">{stage}</span>
-    <span class="chip neutral-chip">{row.get("Industry", "Unknown")}</span>
-    {"<span class='chip neutral-chip'>Score " + score + "</span>" if show_scores else ""}
-  </div>
+  <div class="status-pill {style["css"]}">{label}</div>
+  <div style="font-size:0.98rem; margin-top:0.15rem;"><b>{stage}</b></div>
+  <div style="font-size:0.95rem; margin-top:0.1rem;">{trend}</div>
+  <div style="font-size:0.95rem; margin-top:0.1rem;">{industry}</div>
+  {pct_html}
 </div>
 """,
         unsafe_allow_html=True,
@@ -282,20 +305,15 @@ def render_simple_list(rows: pd.DataFrame, message_col: str = "message"):
 def home_tab(combined_df: pd.DataFrame, industry_df: pd.DataFrame, regime_df: pd.DataFrame, changes_df: pd.DataFrame):
     tone = market_tone(regime_df, combined_df)
     top_industries = top_industry_text(industry_df)
-    strong_count = int((combined_df["classification"] == "Strong").sum()) if not combined_df.empty else 0
-    change_count = 0
-    if not changes_df.empty:
-        for col in ["new_daily_breakout", "new_weekly_breakout", "entered_stage_2", "new_top_10"]:
-            if col in changes_df.columns:
-                change_count += int(changes_df[col].fillna(False).sum())
+    setup_count = int((combined_df["classification"] == "Strong").sum()) if not combined_df.empty else 0
 
     c1, c2, c3 = st.columns(3)
     with c1:
         render_summary_card("Market tone", tone, "Simple summary of the latest saved scan")
     with c2:
-        render_summary_card("Stronger setups", str(strong_count), "Stocks currently classified as Strong")
+        render_summary_card("Top industries", top_industries, "Industries leading the current scan")
     with c3:
-        render_summary_card("Leading industries", top_industries, "Top industries from the latest saved scan")
+        render_summary_card("Setups", str(setup_count), "Stocks currently in the top classification")
 
     st.divider()
     left, right = st.columns([1.25, 1])
@@ -321,42 +339,40 @@ def home_tab(combined_df: pd.DataFrame, industry_df: pd.DataFrame, regime_df: pd
 
 def stocks_tab(combined_df: pd.DataFrame, company_map: Dict[str, str], daily_dir: str, weekly_dir: str):
     st.markdown("### Stocks")
-    st.caption("Use company names to browse the latest classifications and charts.")
-    col1, col2, col3 = st.columns([1.4, 1, 1])
-    names = sorted(company_map.keys())
-    selected_name = col1.selectbox("Select stock", names, key="stocks_select_name")
-    label_filter = col2.selectbox("Classification", ["All", "Strong", "Developing", "Weak"], key="stocks_label_filter")
-    industry_options = ["All"] + sorted(combined_df["Industry"].dropna().astype(str).unique().tolist()) if "Industry" in combined_df.columns else ["All"]
-    industry_filter = col3.selectbox("Industry", industry_options, key="stocks_industry_filter")
+    st.caption("Browse stocks by company name, ordered from higher rank to lower rank.")
+    ranked = combined_df.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
+    names = ranked["Company Name"].dropna().astype(str).tolist()
+    if "selected_stock_name" not in st.session_state or st.session_state["selected_stock_name"] not in names:
+        st.session_state["selected_stock_name"] = names[0]
 
-    filtered = combined_df.copy()
-    if label_filter != "All":
-        filtered = filtered[filtered["classification"] == label_filter]
-    if industry_filter != "All":
-        filtered = filtered[filtered["Industry"] == industry_filter]
+    current_idx = names.index(st.session_state["selected_stock_name"])
+    csel, cprev, cnext = st.columns([4,1,1])
+    selected_name = csel.selectbox("Select stock", names, index=current_idx, key="stocks_select_name_ordered")
+    if selected_name != st.session_state["selected_stock_name"]:
+        st.session_state["selected_stock_name"] = selected_name
+        st.rerun()
 
-    ticker = company_map[selected_name]
-    row = combined_df[combined_df["ticker"] == ticker].iloc[0]
+    with cprev:
+        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
+        if st.button("Previous", use_container_width=True, disabled=(current_idx == 0), key="stocks_prev_btn"):
+            st.session_state["selected_stock_name"] = names[current_idx - 1]
+            st.rerun()
+    with cnext:
+        st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
+        if st.button("Next", use_container_width=True, disabled=(current_idx == len(names) - 1), key="stocks_next_btn"):
+            st.session_state["selected_stock_name"] = names[current_idx + 1]
+            st.rerun()
+
+    row = ranked[ranked["Company Name"] == st.session_state["selected_stock_name"]].iloc[0]
     left, right = st.columns([0.95, 1.05])
     with left:
-        render_stock_card(row, show_scores=True)
-        st.markdown(
-            f"""
-<div class="info-card">
-  <div class="small-label">What this means</div>
-  <ul class="list-tight">
-    <li>Classification: {row.get("classification")}</li>
-    <li>Stage: {stage_display(str(row.get("stage", "")))}</li>
-    <li>Industry: {row.get("Industry", "Unknown")}</li>
-    <li>Stage meaning: {stage_description(str(row.get("stage", "")))}</li>
-  </ul>
-</div>
-""",
-            unsafe_allow_html=True,
-        )
+        render_stock_card(row, show_scores=False)
+        stage_raw = str(row.get("stage", ""))
+        with st.expander(f"What does {stage_raw} mean?", expanded=False):
+            st.write(stage_help_text(stage_raw))
     with right:
-        dpath = resolve_chart_path(daily_dir, ticker, "_daily.png")
-        wpath = resolve_chart_path(weekly_dir, ticker, "_weekly.png")
+        dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
+        wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
         c1, c2 = st.columns(2)
         with c1:
             st.markdown("#### Daily")
@@ -373,43 +389,35 @@ def stocks_tab(combined_df: pd.DataFrame, company_map: Dict[str, str], daily_dir
 
     st.divider()
     st.markdown("### Browse more stocks")
-    browse = filtered.sort_values("final_combined_score", ascending=False).head(20)
+    browse = ranked.head(20)
     for _, r in browse.iterrows():
         render_stock_card(r, show_scores=False)
 
 def market_tab(industry_df: pd.DataFrame, regime_df: pd.DataFrame, combined_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
     st.markdown("### Market")
-    tone = market_tone(regime_df, combined_df)
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        render_summary_card("Market tone", tone, "High-level read of the latest run")
-    with c2:
-        render_summary_card("Top industries", top_industry_text(industry_df), "Industries leading the current scan")
-    with c3:
-        rising = int((industry_changes_df["rank_change"].fillna(0) > 0).sum()) if not industry_changes_df.empty and "rank_change" in industry_changes_df.columns else 0
-        render_summary_card("Industries improving", str(rising), "Industries moving higher in rank")
-
-    st.divider()
-    left, right = st.columns(2)
-    with left:
-        st.markdown("#### Industry strength")
-        cols = [c for c in ["Industry", "avg_combined_score", "rs_rank", "strong_combined", "actionable_daily", "actionable_weekly"] if c in industry_df.columns]
-        if cols:
-            st.dataframe(industry_df[cols], use_container_width=True, hide_index=True, height=420)
-        else:
-            st.info("Industry strength data not available.")
-    with right:
-        st.markdown("#### Industry rotation")
-        cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change", "combined_score_change"] if c in industry_changes_df.columns]
-        if cols:
-            rising_df = industry_changes_df.sort_values(["rank_change", "combined_score_change"], ascending=[False, False]).head(10)
-            st.dataframe(rising_df[cols], use_container_width=True, hide_index=True, height=420)
-        else:
-            st.info("Industry rotation data not available.")
+    st.caption("Industry strength with current rank and number of Stage 2 stocks.")
+    view = industry_df.copy()
+    if view.empty:
+        st.info("Industry data not available.")
+        return
+    stage2 = stage2_count_by_industry(combined_df)
+    if "Industry" in view.columns:
+        view = view.merge(stage2, on="Industry", how="left")
+    rank_col = "current_rank" if "current_rank" in view.columns else ("rs_rank" if "rs_rank" in view.columns else None)
+    cols = []
+    if "Industry" in view.columns:
+        cols.append("Industry")
+    if rank_col:
+        cols.append(rank_col)
+        view = view.rename(columns={rank_col: "Current Rank"})
+        cols[-1] = "Current Rank"
+    if "Stage 2 Stocks" in view.columns:
+        cols.append("Stage 2 Stocks")
+    st.dataframe(view[cols].sort_values("Current Rank", ascending=True), use_container_width=True, hide_index=True, height=520)
 
 def movers_tab(price_moves_df: pd.DataFrame):
     st.markdown("### Movers")
-    st.caption("This view shows which names moved most over the selected time window. Movement and classification are separate concepts.")
+    st.caption("This view shows which names moved most over the selected time window.")
     if price_moves_df.empty:
         st.info("Price move data not found yet.")
         return
@@ -430,12 +438,12 @@ def movers_tab(price_moves_df: pd.DataFrame):
         st.markdown(f"#### Fastest upward moves • {selected}")
         leaders = df.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10)
         for _, row in leaders.iterrows():
-            render_stock_card(row, show_scores=False)
+            render_stock_card(row, show_scores=False, show_change_pct=f"{float(row[col]):+.2f}%")
     with c2:
         st.markdown(f"#### Fastest downward moves • {selected}")
         laggards = df.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10)
         for _, row in laggards.iterrows():
-            render_stock_card(row, show_scores=False)
+            render_stock_card(row, show_scores=False, show_change_pct=f"{float(row[col]):+.2f}%")
 
 def portfolio_tab(combined_df: pd.DataFrame, company_map: Dict[str, str]):
     st.markdown("### Portfolio")
@@ -527,67 +535,24 @@ def learn_tab(help_image_path: str):
 
 def advanced_tab(daily_df: pd.DataFrame, weekly_df: pd.DataFrame, combined_df: pd.DataFrame, changes_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
     st.markdown("### Advanced")
-    st.caption("Raw tables for users who want deeper detail.")
+    st.caption("Simplified tables without raw score columns.")
+    def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
+        wanted = [c for c in ["Company Name", "ticker", "classification", "stage", "Industry"] if c in df.columns]
+        out = df[wanted].copy() if wanted else df.copy()
+        if "ticker" in out.columns:
+            out = out.rename(columns={"ticker": "Ticker"})
+            out["Ticker"] = out["Ticker"].astype(str).str.replace(".NS", "", regex=False)
+        return out
+
     with st.expander("Overall ranked", expanded=True):
-        st.dataframe(combined_df, use_container_width=True, hide_index=True, height=360)
+        st.dataframe(keep_simple(combined_df), use_container_width=True, hide_index=True, height=360)
     with st.expander("Daily ranked", expanded=False):
-        st.dataframe(daily_df, use_container_width=True, hide_index=True, height=320)
+        st.dataframe(keep_simple(daily_df), use_container_width=True, hide_index=True, height=320)
     with st.expander("Weekly ranked", expanded=False):
-        st.dataframe(weekly_df, use_container_width=True, hide_index=True, height=320)
+        st.dataframe(keep_simple(weekly_df), use_container_width=True, hide_index=True, height=320)
     with st.expander("Stock changes", expanded=False):
-        st.dataframe(changes_df, use_container_width=True, hide_index=True, height=320)
+        st.dataframe(keep_simple(changes_df), use_container_width=True, hide_index=True, height=320)
     with st.expander("Industry changes", expanded=False):
-        st.dataframe(industry_changes_df, use_container_width=True, hide_index=True, height=320)
+        keep = [c for c in ["Industry"] if c in industry_changes_df.columns]
+        st.dataframe(industry_changes_df[keep] if keep else industry_changes_df, use_container_width=True, hide_index=True, height=320)
 
-st.title("VCP Market Analytics")
-render_disclosure()
-
-with st.sidebar:
-    st.header("Settings")
-    outdir = st.text_input("Output folder", value="outputs")
-    help_image_path = st.text_input("Stage image", value="market_phases_reference.png")
-
-outputs = {
-    "daily": str(Path(outdir) / "vcp_daily_ranked.csv"),
-    "weekly": str(Path(outdir) / "vcp_weekly_ranked.csv"),
-    "combined": str(Path(outdir) / "vcp_combined_ranked.csv"),
-    "industry": str(Path(outdir) / "industry_strength.csv"),
-    "regime": str(Path(outdir) / "market_regime.csv"),
-    "stock_changes": str(Path(outdir) / "stock_changes.csv"),
-    "industry_changes": str(Path(outdir) / "industry_changes.csv"),
-    "price_moves": str(Path(outdir) / "stock_price_moves.csv"),
-    "daily_charts_dir": str(Path(outdir) / "charts" / "daily"),
-    "weekly_charts_dir": str(Path(outdir) / "charts" / "weekly"),
-}
-
-daily_df = add_labels(safe_read(outputs["daily"]))
-weekly_df = add_labels(safe_read(outputs["weekly"]))
-combined_df = add_labels(safe_read(outputs["combined"]))
-industry_df = add_labels(safe_read(outputs["industry"]))
-regime_df = safe_read(outputs["regime"])
-changes_df = add_labels(safe_read(outputs["stock_changes"]))
-industry_changes_df = add_labels(safe_read(outputs["industry_changes"]))
-price_moves_df = add_labels(safe_read(outputs["price_moves"]))
-
-if combined_df.empty:
-    st.warning("No output files found yet. Run the scan first.")
-    st.stop()
-
-company_map = company_choices(combined_df)
-
-tabs = st.tabs(["Home", "Stocks", "Market", "Movers", "Learn", "Portfolio", "Advanced"])
-
-with tabs[0]:
-    home_tab(combined_df, industry_df, regime_df, changes_df)
-with tabs[1]:
-    stocks_tab(combined_df, company_map, outputs["daily_charts_dir"], outputs["weekly_charts_dir"])
-with tabs[2]:
-    market_tab(industry_df, regime_df, combined_df, industry_changes_df)
-with tabs[3]:
-    movers_tab(price_moves_df)
-with tabs[4]:
-    learn_tab(help_image_path)
-with tabs[5]:
-    portfolio_tab(combined_df, company_map)
-with tabs[6]:
-    advanced_tab(daily_df, weekly_df, combined_df, changes_df, industry_changes_df)
