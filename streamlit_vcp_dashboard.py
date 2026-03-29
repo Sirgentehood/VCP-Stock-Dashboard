@@ -4,7 +4,7 @@ from typing import Optional, Dict
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="VCP Market Analytics", layout="wide")
+st.set_page_config(page_title="VCP Market Analytics", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown(
     """
@@ -16,11 +16,18 @@ st.markdown(
   --strong: #1ec977;
   --developing: #f0b429;
   --weak: #ff6b6b;
-  --up-bg: rgba(30,201,119,0.08);
-  --down-bg: rgba(255,107,107,0.08);
+  --up: #1ec977;
+  --down: #ff6b6b;
+  --stage1: #7c5cff;
+  --stage2: #00a3a3;
+  --stage3: #c77d00;
+  --stage4: #a855f7;
 }
 .block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 .stImage img {border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.08);}
+[data-testid="stSidebar"] {display:none;}
+section[data-testid="stSidebar"] {display:none;}
+[data-testid="collapsedControl"] {display:none;}
 [data-testid="stMetric"] {background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.45rem 0.6rem; border-radius: 0.85rem;}
 [data-testid="stMetricLabel"] {font-size: 0.82rem;}
 [data-testid="stMetricValue"] {font-size: 1.14rem;}
@@ -56,6 +63,10 @@ button[kind="primary"], button[kind="secondary"] {font-size: 0.98rem !important;
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-bottom: 0.1rem; line-height: 1.2;}
 .stock-card {margin-bottom: 0.42rem;}
+.stage-border-1 {border-left: 5px solid var(--stage1);}
+.stage-border-2 {border-left: 5px solid var(--stage2);}
+.stage-border-3 {border-left: 5px solid var(--stage3);}
+.stage-border-4 {border-left: 5px solid var(--stage4);}
 .disclosure {
   border-left: 4px solid rgba(240,180,41,0.55);
   background: rgba(240,180,41,0.08);
@@ -69,9 +80,10 @@ button[kind="primary"], button[kind="secondary"] {font-size: 0.98rem !important;
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.25; margin-top: 0.1rem;}
-.stock-card.up-highlight {background: var(--up-bg);}
-.stock-card.down-highlight {background: var(--down-bg);}
-.change-badge {font-size: 0.94rem; font-weight: 800; margin-top: 0.18rem;}
+.change-badge-up {font-size: 0.98rem; font-weight: 800; margin-top: 0.18rem; color: var(--up);}
+.change-badge-down {font-size: 0.98rem; font-weight: 800; margin-top: 0.18rem; color: var(--down);}
+.change-side-up {border-left: 5px solid var(--up);}
+.change-side-down {border-left: 5px solid var(--down);}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
@@ -231,7 +243,15 @@ def render_summary_card(title: str, value: str, subtitle: str):
         unsafe_allow_html=True,
     )
 
-def render_stock_card(row: pd.Series, show_change_pct: str = "", highlight: str = ""):
+def _stage_border_class(stage_raw: str) -> str:
+    return {
+        "Stage 1": "stage-border-1",
+        "Stage 2": "stage-border-2",
+        "Stage 3": "stage-border-3",
+        "Stage 4": "stage-border-4",
+    }.get(stage_raw, "")
+
+def render_stock_card(row: pd.Series, show_change_pct: str = "", highlight: str = "", use_stage_color: bool = False):
     label = row.get("classification", "Developing")
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
@@ -239,11 +259,18 @@ def render_stock_card(row: pd.Series, show_change_pct: str = "", highlight: str 
     stage_raw = str(row.get("stage", "Unknown"))
     trend = trend_text(row)
     phase = stage_display(stage_raw)
-    change_html = f"<div class='change-badge'>{show_change_pct}</div>" if show_change_pct else ""
-    highlight_cls = "up-highlight" if highlight == "up" else ("down-highlight" if highlight == "down" else "")
+    border_cls = _stage_border_class(stage_raw) if use_stage_color else ""
+    if highlight == "up":
+        border_cls = "change-side-up"
+    elif highlight == "down":
+        border_cls = "change-side-down"
+    change_html = ""
+    if show_change_pct:
+        cls = "change-badge-up" if highlight == "up" else ("change-badge-down" if highlight == "down" else "change-badge-up")
+        change_html = f"<div class='{cls}'>{show_change_pct}</div>"
     st.markdown(
         f"""
-<div class="stock-card {highlight_cls}">
+<div class="stock-card {border_cls}">
   <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
     <div style="min-width:0;">
       <div class="stock-title">{company} ({ticker})</div>
@@ -318,28 +345,29 @@ def stocks_tab(combined_df: pd.DataFrame, daily_dir: str, weekly_dir: str):
     if not names:
         st.info("No stock data available.")
         return
-    if "selected_stock_name" not in st.session_state or st.session_state["selected_stock_name"] not in names:
-        st.session_state["selected_stock_name"] = names[0]
+    if "selected_stock_index" not in st.session_state:
+        st.session_state["selected_stock_index"] = 0
+    st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
 
-    current_idx = names.index(st.session_state["selected_stock_name"])
     csel, cprev, cnext = st.columns([4, 1, 1])
-    selected_name = csel.selectbox("Select stock", names, index=current_idx, key="stocks_select_name_ordered")
-    if selected_name != st.session_state["selected_stock_name"]:
-        st.session_state["selected_stock_name"] = selected_name
+    selected_name = csel.selectbox("Select stock", names, index=st.session_state["selected_stock_index"], key="stocks_select_name_ordered")
+    new_idx = names.index(selected_name)
+    if new_idx != st.session_state["selected_stock_index"]:
+        st.session_state["selected_stock_index"] = new_idx
         st.rerun()
 
     with cprev:
         st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        if st.button("Previous", use_container_width=True, disabled=(current_idx == 0), key="stocks_prev_btn"):
-            st.session_state["selected_stock_name"] = names[current_idx - 1]
+        if st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key="stocks_prev_btn"):
+            st.session_state["selected_stock_index"] -= 1
             st.rerun()
     with cnext:
         st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-        if st.button("Next", use_container_width=True, disabled=(current_idx == len(names) - 1), key="stocks_next_btn"):
-            st.session_state["selected_stock_name"] = names[current_idx + 1]
+        if st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key="stocks_next_btn"):
+            st.session_state["selected_stock_index"] += 1
             st.rerun()
 
-    row = ranked[ranked["Company Name"] == st.session_state["selected_stock_name"]].iloc[0]
+    row = ranked.iloc[st.session_state["selected_stock_index"]]
 
     st.markdown("#### Selected charts")
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
@@ -359,12 +387,12 @@ def stocks_tab(combined_df: pd.DataFrame, daily_dir: str, weekly_dir: str):
             st.info("Weekly chart not available.")
 
     st.markdown("#### Selected stock")
-    render_stock_card(row)
+    render_stock_card(row, use_stage_color=True)
 
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
-        render_stock_card(r)
+        render_stock_card(r, use_stage_color=True)
 
 def market_tab(industry_df: pd.DataFrame, combined_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
     st.markdown("### Market")
@@ -470,7 +498,7 @@ def portfolio_tab(combined_df: pd.DataFrame, company_map: Dict[str, str]):
 
     st.divider()
     for _, row in current.sort_values(["final_combined_score"], ascending=[False]).iterrows():
-        render_stock_card(row)
+        render_stock_card(row, use_stage_color=True)
 
     removable = [""] + sorted(st.session_state["portfolio_names"])
     selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
@@ -533,13 +561,12 @@ def advanced_tab(daily_df: pd.DataFrame, weekly_df: pd.DataFrame, combined_df: p
         renamed = industry_changes_df[simple_cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}) if simple_cols else industry_changes_df
         st.dataframe(renamed, use_container_width=True, hide_index=True, height=320)
 
+# defaults without sidebar
+outdir = "outputs"
+help_image_path = "market_phases_reference.png"
+
 st.title("VCP Market Analytics")
 render_disclosure()
-
-with st.sidebar:
-    st.header("Settings")
-    outdir = st.text_input("Output folder", value="outputs")
-    help_image_path = st.text_input("Stage image", value="market_phases_reference.png")
 
 outputs = {
     "daily": str(Path(outdir) / "vcp_daily_ranked.csv"),
@@ -564,8 +591,8 @@ industry_changes_df = add_labels(safe_read(outputs["industry_changes"]))
 price_moves_df = add_labels(safe_read(outputs["price_moves"]))
 
 if combined_df.empty:
-    st.error("No data found in the selected output folder.")
-    st.info("Check that these files exist inside the folder you selected: vcp_combined_ranked.csv, vcp_daily_ranked.csv, vcp_weekly_ranked.csv, industry_strength.csv")
+    st.error("No data found in the default outputs folder.")
+    st.info("Create an outputs folder beside this file and keep the generated CSV files there.")
     st.stop()
 
 company_map = company_choices(combined_df)
