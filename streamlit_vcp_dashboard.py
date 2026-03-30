@@ -420,6 +420,9 @@ def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
 def get_stock_rank(ticker: str) -> str:
     return rank_lookup(top_movers, ticker, ["current_rank"])
 
+def get_display_stock_rank(ticker: str) -> str:
+    return get_stock_rank(ticker)
+
 def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
     if not industry_df.empty and "Industry" in industry_df.columns:
         view = industry_df.copy()
@@ -538,14 +541,14 @@ with tabs[1]:
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
     a, b = st.columns(2)
     with a:
-        daily_rank = rank_lookup(daily_df, row["ticker"], ["current_rank", "rank", "rs_rank"])
+        daily_rank = get_display_stock_rank(row["ticker"])
         st.markdown(f"#### Daily * {ticker_short} * {row.get('stage', '')} * Daily Stock Rank {daily_rank}")
         if dpath:
             st.image(safe_image_bytes(dpath), use_container_width=True)
         else:
             st.info("Daily chart not available.")
     with b:
-        weekly_rank = rank_lookup(weekly_df, row["ticker"], ["current_rank", "rank", "rs_rank"])
+        weekly_rank = get_display_stock_rank(row["ticker"])
         st.markdown(f"#### Weekly * {ticker_short} * {row.get('stage', '')} * Weekly Stock Rank {weekly_rank}")
         if wpath:
             st.image(safe_image_bytes(wpath), use_container_width=True)
@@ -669,17 +672,32 @@ with tabs[4]:
 with tabs[5]:
     if "portfolio_names" not in st.session_state:
         st.session_state["portfolio_names"] = []
+    if "custom_portfolio_names" not in st.session_state:
+        st.session_state["custom_portfolio_names"] = []
     if "portfolio_chart_index" not in st.session_state:
         st.session_state["portfolio_chart_index"] = 0
+    if "portfolio_selection" not in st.session_state:
+        st.session_state["portfolio_selection"] = "Custom"
+    if "portfolio_selection_prev" not in st.session_state:
+        st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
 
     portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
-    if selected_portfolio != "Custom":
-        st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
+    previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
+    if selected_portfolio != previous_portfolio:
+        if previous_portfolio == "Custom":
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+        if selected_portfolio == "Custom":
+            st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("custom_portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
+        else:
+            st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
         st.session_state["portfolio_chart_index"] = 0
+        st.session_state["portfolio_selection_prev"] = selected_portfolio
 
     st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+    if selected_portfolio == "Custom":
+        st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
 
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
@@ -689,6 +707,8 @@ with tabs[5]:
         st.warning(f"Portfolio is limited to {MAX_PORTFOLIO_STOCKS} stocks.")
     if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
         st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=MAX_PORTFOLIO_STOCKS)
+        if selected_portfolio == "Custom":
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
         if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
             st.session_state["portfolio_chart_index"] = max(0, len(st.session_state["portfolio_names"]) - 1)
         st.rerun()
@@ -714,6 +734,8 @@ with tabs[5]:
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
         if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
             st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
+            if selected_portfolio == "Custom":
+                st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
             st.session_state["portfolio_chart_index"] = min(st.session_state["portfolio_chart_index"], max(0, len(st.session_state["portfolio_names"]) - 1))
             st.rerun()
 
@@ -727,7 +749,7 @@ with tabs[5]:
 
             pc1, pc2 = st.columns(2)
             with pc1:
-                pdaily_rank = rank_lookup(daily_df, prow["ticker"], ["current_rank", "rank", "rs_rank"])
+                pdaily_rank = get_display_stock_rank(prow["ticker"])
                 st.markdown(f"#### Daily * {pticker_short} * {prow.get('stage', '')} * Daily Stock Rank {pdaily_rank}")
                 pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
                 if pdpath:
@@ -735,7 +757,7 @@ with tabs[5]:
                 else:
                     st.info("Daily chart not available.")
             with pc2:
-                pweekly_rank = rank_lookup(weekly_df, prow["ticker"], ["current_rank", "rank", "rs_rank"])
+                pweekly_rank = get_display_stock_rank(prow["ticker"])
                 st.markdown(f"#### Weekly * {pticker_short} * {prow.get('stage', '')} * Weekly Stock Rank {pweekly_rank}")
                 pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
                 if pwpath:
@@ -745,9 +767,9 @@ with tabs[5]:
 
             nav1, nav2 = st.columns(2)
             with nav1:
-                pprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] == 0), key=f"portfolio_prev_{st.session_state['portfolio_chart_index']}")
+                pprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] == 0), key="portfolio_prev")
             with nav2:
-                pnext = st.button("Next", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1), key=f"portfolio_next_{st.session_state['portfolio_chart_index']}")
+                pnext = st.button("Next", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1), key="portfolio_next")
             if pprev and st.session_state["portfolio_chart_index"] > 0:
                 st.session_state["portfolio_chart_index"] -= 1
                 st.rerun()
