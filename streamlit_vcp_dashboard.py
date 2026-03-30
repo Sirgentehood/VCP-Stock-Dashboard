@@ -72,6 +72,8 @@ LABELS = {
     "Cautious": {"css": "status-cautious"},
 }
 
+MAX_PORTFOLIO_STOCKS = 25
+
 @st.cache_data(show_spinner=False)
 def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
     return pd.read_csv(path)
@@ -382,6 +384,9 @@ industry = ensure_label(safe_read(f"{outdir}/industry_strength.csv"))
 changes = ensure_label(safe_read(f"{outdir}/stock_changes.csv"))
 industry_changes = ensure_label(safe_read(f"{outdir}/industry_changes.csv"))
 moves = ensure_label(safe_read(f"{outdir}/stock_price_moves.csv"))
+top_movers = ensure_label(safe_read(f"{outdir}/top_movers.csv"))
+if top_movers.empty:
+    top_movers = moves.copy()
 regime = safe_read(f"{outdir}/market_regime.csv")
 
 if combined.empty:
@@ -397,34 +402,87 @@ changed_tickers = set(top_changed_df["ticker"].dropna().tolist()) if not top_cha
 top_stocks_today = combined[~combined["ticker"].isin(changed_tickers)].sort_values("final_combined_score", ascending=False).head(5).copy()
 stage_counts = stage_count_summary(combined)
 
+def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
+    out = []
+    seen = set()
+    for name in names:
+        if pd.isna(name):
+            continue
+        name = str(name).strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        out.append(name)
+        if len(out) >= limit:
+            break
+    return out
+
+def get_stock_rank(ticker: str) -> str:
+    return rank_lookup(top_movers, ticker, ["current_rank"])
+
+def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
+    if not industry_df.empty and "Industry" in industry_df.columns:
+        view = industry_df.copy()
+        sort_col = None
+        ascending = False
+        for candidate in ["avg_combined_score", "final_combined_score"]:
+            if candidate in view.columns:
+                sort_col = candidate
+                ascending = False
+                break
+        if sort_col is None:
+            for candidate in ["current_rank", "rs_rank"]:
+                if candidate in view.columns:
+                    sort_col = candidate
+                    ascending = True
+                    break
+        if sort_col is not None:
+            view[sort_col] = pd.to_numeric(view[sort_col], errors="coerce")
+            view = view.sort_values(sort_col, ascending=ascending, na_position="last")
+        industries = view["Industry"].dropna().astype(str).str.strip().tolist()
+        return dedupe_names(industries, limit=limit)
+
+    if "Industry" not in combined_df.columns:
+        return []
+
+    grouped = (combined_df.dropna(subset=["Industry"])
+               .groupby("Industry", as_index=False)["final_combined_score"]
+               .mean()
+               .sort_values("final_combined_score", ascending=False))
+    industries = grouped["Industry"].astype(str).str.strip().tolist()
+    return dedupe_names(industries, limit=limit)
+
+INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=21)
+
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame) -> list:
     ranked = combined.sort_values("final_combined_score", ascending=False)
+    names = []
     if name == "Top 15":
-        return ranked.head(15)["Company Name"].dropna().tolist()
-    if name == "New Breakouts":
+        names = ranked.head(15)["Company Name"].dropna().tolist()
+    elif name == "New Breakouts":
         tmp = changes.copy()
         mask = pd.Series(False, index=tmp.index)
         if "new_daily_breakout" in tmp.columns:
             mask = mask | tmp["new_daily_breakout"].fillna(False)
         if "new_weekly_breakout" in tmp.columns:
             mask = mask | tmp["new_weekly_breakout"].fillna(False)
-        return tmp.loc[mask, "Company Name"].dropna().tolist()
-    if name == "New Strong":
+        names = tmp.loc[mask, "Company Name"].dropna().tolist()
+    elif name == "New Strong":
         tmp = changes.copy()
         if "label" not in tmp.columns:
             tmp["label"] = tmp.apply(classify_stock, axis=1)
-        return tmp.loc[tmp["label"] == "Strong", "Company Name"].dropna().tolist()
-    if name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
-        return combined.loc[combined["stage"] == name, "Company Name"].dropna().tolist()
-    if name == "All Industry":
-        return combined["Company Name"].dropna().tolist()
-    if name == "Cautious":
-        return combined.loc[combined["label"] == "Cautious", "Company Name"].dropna().tolist()
-    if name == "Weak":
-        return combined.loc[combined["label"] == "Weak", "Company Name"].dropna().tolist()
-    if name == "Strong":
-        return combined.loc[combined["label"] == "Strong", "Company Name"].dropna().tolist()
-    return []
+        names = tmp.loc[tmp["label"] == "Strong", "Company Name"].dropna().tolist()
+    elif name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
+        names = combined.loc[combined["stage"] == name, "Company Name"].dropna().tolist()
+    elif name == "Cautious":
+        names = combined.loc[combined["label"] == "Cautious", "Company Name"].dropna().tolist()
+    elif name == "Weak":
+        names = combined.loc[combined["label"] == "Weak", "Company Name"].dropna().tolist()
+    elif name == "Strong":
+        names = combined.loc[combined["label"] == "Strong", "Company Name"].dropna().tolist()
+    elif name in INDUSTRY_PORTFOLIOS:
+        names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
+    return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
 st.title("Market Structure Radar")
 tabs = st.tabs(["Home","Stocks","Movers","Market","Learn","Portfolio","Advanced","Disclaimer"])
@@ -447,12 +505,12 @@ with tabs[0]:
             st.info("No major stock changes found in the latest run.")
         else:
             for _, r in top_changed_df.iterrows():
-                stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+                stock_rank = get_stock_rank(r["ticker"])
                 card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
     with right:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
-            stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+            stock_rank = get_stock_rank(r["ticker"])
             card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
@@ -473,7 +531,7 @@ with tabs[1]:
     row = ranked.iloc[st.session_state["selected_stock_index"]]
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
-    stock_rank = rank_lookup(combined, row["ticker"], ["current_rank", "rank", "rs_rank"])
+    stock_rank = get_stock_rank(row["ticker"])
     card(row, use_stage_color=True, stock_rank=stock_rank)
 
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
@@ -509,7 +567,7 @@ with tabs[1]:
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
-        stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+        stock_rank = get_stock_rank(r["ticker"])
         card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
@@ -529,12 +587,12 @@ with tabs[2]:
         with c1:
             st.markdown(f"#### Fastest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
-                stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+                stock_rank = get_stock_rank(r["ticker"])
                 card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
         with c2:
             st.markdown(f"#### Fastest downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
-                stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+                stock_rank = get_stock_rank(r["ticker"])
                 card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
@@ -614,18 +672,23 @@ with tabs[5]:
     if "portfolio_chart_index" not in st.session_state:
         st.session_state["portfolio_chart_index"] = 0
 
-    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4", "All Industry"]
+    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
     if selected_portfolio != "Custom":
         st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
         st.session_state["portfolio_chart_index"] = 0
 
+    st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
-    selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name")
-    if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn") and selected_to_add:
-        st.session_state["portfolio_names"].append(selected_to_add)
+    portfolio_full = len(st.session_state["portfolio_names"]) >= MAX_PORTFOLIO_STOCKS
+    selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name", disabled=portfolio_full)
+    if portfolio_full:
+        st.warning(f"Portfolio is limited to {MAX_PORTFOLIO_STOCKS} stocks.")
+    if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
+        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=MAX_PORTFOLIO_STOCKS)
         if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
             st.session_state["portfolio_chart_index"] = max(0, len(st.session_state["portfolio_names"]) - 1)
         st.rerun()
@@ -633,7 +696,7 @@ with tabs[5]:
     if not st.session_state["portfolio_names"]:
         st.info("No stocks added yet.")
     else:
-        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy()
+        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(MAX_PORTFOLIO_STOCKS).copy()
         p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
@@ -644,7 +707,7 @@ with tabs[5]:
 
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
-            stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+            stock_rank = get_stock_rank(r["ticker"])
             card(r, use_stage_color=True, stock_rank=stock_rank)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
