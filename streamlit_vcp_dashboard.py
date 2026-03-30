@@ -15,14 +15,14 @@ st.markdown("""
   --cautious: #ff9f43;
   --up: #1ec977;
   --down: #ff6b6b;
-  --stage1-bg: rgba(108,92,231,0.12);
+  --stage1-bg: rgba(55,95,220,0.14);
   --stage2-bg: rgba(0,179,179,0.12);
   --stage3-bg: rgba(212,160,23,0.12);
-  --stage4-bg: rgba(142,125,255,0.12);
-  --stage1-border: rgba(108,92,231,0.28);
+  --stage4-bg: rgba(170,80,180,0.14);
+  --stage1-border: rgba(55,95,220,0.34);
   --stage2-border: rgba(0,179,179,0.28);
   --stage3-border: rgba(212,160,23,0.28);
-  --stage4-border: rgba(142,125,255,0.28);
+  --stage4-border: rgba(170,80,180,0.34);
 }
 .block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {display:none;}
@@ -52,6 +52,7 @@ st.markdown("""
 .stage-card-4 {background: var(--stage4-bg); border-color: var(--stage4-border);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
+.rank-text {font-size: 0.84rem; font-weight: 700; color: var(--muted); margin-top: 0.18rem;}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
@@ -214,7 +215,21 @@ def _stage_card_class(stage_raw: str) -> str:
         "Stage 4": "stage-card-4",
     }.get(stage_raw, "")
 
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = ""):
+def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
+    if df.empty or "ticker" not in df.columns:
+        return "n/a"
+    match = df[df["ticker"] == ticker]
+    if match.empty:
+        return "n/a"
+    row = match.iloc[0]
+    for col in preferred_cols:
+        if col in match.columns:
+            val = pd.to_numeric(row.get(col), errors="coerce")
+            if pd.notna(val):
+                return str(int(val))
+    return "n/a"
+
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a"):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
@@ -234,6 +249,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
+    rank_html = f"<div class='rank-text'>Stock Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
@@ -242,7 +258,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
-        f"{status_html}{change_html}"
+        f"{status_html}{rank_html}{change_html}"
         f"</div>"
         f"</div>"
         f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
@@ -319,6 +335,8 @@ outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
+daily_df = ensure_label(safe_read(f"{outdir}/vcp_daily_ranked.csv"))
+weekly_df = ensure_label(safe_read(f"{outdir}/vcp_weekly_ranked.csv"))
 industry = ensure_label(safe_read(f"{outdir}/industry_strength.csv"))
 changes = ensure_label(safe_read(f"{outdir}/stock_changes.csv"))
 industry_changes = ensure_label(safe_read(f"{outdir}/industry_changes.csv"))
@@ -338,24 +356,49 @@ changed_tickers = set(top_changed_df["ticker"].dropna().tolist()) if not top_cha
 top_stocks_today = combined[~combined["ticker"].isin(changed_tickers)].sort_values("final_combined_score", ascending=False).head(5).copy()
 stage_counts = stage_count_summary(combined)
 
+def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame) -> list:
+    ranked = combined.sort_values("final_combined_score", ascending=False)
+    if name == "Top 15":
+        return ranked.head(15)["Company Name"].dropna().tolist()
+    if name == "New Breakouts":
+        tmp = changes.copy()
+        mask = pd.Series(False, index=tmp.index)
+        if "new_daily_breakout" in tmp.columns:
+            mask = mask | tmp["new_daily_breakout"].fillna(False)
+        if "new_weekly_breakout" in tmp.columns:
+            mask = mask | tmp["new_weekly_breakout"].fillna(False)
+        return tmp.loc[mask, "Company Name"].dropna().tolist()
+    if name == "New Strong":
+        tmp = changes.copy()
+        if "label" not in tmp.columns:
+            tmp["label"] = tmp.apply(classify_stock, axis=1)
+        return tmp.loc[tmp["label"] == "Strong", "Company Name"].dropna().tolist()
+    if name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
+        return combined.loc[combined["stage"] == name, "Company Name"].dropna().tolist()
+    if name == "All Industry":
+        return combined["Company Name"].dropna().tolist()
+    if name == "Cautious":
+        return combined.loc[combined["label"] == "Cautious", "Company Name"].dropna().tolist()
+    if name == "Weak":
+        return combined.loc[combined["label"] == "Weak", "Company Name"].dropna().tolist()
+    if name == "Strong":
+        return combined.loc[combined["label"] == "Strong", "Company Name"].dropna().tolist()
+    return []
+
 st.title("Market Structure Radar")
 tabs = st.tabs(["Home","Stocks","Movers","Market","Learn","Portfolio","Advanced","Disclaimer"])
 
 with tabs[0]:
+    st.markdown("### Today's Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
-        render_summary_card("Market tone", market_tone(regime, combined), "Simple summary of the latest saved scan")
+        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stocks that improved materially")
     with c2:
-        render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
+        render_summary_card("Market tone", market_tone(regime, combined), "Simple summary of the latest saved scan")
     with c3:
-        render_summary_card("Entered Stage 2", str(changes_summary["Entered Stage 2"]), "Moved into uptrend phase")
+        render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
+
     st.divider()
-    st.markdown("### Today’s Changes")
-    st.caption("The most important changes since the previous scan")
-    s1, s2, s3 = st.columns(3)
-    with s1: render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stocks that improved materially")
-    with s2: render_summary_card("Entered Stage 2", str(changes_summary["Entered Stage 2"]), "Moved into uptrend phase")
-    with s3: render_summary_card("New Breakouts", str(changes_summary["New Breakouts"]), "Daily or weekly breakout conditions")
     left, right = st.columns([1.25, 1])
     with left:
         st.markdown("#### Top names that changed")
@@ -363,11 +406,13 @@ with tabs[0]:
             st.info("No major stock changes found in the latest run.")
         else:
             for _, r in top_changed_df.iterrows():
-                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}")
+                stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
     with right:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
-            card(r, use_stage_color=True)
+            stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+            card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
 with tabs[1]:
@@ -387,19 +432,22 @@ with tabs[1]:
     row = ranked.iloc[st.session_state["selected_stock_index"]]
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
-    card(row, use_stage_color=True)
+    stock_rank = rank_lookup(combined, row["ticker"], ["current_rank", "rank", "rs_rank"])
+    card(row, use_stage_color=True, stock_rank=stock_rank)
 
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
     a, b = st.columns(2)
     with a:
-        st.markdown(f"#### Daily * {ticker_short} * {row.get('stage', '')}")
+        daily_rank = rank_lookup(daily_df, row["ticker"], ["current_rank", "rank", "rs_rank"])
+        st.markdown(f"#### Daily * {ticker_short} * {row.get('stage', '')} * Daily Stock Rank {daily_rank}")
         if dpath:
             st.image(safe_image_bytes(dpath), use_container_width=True)
         else:
             st.info("Daily chart not available.")
     with b:
-        st.markdown(f"#### Weekly * {ticker_short} * {row.get('stage', '')}")
+        weekly_rank = rank_lookup(weekly_df, row["ticker"], ["current_rank", "rank", "rs_rank"])
+        st.markdown(f"#### Weekly * {ticker_short} * {row.get('stage', '')} * Weekly Stock Rank {weekly_rank}")
         if wpath:
             st.image(safe_image_bytes(wpath), use_container_width=True)
         else:
@@ -420,7 +468,8 @@ with tabs[1]:
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
-        card(r, use_stage_color=True)
+        stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+        card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
 with tabs[2]:
@@ -439,11 +488,13 @@ with tabs[2]:
         with c1:
             st.markdown(f"#### Fastest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), use_stage_color=True)
+                stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
         with c2:
             st.markdown(f"#### Fastest downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
-                card(r, pct=float(r[col]), use_stage_color=True)
+                stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
 with tabs[3]:
@@ -522,6 +573,13 @@ with tabs[5]:
     if "portfolio_chart_index" not in st.session_state:
         st.session_state["portfolio_chart_index"] = 0
 
+    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4", "All Industry"]
+    selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
+
+    if selected_portfolio != "Custom":
+        st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
+        st.session_state["portfolio_chart_index"] = 0
+
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
     selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name")
@@ -545,38 +603,36 @@ with tabs[5]:
 
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
-            card(r, use_stage_color=True)
+            stock_rank = rank_lookup(combined, r["ticker"], ["current_rank", "rank", "rs_rank"])
+            card(r, use_stage_color=True, stock_rank=stock_rank)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
         if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
             st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
-            st.session_state["portfolio_chart_index"] = min(
-                st.session_state["portfolio_chart_index"],
-                max(0, len(st.session_state["portfolio_names"]) - 1)
-            )
+            st.session_state["portfolio_chart_index"] = min(st.session_state["portfolio_chart_index"], max(0, len(st.session_state["portfolio_names"]) - 1))
             st.rerun()
 
         portfolio_ordered = current.sort_values("final_combined_score", ascending=False).reset_index(drop=True)
         if not portfolio_ordered.empty:
             st.divider()
             st.markdown("### Portfolio charts")
-            st.session_state["portfolio_chart_index"] = max(
-                0, min(st.session_state["portfolio_chart_index"], len(portfolio_ordered) - 1)
-            )
+            st.session_state["portfolio_chart_index"] = max(0, min(st.session_state["portfolio_chart_index"], len(portfolio_ordered) - 1))
             prow = portfolio_ordered.iloc[st.session_state["portfolio_chart_index"]]
             pticker_short = str(prow["ticker"]).replace(".NS", "")
 
             pc1, pc2 = st.columns(2)
             with pc1:
-                st.markdown(f"#### Daily * {pticker_short} * {prow.get('stage', '')}")
+                pdaily_rank = rank_lookup(daily_df, prow["ticker"], ["current_rank", "rank", "rs_rank"])
+                st.markdown(f"#### Daily * {pticker_short} * {prow.get('stage', '')} * Daily Stock Rank {pdaily_rank}")
                 pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
                 if pdpath:
                     st.image(safe_image_bytes(pdpath), use_container_width=True)
                 else:
                     st.info("Daily chart not available.")
             with pc2:
-                st.markdown(f"#### Weekly * {pticker_short} * {prow.get('stage', '')}")
+                pweekly_rank = rank_lookup(weekly_df, prow["ticker"], ["current_rank", "rank", "rs_rank"])
+                st.markdown(f"#### Weekly * {pticker_short} * {prow.get('stage', '')} * Weekly Stock Rank {pweekly_rank}")
                 pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
                 if pwpath:
                     st.image(safe_image_bytes(pwpath), use_container_width=True)
@@ -585,20 +641,9 @@ with tabs[5]:
 
             nav1, nav2 = st.columns(2)
             with nav1:
-                pprev = st.button(
-                    "Previous",
-                    use_container_width=True,
-                    disabled=(st.session_state["portfolio_chart_index"] == 0),
-                    key=f"portfolio_prev_{st.session_state['portfolio_chart_index']}"
-                )
+                pprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] == 0), key=f"portfolio_prev_{st.session_state['portfolio_chart_index']}")
             with nav2:
-                pnext = st.button(
-                    "Next",
-                    use_container_width=True,
-                    disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1),
-                    key=f"portfolio_next_{st.session_state['portfolio_chart_index']}"
-                )
-
+                pnext = st.button("Next", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1), key=f"portfolio_next_{st.session_state['portfolio_chart_index']}")
             if pprev and st.session_state["portfolio_chart_index"] > 0:
                 st.session_state["portfolio_chart_index"] -= 1
                 st.rerun()
@@ -625,9 +670,9 @@ with tabs[6]:
     with st.expander("Overall ranked", expanded=True):
         st.dataframe(keep_simple(combined), use_container_width=True, hide_index=True, height=360)
     with st.expander("Daily ranked", expanded=False):
-        st.dataframe(keep_simple(ensure_label(safe_read(f"{outdir}/vcp_daily_ranked.csv"))), use_container_width=True, hide_index=True, height=320)
+        st.dataframe(keep_simple(daily_df), use_container_width=True, hide_index=True, height=320)
     with st.expander("Weekly ranked", expanded=False):
-        st.dataframe(keep_simple(ensure_label(safe_read(f"{outdir}/vcp_weekly_ranked.csv"))), use_container_width=True, hide_index=True, height=320)
+        st.dataframe(keep_simple(weekly_df), use_container_width=True, hide_index=True, height=320)
     with st.expander("Stock changes", expanded=False):
         st.dataframe(keep_simple(changes), use_container_width=True, hide_index=True, height=320)
     with st.expander("Industry changes", expanded=False):
