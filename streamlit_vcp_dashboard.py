@@ -215,19 +215,60 @@ def _stage_card_class(stage_raw: str) -> str:
         "Stage 4": "stage-card-4",
     }.get(stage_raw, "")
 
+def auto_rank(df: pd.DataFrame, preferred_cols: list) -> str:
+    if df.empty:
+        return "n/a"
+    work = df.copy()
+    candidate_score_cols = [
+        "final_combined_score", "avg_combined_score", "combined_score",
+        "final_daily_score", "daily_score", "final_weekly_score", "weekly_score",
+        "score"
+    ]
+    for score_col in candidate_score_cols:
+        if score_col in work.columns:
+            scores = pd.to_numeric(work[score_col], errors="coerce")
+            if scores.notna().any():
+                val = scores.rank(method="min", ascending=False).iloc[0]
+                if pd.notna(val):
+                    return str(int(val))
+    return "n/a"
+
 def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
-    if df.empty or "ticker" not in df.columns:
+    if df.empty:
         return "n/a"
-    match = df[df["ticker"] == ticker]
+
+    work = df.copy()
+    ticker_col = None
+    for cand in ["ticker", "Ticker", "symbol", "Symbol"]:
+        if cand in work.columns:
+            ticker_col = cand
+            break
+
+    if ticker_col is None:
+        return auto_rank(work, preferred_cols)
+
+    work[ticker_col] = work[ticker_col].astype(str).str.strip()
+    ticker_norm = str(ticker).strip()
+
+    match = work[work[ticker_col] == ticker_norm]
     if match.empty:
-        return "n/a"
+        match = work[work[ticker_col].str.replace(".NS", "", regex=False) == ticker_norm.replace(".NS", "")]
+
+    if match.empty:
+        return auto_rank(work, preferred_cols)
+
     row = match.iloc[0]
-    for col in preferred_cols:
+    search_cols = preferred_cols + [
+        "current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank",
+        "final_rank", "combined_rank", "stock_rank"
+    ]
+    for col in search_cols:
         if col in match.columns:
             val = pd.to_numeric(row.get(col), errors="coerce")
             if pd.notna(val):
                 return str(int(val))
-    return "n/a"
+
+    return auto_rank(match, preferred_cols)
 
 def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a"):
     label = row.get("label", row.get("classification", "Developing"))
