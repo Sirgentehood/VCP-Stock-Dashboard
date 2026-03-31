@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+import math
 
 st.set_page_config(page_title="Market Structure Radar", layout="wide", initial_sidebar_state="collapsed")
 
@@ -51,9 +52,9 @@ st.markdown("""
 .assist-title {font-size:1rem; font-weight:800; margin-bottom:0.28rem;}
 .assist-text {font-size:0.92rem; color: var(--muted); line-height:1.35;}
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
-.meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.25; margin-top: 0.1rem;}
-.stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.2;}
-.stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03);}
+.meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.18; margin-top: 0.06rem; margin-bottom: 0.02rem;}
+.stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.04rem; line-height: 1.1;}
+.stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03); padding-top: 0.72rem; padding-bottom: 0.72rem;}
 .stage-card-1 {background: var(--stage1-bg); border-color: var(--stage1-border);}
 .stage-card-2 {background: var(--stage2-bg); border-color: var(--stage2-border);}
 .stage-card-3 {background: var(--stage3-bg); border-color: var(--stage3-border);}
@@ -65,7 +66,7 @@ st.markdown("""
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
-.change-text {font-size: 0.88rem; margin-top: 0.12rem;}
+.change-text {font-size: 0.88rem; margin-top: 0.06rem; line-height: 1.18;}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
@@ -176,17 +177,6 @@ def trend_text(row: pd.Series) -> str:
         return "Cautious trend"
     return "Developing trend"
 
-def action_layer(row: pd.Series) -> dict:
-    label = str(row.get("label", row.get("classification", "Developing")))
-    stage = str(row.get("stage", ""))
-    if label == "Strong" and stage == "Stage 2":
-        return {"title": "Opportunity", "css": "action-opportunity", "hint": "Fits momentum criteria"}
-    if label == "Developing" and stage in {"Stage 1", "Stage 2"}:
-        return {"title": "Watch", "css": "action-watch", "hint": "Building structure"}
-    if label == "Cautious" or stage == "Stage 3":
-        return {"title": "Caution", "css": "action-caution", "hint": "Strength is fading"}
-    return {"title": "Avoid", "css": "action-avoid", "hint": "Weak structure"}
-
 def one_line_explanation(row: pd.Series) -> str:
     label = str(row.get("label", row.get("classification", "Developing")))
     stage = str(row.get("stage", ""))
@@ -227,17 +217,18 @@ def one_line_explanation(row: pd.Series) -> str:
         return f"Relative strength is weak across timeframes and lagging {industry} peers."
     return "Current structure is weak, so it is not a priority candidate right now."
 
+
 def guided_workflow_steps(market_label: str) -> list:
     first_step = {
-        "Risk On": "Start with Opportunity stocks in Stage 2 and the strongest industries.",
-        "Mixed": "Be selective: focus on top-ranked Opportunity and Watch names only.",
-        "Risk Off": "Reduce aggression and use the dashboard mainly as a tracking tool.",
+        "Risk On": "Start with Stage 2 names and the strongest industries.",
+        "Mixed": "Be selective and focus on top-ranked names with aligned daily and weekly charts.",
+        "Risk Off": "Use the dashboard mainly to track improving names and avoid forcing setups.",
     }.get(market_label, "Start with the highest-ranked names and confirm on both timeframes.")
     return [
         f"Step 1: Read market tone first. Today the model reads: {market_label}. {first_step}",
-        "Step 2: Open a stock card and read its Action Layer before looking at charts.",
-        "Step 3: Confirm that daily and weekly charts tell the same story before adding it to a watchlist.",
-        "Step 4: Prefer strong industries and improving ranks over isolated laggards.",
+        "Step 2: Open a stock and compare daily and weekly structure before giving it attention.",
+        "Step 3: Prefer improving ranks and stronger industries over isolated laggards.",
+        "Step 4: Use Portfolio and Alerts tabs to monitor structure changes over time.",
     ]
 
 def portfolio_assistant(current: pd.DataFrame) -> list:
@@ -367,10 +358,10 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
 
     return auto_rank(match, preferred_cols)
 
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a"):
+
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
-    action = action_layer(row)
     company = row.get("Company Name", row.get("ticker", "Stock"))
     ticker = str(row.get("ticker", "")).replace(".NS", "")
     stage_raw = str(row.get("stage", "Unknown"))
@@ -387,9 +378,9 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
+    quick_read_html = f"<div class='change-text'><b>Quick read:</b> {explanation}</div>" if show_quick_read else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
-    action_html = f"<div class='action-pill {action['css']}'>{action['title']}</div>"
     rank_html = f"<div class='rank-text'>Stock Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
@@ -397,14 +388,13 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{company} ({ticker})</div>"
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
+        f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
-        f"{status_html}{action_html}{rank_html}{change_html}"
+        f"{status_html}{rank_html}{change_html}"
         f"</div>"
         f"</div>"
-        f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
-        f"<div class='change-text'><b>Action layer:</b> {action['hint']}</div>"
-        f"<div class='change-text'><b>Quick read:</b> {explanation}</div>"
+        f"{quick_read_html}"
         f"{extra_change}"
         f"</div>"
     )
@@ -632,6 +622,9 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
 st.title("Market Structure Radar")
+view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
+show_pro_quick_read = view_mode == "Pro"
+st.caption("Pro mode adds a quick-read summary on stock cards. Beginner mode keeps cards cleaner.")
 tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
 with tabs[0]:
@@ -639,9 +632,9 @@ with tabs[0]:
     st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
-        render_summary_card("New Opportunity", str(changes_summary["New Strong"]), "Strong stocks improving materially")
+        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Strong stocks improving materially")
     with c2:
-        render_summary_card("Market tone", current_market_tone, "Use this before reading any stock card")
+        render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
     with c3:
         render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
 
@@ -666,19 +659,7 @@ with tabs[0]:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank)
-
-    st.divider()
-    st.markdown("#### Beginner translation")
-    bt1, bt2, bt3, bt4 = st.columns(4)
-    with bt1:
-        st.markdown('<div class="assist-box"><div class="assist-title">Opportunity</div><div class="assist-text">A strong setup inside an uptrend. Track first.</div></div>', unsafe_allow_html=True)
-    with bt2:
-        st.markdown('<div class="assist-box"><div class="assist-title">Watch</div><div class="assist-text">Improving, but not yet among the best leaders.</div></div>', unsafe_allow_html=True)
-    with bt3:
-        st.markdown('<div class="assist-box"><div class="assist-title">Caution</div><div class="assist-text">Strength is fading or risk is increasing.</div></div>', unsafe_allow_html=True)
-    with bt4:
-        st.markdown('<div class="assist-box"><div class="assist-title">Avoid</div><div class="assist-text">Weak structure. Low priority until conditions improve.</div></div>', unsafe_allow_html=True)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
     render_disclosure()
 
 with tabs[1]:
@@ -699,7 +680,7 @@ with tabs[1]:
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
     stock_rank = get_stock_rank(row["ticker"])
-    card(row, use_stage_color=True, stock_rank=stock_rank)
+    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -755,12 +736,12 @@ with tabs[2]:
             st.markdown(f"#### Fastest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
         with c2:
             st.markdown(f"#### Fastest downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
     render_disclosure()
 
 with tabs[3]:
@@ -812,7 +793,7 @@ with tabs[4]:
   <ul class="list-tight">
     <li>Start with <b>Market tone</b>. Today it reads <b>{current_market_tone}</b>.</li>
     <li>Then scan only <b>Opportunity</b> and <b>Watch</b> names first.</li>
-    <li>Read the <b>Action layer</b> and the <b>Quick read</b> before opening charts.</li>
+    <li>Read the <b>Quick read</b> and the <b>Quick read</b> before opening charts.</li>
     <li>Use daily and weekly charts together. When both agree, the setup is cleaner.</li>
   </ul>
 </div>
@@ -905,7 +886,7 @@ with tabs[5]:
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
