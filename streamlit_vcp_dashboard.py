@@ -958,22 +958,22 @@ with tabs[6]:
         st.markdown('<div class="assist-box"><div class="assist-title">3. Send neutral notifications</div><div class="assist-text">Use email, Telegram, WhatsApp or push notifications with neutral wording like “entered Stage 2” or “rank improved”.</div></div>', unsafe_allow_html=True)
 
     st.markdown("#### Suggested MVP alert schema")
-    st.code(
-'''alerts_rule
-- user_id
-- ticker
-- rule_type  # entered_stage_2 / daily_breakout / weekly_breakout / rank_improved / turned_weak
-- threshold  # optional, e.g. 5 ranks
-- channel    # email / telegram / whatsapp / in_app
-- is_active
+#     st.code(
+# '''alerts_rule
+# - user_id
+# - ticker
+# - rule_type  # entered_stage_2 / daily_breakout / weekly_breakout / rank_improved / turned_weak
+# - threshold  # optional, e.g. 5 ranks
+# - channel    # email / telegram / whatsapp / in_app
+# - is_active
 
-alerts_event
-- user_id
-- ticker
-- rule_type
-- triggered_at
-- message
-- dedupe_key''', language="text")
+# alerts_event
+# - user_id
+# - ticker
+# - rule_type
+# - triggered_at
+# - message
+# - dedupe_key''', language="text")
     render_disclosure()
 
 with tabs[7]:
