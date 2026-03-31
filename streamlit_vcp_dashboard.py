@@ -500,30 +500,6 @@ company_map = company_choices(combined)
 top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
 changed_tickers = set(top_changed_df["ticker"].dropna().tolist()) if not top_changed_df.empty and "ticker" in top_changed_df.columns else set()
 top_stocks_today = combined[~combined["ticker"].isin(changed_tickers)].sort_values("final_combined_score", ascending=False).head(5).copy()
-alert_candidates = build_alert_candidates(combined, changes)
-stage_counts = stage_count_summary(combined)
-
-def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
-    out = []
-    seen = set()
-    for name in names:
-        if pd.isna(name):
-            continue
-        name = str(name).strip()
-        if not name or name in seen:
-            continue
-        seen.add(name)
-        out.append(name)
-        if len(out) >= limit:
-            break
-    return out
-
-def get_stock_rank(ticker: str) -> str:
-    return rank_lookup(top_movers, ticker, ["current_rank"])
-
-def get_display_stock_rank(ticker: str) -> str:
-    return get_stock_rank(ticker)
-
 def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> pd.DataFrame:
     if combined_df.empty:
         return pd.DataFrame()
@@ -565,6 +541,31 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
     if "final_combined_score" in out.columns:
         out = out.sort_values(["final_combined_score", "alert_type"], ascending=[False, True])
     return out.head(20)
+
+
+alert_candidates = build_alert_candidates(combined, changes)
+stage_counts = stage_count_summary(combined)
+
+def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
+    out = []
+    seen = set()
+    for name in names:
+        if pd.isna(name):
+            continue
+        name = str(name).strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        out.append(name)
+        if len(out) >= limit:
+            break
+    return out
+
+def get_stock_rank(ticker: str) -> str:
+    return rank_lookup(top_movers, ticker, ["current_rank"])
+
+def get_display_stock_rank(ticker: str) -> str:
+    return get_stock_rank(ticker)
 
 def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
     if not industry_df.empty and "Industry" in industry_df.columns:
