@@ -42,6 +42,14 @@ st.markdown("""
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
 .status-cautious {background: rgba(255,159,67,0.14); color: var(--cautious); border:1px solid rgba(255,159,67,0.35);}
+.action-pill {display:inline-block; font-size:0.74rem; font-weight:800; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; margin-top:0.22rem;}
+.action-opportunity {background: rgba(30,201,119,0.12); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
+.action-watch {background: rgba(55,95,220,0.12); color: #8ab4ff; border:1px solid rgba(55,95,220,0.35);}
+.action-caution {background: rgba(255,159,67,0.12); color: var(--cautious); border:1px solid rgba(255,159,67,0.35);}
+.action-avoid {background: rgba(255,107,107,0.12); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
+.assist-box {border:1px solid var(--card-border); border-radius:16px; padding:0.85rem 0.95rem; background:rgba(255,255,255,0.03); margin-bottom:0.55rem;}
+.assist-title {font-size:1rem; font-weight:800; margin-bottom:0.28rem;}
+.assist-text {font-size:0.92rem; color: var(--muted); line-height:1.35;}
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.25; margin-top: 0.1rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.2;}
@@ -168,6 +176,93 @@ def trend_text(row: pd.Series) -> str:
         return "Cautious trend"
     return "Developing trend"
 
+def action_layer(row: pd.Series) -> dict:
+    label = str(row.get("label", row.get("classification", "Developing")))
+    stage = str(row.get("stage", ""))
+    if label == "Strong" and stage == "Stage 2":
+        return {"title": "Opportunity", "css": "action-opportunity", "hint": "Fits momentum criteria"}
+    if label == "Developing" and stage in {"Stage 1", "Stage 2"}:
+        return {"title": "Watch", "css": "action-watch", "hint": "Building structure"}
+    if label == "Cautious" or stage == "Stage 3":
+        return {"title": "Caution", "css": "action-caution", "hint": "Strength is fading"}
+    return {"title": "Avoid", "css": "action-avoid", "hint": "Weak structure"}
+
+def one_line_explanation(row: pd.Series) -> str:
+    label = str(row.get("label", row.get("classification", "Developing")))
+    stage = str(row.get("stage", ""))
+    industry = str(row.get("Industry", "its industry")).strip() or "its industry"
+    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
+    prev_rank = pd.to_numeric(row.get("prev_rank"), errors="coerce")
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
+    rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
+    score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
+
+    if label == "Strong" and stage == "Stage 2":
+        if pd.notna(rank_change) and rank_change > 0:
+            return f"Uptrend is intact and relative position improved by {int(rank_change)} places."
+        if pd.notna(rank) and rank <= 10:
+            return "Strong trend with a top-ranked setup in the current scan."
+        if pd.notna(rs3) and rs3 > 0 and pd.notna(rs6) and rs6 > 0:
+            return "Trend and medium-term relative strength are aligned on the upside."
+        return "Price structure is healthy and the stock is behaving like a leader."
+
+    if label == "Developing":
+        if stage == "Stage 1":
+            return "Base is forming, so this is more of a watchlist candidate than a leadership name."
+        if stage == "Stage 2":
+            return "Trend is positive, but conviction is still developing versus stronger leaders."
+        if pd.notna(score) and score >= 50:
+            return "Mixed signals, but enough improvement to keep it on a watchlist."
+        return "Early improvement is visible, though the setup is not fully mature yet."
+
+    if label == "Cautious" or stage == "Stage 3":
+        if pd.notna(prev_rank) and pd.notna(rank) and rank > prev_rank:
+            return "Structure is losing momentum and rank is slipping versus peers."
+        return "The stock still has some strength, but distribution risk is now higher."
+
+    if stage == "Stage 4":
+        return "Downtrend remains dominant, so this is better treated as avoid-for-now."
+    if pd.notna(rs3) and pd.notna(rs6) and rs3 < 0 and rs6 < 0:
+        return f"Relative strength is weak across timeframes and lagging {industry} peers."
+    return "Current structure is weak, so it is not a priority candidate right now."
+
+def guided_workflow_steps(market_label: str) -> list:
+    first_step = {
+        "Risk On": "Start with Opportunity stocks in Stage 2 and the strongest industries.",
+        "Mixed": "Be selective: focus on top-ranked Opportunity and Watch names only.",
+        "Risk Off": "Reduce aggression and use the dashboard mainly as a tracking tool.",
+    }.get(market_label, "Start with the highest-ranked names and confirm on both timeframes.")
+    return [
+        f"Step 1: Read market tone first. Today the model reads: {market_label}. {first_step}",
+        "Step 2: Open a stock card and read its Action Layer before looking at charts.",
+        "Step 3: Confirm that daily and weekly charts tell the same story before adding it to a watchlist.",
+        "Step 4: Prefer strong industries and improving ranks over isolated laggards.",
+    ]
+
+def portfolio_assistant(current: pd.DataFrame) -> list:
+    if current.empty:
+        return ["Portfolio is empty. Add stocks to see a structure summary."]
+    total = len(current)
+    stage2 = int((current["stage"] == "Stage 2").sum()) if "stage" in current.columns else 0
+    weak = int((current["label"].isin(["Weak", "Cautious"])).sum()) if "label" in current.columns else 0
+    stage4 = int((current["stage"] == "Stage 4").sum()) if "stage" in current.columns else 0
+    msgs = []
+    if stage2 >= max(3, math.ceil(total * 0.45)):
+        msgs.append(f"{stage2} of {total} stocks are in Stage 2, so the basket has decent trend participation.")
+    else:
+        msgs.append(f"Only {stage2} of {total} stocks are in Stage 2, so leadership inside the basket is limited.")
+    if weak >= max(2, math.ceil(total * 0.4)):
+        msgs.append(f"{weak} names are in Weak or Cautious territory, so risk is concentrated in lagging names.")
+    else:
+        msgs.append("Weak and Cautious names are contained, so the basket is not heavily tilted to laggards.")
+    if stage4 > 0:
+        msgs.append(f"{stage4} names are already in Stage 4, so these deserve extra review first.")
+    top_industries = current["Industry"].dropna().astype(str).value_counts().head(2).index.tolist() if "Industry" in current.columns else []
+    if top_industries:
+        msgs.append(f"The basket is most exposed to {', '.join(top_industries)}.")
+    return msgs
+
 def market_tone(regime_df: pd.DataFrame, combined_df: pd.DataFrame) -> str:
     if not regime_df.empty and "regime_label" in regime_df.columns:
         label = str(regime_df.iloc[0]["regime_label"])
@@ -275,11 +370,13 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
 def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a"):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
+    action = action_layer(row)
     company = row.get("Company Name", row.get("ticker", "Stock"))
     ticker = str(row.get("ticker", "")).replace(".NS", "")
     stage_raw = str(row.get("stage", "Unknown"))
     trend = trend_text(row)
     phase = stage_display(stage_raw)
+    explanation = one_line_explanation(row)
     classes = []
     if use_stage_color:
         stage_cls = _stage_card_class(stage_raw)
@@ -292,6 +389,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
+    action_html = f"<div class='action-pill {action['css']}'>{action['title']}</div>"
     rank_html = f"<div class='rank-text'>Stock Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
@@ -301,10 +399,12 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
-        f"{status_html}{rank_html}{change_html}"
+        f"{status_html}{action_html}{rank_html}{change_html}"
         f"</div>"
         f"</div>"
         f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
+        f"<div class='change-text'><b>Action layer:</b> {action['hint']}</div>"
+        f"<div class='change-text'><b>Quick read:</b> {explanation}</div>"
         f"{extra_change}"
         f"</div>"
     )
@@ -400,6 +500,7 @@ company_map = company_choices(combined)
 top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
 changed_tickers = set(top_changed_df["ticker"].dropna().tolist()) if not top_changed_df.empty and "ticker" in top_changed_df.columns else set()
 top_stocks_today = combined[~combined["ticker"].isin(changed_tickers)].sort_values("final_combined_score", ascending=False).head(5).copy()
+alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 
 def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
@@ -422,6 +523,48 @@ def get_stock_rank(ticker: str) -> str:
 
 def get_display_stock_rank(ticker: str) -> str:
     return get_stock_rank(ticker)
+
+def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> pd.DataFrame:
+    if combined_df.empty:
+        return pd.DataFrame()
+    alerts = []
+    changes_lookup = changes_df.copy() if not changes_df.empty else pd.DataFrame()
+    if not changes_lookup.empty and "ticker" in changes_lookup.columns:
+        changes_lookup["ticker"] = changes_lookup["ticker"].astype(str).str.strip()
+        changes_lookup = changes_lookup.set_index("ticker", drop=False)
+
+    for _, row in combined_df.iterrows():
+        ticker = str(row.get("ticker", "")).strip()
+        cr = changes_lookup.loc[ticker] if (not changes_lookup.empty and ticker in changes_lookup.index) else None
+        alert_type = ""
+        reason = ""
+        if cr is not None and bool(cr.get("entered_stage_2", False)):
+            alert_type = "Entered Stage 2"
+            reason = "Trend moved into the uptrend phase."
+        elif cr is not None and bool(cr.get("new_weekly_breakout", False)):
+            alert_type = "Weekly breakout"
+            reason = "Weekly structure triggered a fresh breakout event."
+        elif cr is not None and bool(cr.get("new_daily_breakout", False)):
+            alert_type = "Daily breakout"
+            reason = "Daily structure triggered a fresh breakout event."
+        else:
+            rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+            if pd.notna(rank_change) and rank_change >= 5:
+                alert_type = "Rank improvement"
+                reason = f"Rank improved by {int(rank_change)} places."
+
+        if alert_type:
+            item = row.copy()
+            item["alert_type"] = alert_type
+            item["alert_reason"] = reason
+            alerts.append(item)
+
+    if not alerts:
+        return pd.DataFrame()
+    out = pd.DataFrame(alerts)
+    if "final_combined_score" in out.columns:
+        out = out.sort_values(["final_combined_score", "alert_type"], ascending=[False, True])
+    return out.head(20)
 
 def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
     if not industry_df.empty and "Industry" in industry_df.columns:
@@ -488,17 +631,25 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
 st.title("Market Structure Radar")
-tabs = st.tabs(["Home","Stocks","Movers","Market","Learn","Portfolio","Advanced","Disclaimer"])
+tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
 with tabs[0]:
-    st.markdown("### Today's Summary")
+    current_market_tone = market_tone(regime, combined)
+    st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
-        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stocks that improved materially")
+        render_summary_card("New Opportunity", str(changes_summary["New Strong"]), "Strong stocks improving materially")
     with c2:
-        render_summary_card("Market tone", market_tone(regime, combined), "Simple summary of the latest saved scan")
+        render_summary_card("Market tone", current_market_tone, "Use this before reading any stock card")
     with c3:
         render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
+
+    st.divider()
+    st.markdown("#### Guided workflow")
+    workflow_cols = st.columns(len(guided_workflow_steps(current_market_tone)))
+    for col, step_text in zip(workflow_cols, guided_workflow_steps(current_market_tone)):
+        with col:
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{step_text}</div></div>""", unsafe_allow_html=True)
 
     st.divider()
     left, right = st.columns([1.25, 1])
@@ -515,6 +666,18 @@ with tabs[0]:
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
             card(r, use_stage_color=True, stock_rank=stock_rank)
+
+    st.divider()
+    st.markdown("#### Beginner translation")
+    bt1, bt2, bt3, bt4 = st.columns(4)
+    with bt1:
+        st.markdown('<div class="assist-box"><div class="assist-title">Opportunity</div><div class="assist-text">A strong setup inside an uptrend. Track first.</div></div>', unsafe_allow_html=True)
+    with bt2:
+        st.markdown('<div class="assist-box"><div class="assist-title">Watch</div><div class="assist-text">Improving, but not yet among the best leaders.</div></div>', unsafe_allow_html=True)
+    with bt3:
+        st.markdown('<div class="assist-box"><div class="assist-title">Caution</div><div class="assist-text">Strength is fading or risk is increasing.</div></div>', unsafe_allow_html=True)
+    with bt4:
+        st.markdown('<div class="assist-box"><div class="assist-title">Avoid</div><div class="assist-text">Weak structure. Low priority until conditions improve.</div></div>', unsafe_allow_html=True)
     render_disclosure()
 
 with tabs[1]:
@@ -640,24 +803,33 @@ with tabs[3]:
     render_disclosure()
 
 with tabs[4]:
+    current_market_tone = market_tone(regime, combined)
     left, right = st.columns([1.05, 0.95])
     with left:
-        st.markdown("""
-<div class="learn-card">
-  <div class="stock-title">What this site is trying to show</div>
+        st.markdown(f"""<div class="learn-card">
+  <div class="stock-title">How to read this dashboard</div>
   <ul class="list-tight">
-    <li>Which stocks currently look technically stronger or weaker inside this model.</li>
-    <li>Which industries are improving or weakening relative to others.</li>
-    <li>How daily and weekly structure compare for the same stock.</li>
+    <li>Start with <b>Market tone</b>. Today it reads <b>{current_market_tone}</b>.</li>
+    <li>Then scan only <b>Opportunity</b> and <b>Watch</b> names first.</li>
+    <li>Read the <b>Action layer</b> and the <b>Quick read</b> before opening charts.</li>
+    <li>Use daily and weekly charts together. When both agree, the setup is cleaner.</li>
+  </ul>
+</div>
+<div class="learn-card">
+  <div class="stock-title">SEBI-safe language built into the app</div>
+  <ul class="list-tight">
+    <li>The app describes structure, trend, rank and improvement.</li>
+    <li>It avoids direct buy, sell, target, stop-loss or allocation advice.</li>
+    <li>Use terms like <b>fits momentum criteria</b>, <b>building structure</b>, or <b>weak structure</b>.</li>
   </ul>
 </div>
 <div class="learn-card">
   <div class="stock-title">Simple labels</div>
   <ul class="list-tight">
-    <li><b>Strong</b>: the model sees stronger structure right now.</li>
-    <li><b>Developing</b>: the model sees mixed or still-building structure.</li>
-    <li><b>Cautious</b>: the model sees a high score but in Stage 3.</li>
-    <li><b>Weak</b>: the model sees weaker structure right now.</li>
+    <li><b>Opportunity</b>: strong setup in an uptrend.</li>
+    <li><b>Watch</b>: improving, but still developing.</li>
+    <li><b>Caution</b>: strength is fading or becoming unstable.</li>
+    <li><b>Avoid</b>: weak structure right now.</li>
   </ul>
 </div>
 """, unsafe_allow_html=True)
@@ -725,6 +897,10 @@ with tabs[5]:
         with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Distribution")
         with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Downtrend")
 
+        st.markdown("### Portfolio assistant")
+        for msg in portfolio_assistant(current):
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{msg}</div></div>""", unsafe_allow_html=True)
+
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             stock_rank = get_stock_rank(r["ticker"])
@@ -780,6 +956,45 @@ with tabs[5]:
     render_disclosure()
 
 with tabs[6]:
+    st.markdown("### Alerts")
+    st.markdown("#### Triggered alert candidates from the latest scan")
+    if alert_candidates.empty:
+        st.info("No alert candidates found in the latest data.")
+    else:
+        for _, r in alert_candidates.iterrows():
+            stock_rank = get_stock_rank(r["ticker"])
+            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
+
+    st.divider()
+    st.markdown("#### How to add alerts for users")
+    a1, a2, a3 = st.columns(3)
+    with a1:
+        st.markdown('<div class="assist-box"><div class="assist-title">1. Store user rules</div><div class="assist-text">Save watchlists and alert rules in a database: entered Stage 2, breakout, rank improvement, or weak structure.</div></div>', unsafe_allow_html=True)
+    with a2:
+        st.markdown('<div class="assist-box"><div class="assist-title">2. Run after each scan</div><div class="assist-text">After CSV generation, compare the latest snapshot vs previous snapshot and create alert events only for new changes.</div></div>', unsafe_allow_html=True)
+    with a3:
+        st.markdown('<div class="assist-box"><div class="assist-title">3. Send neutral notifications</div><div class="assist-text">Use email, Telegram, WhatsApp or push notifications with neutral wording like “entered Stage 2” or “rank improved”.</div></div>', unsafe_allow_html=True)
+
+    st.markdown("#### Suggested MVP alert schema")
+    st.code(
+'''alerts_rule
+- user_id
+- ticker
+- rule_type  # entered_stage_2 / daily_breakout / weekly_breakout / rank_improved / turned_weak
+- threshold  # optional, e.g. 5 ranks
+- channel    # email / telegram / whatsapp / in_app
+- is_active
+
+alerts_event
+- user_id
+- ticker
+- rule_type
+- triggered_at
+- message
+- dedupe_key''', language="text")
+    render_disclosure()
+
+with tabs[7]:
     def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
         wanted = [c for c in ["Company Name","ticker","label","classification","stage","Industry"] if c in df.columns]
         out = df[wanted].copy() if wanted else df.copy()
@@ -806,7 +1021,7 @@ with tabs[6]:
         st.dataframe(industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}), use_container_width=True, hide_index=True, height=320)
     render_disclosure()
 
-with tabs[7]:
+with tabs[8]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based classifications and market summaries. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
     render_disclosure()
