@@ -382,19 +382,21 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
+    # rank_html =
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{company} ({ticker})</div>"
+        # f"<div class='stock-title'>{stage_raw} * {trend} * {phase}</div>"
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
         # f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
         f"</div>"
-        f"</div>"
-        f"<div class='meta-line'>{quick_read_html}</div>"
+        # f"</div>"
+        f"<div class='stock-title'>{quick_read_html}</div>"
         f"{extra_change}"
         f"</div>"
     )
@@ -632,14 +634,14 @@ with tabs[0]:
     st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
-        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Strong stocks improving materially")
-    with c2:
         render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
+    with c2:
+        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Strong stocks improving materially")
     with c3:
-        render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
+        render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currenlty")
 
    
-    st.divider()
+    # st.divider()
     left, right = st.columns([1.25, 1])
     with left:
         st.markdown("#### Top names that changed")
@@ -689,14 +691,14 @@ with tabs[1]:
     a, b = st.columns(2)
     with a:
         daily_rank = get_display_stock_rank(row["ticker"])
-        st.markdown(f"#### Daily * {ticker_short} * {row.get('stage', '')} * Daily Stock Rank {daily_rank}")
+        st.markdown(f"#### {ticker_short} * {row.get('stage', '')} * Daily Rank {daily_rank}")
         if dpath:
             st.image(safe_image_bytes(dpath), use_container_width=True)
         else:
             st.info("Daily chart not available.")
     with b:
         weekly_rank = get_display_stock_rank(row["ticker"])
-        st.markdown(f"#### Weekly * {ticker_short} * {row.get('stage', '')} * Weekly Stock Rank {weekly_rank}")
+        st.markdown(f"#### {ticker_short} * {row.get('stage', '')} * Weekly Rank {weekly_rank}")
         if wpath:
             st.image(safe_image_bytes(wpath), use_container_width=True)
         else:
@@ -723,7 +725,7 @@ with tabs[1]:
 
 with tabs[2]:
     st.markdown("### Movers")
-    st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
+    # st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
     if moves.empty:
         st.info("Price move data not found yet.")
     else:
@@ -735,12 +737,12 @@ with tabs[2]:
         mv = mv.dropna(subset=[col])
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown(f"#### Fastest upward moves • {selected}")
+            st.markdown(f"#### Biggest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
                 card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
         with c2:
-            st.markdown(f"#### Fastest downward moves • {selected}")
+            st.markdown(f"#### Major downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
                 card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
