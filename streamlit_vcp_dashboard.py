@@ -30,7 +30,7 @@ st.markdown("""
 .stTabs [data-baseweb="tab"] {font-size: 1.15rem; font-weight: 700;}
 .stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
 .hero-card, .stock-card, .list-card, .learn-card {
-  border: 1px solid var(--card-border);
+  border: 2px solid var(--card-border);
   border-radius: 16px;
   padding: 0.8rem 0.9rem;
 }
@@ -381,20 +381,20 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     quick_read_html = f"<div class='change-text'><b>Quick read:</b> {explanation}</div>" if show_quick_read else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
-    rank_html = f"<div class='rank-text'>Stock Rank {stock_rank}</div>"
+    rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{company} ({ticker})</div>"
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
-        f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
+        # f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
         f"</div>"
         f"</div>"
-        f"{quick_read_html}"
+        f"<div class='meta-line'>{quick_read_html}</div>"
         f"{extra_change}"
         f"</div>"
     )
@@ -638,13 +638,7 @@ with tabs[0]:
     with c3:
         render_summary_card("Top industries", top_industry_text(industry), "Industries leading the current scan")
 
-    st.divider()
-    st.markdown("#### Guided workflow")
-    workflow_cols = st.columns(len(guided_workflow_steps(current_market_tone)))
-    for col, step_text in zip(workflow_cols, guided_workflow_steps(current_market_tone)):
-        with col:
-            st.markdown(f"""<div class="assist-box"><div class="assist-text">{step_text}</div></div>""", unsafe_allow_html=True)
-
+   
     st.divider()
     left, right = st.columns([1.25, 1])
     with left:
@@ -660,6 +654,14 @@ with tabs[0]:
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
             card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+
+    st.divider()
+    st.markdown("#### Guided workflow")
+    workflow_cols = st.columns(len(guided_workflow_steps(current_market_tone)))
+    for col, step_text in zip(workflow_cols, guided_workflow_steps(current_market_tone)):
+        with col:
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{step_text}</div></div>""", unsafe_allow_html=True)
+
     render_disclosure()
 
 with tabs[1]:
