@@ -684,30 +684,33 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
 
     display_bars = 180 if not is_weekly else 104
     fast_window = 10 if is_weekly else 50
-    mid_window = 30 if is_weekly else 150
-    slow_window = None if is_weekly else 200
-    history_buffer = max(display_bars + mid_window + 20, display_bars + (slow_window or 0) + 20)
+    slow_window = 30 if is_weekly else 200
+    history_buffer = display_bars + slow_window + 40
 
     working_df = df.copy().tail(history_buffer)
     if working_df.empty:
         return
 
     close_all = working_df["Close"].astype(float)
-    high_all = working_df["High"].astype(float)
-    low_all = working_df["Low"].astype(float)
-    volume_all = working_df["Volume"].astype(float)
-
     ma_fast_all = close_all.rolling(fast_window).mean()
-    ma_mid_all = close_all.rolling(mid_window).mean()
-    ma_slow_all = close_all.rolling(slow_window).mean() if slow_window is not None else None
+    ma_slow_all = close_all.rolling(slow_window).mean()
 
     start_idx = max(0, len(working_df) - display_bars)
-    if ma_slow_all is not None and ma_slow_all.notna().sum() >= display_bars:
-        first_valid = int(np.where(ma_slow_all.notna().values)[0][0])
-        start_idx = max(start_idx, first_valid)
-    elif ma_mid_all.notna().sum() >= display_bars:
-        first_valid = int(np.where(ma_mid_all.notna().values)[0][0])
-        start_idx = max(start_idx, first_valid)
+
+    def _first_valid_full_window(series: pd.Series, needed_len: int) -> Optional[int]:
+        valid = np.where(series.notna().values)[0]
+        if len(valid) == 0:
+            return None
+        first_valid = int(valid[0])
+        return first_valid if len(series) - first_valid >= needed_len else None
+
+    fast_first_valid = _first_valid_full_window(ma_fast_all, display_bars)
+    slow_first_valid = _first_valid_full_window(ma_slow_all, display_bars)
+
+    if slow_first_valid is not None:
+        start_idx = max(start_idx, slow_first_valid)
+    elif fast_first_valid is not None:
+        start_idx = max(start_idx, fast_first_valid)
 
     plot_df = working_df.iloc[start_idx:].copy()
     if plot_df.empty:
@@ -720,12 +723,11 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     x = plot_df.index
 
     ma_fast = ma_fast_all.iloc[start_idx:]
-    ma_mid = ma_mid_all.iloc[start_idx:]
-    ma_slow = ma_slow_all.iloc[start_idx:] if ma_slow_all is not None and ma_slow_all.notna().sum() >= len(plot_df) else None
-    if ma_mid.notna().sum() < len(plot_df):
-        ma_mid = None
+    ma_slow = ma_slow_all.iloc[start_idx:]
     if ma_fast.notna().sum() < len(plot_df):
         ma_fast = None
+    if ma_slow.notna().sum() < len(plot_df):
+        ma_slow = None
 
     pair_seq = extract_vcp_contraction_pairs(
         high,
@@ -741,83 +743,94 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
         DEFAULT_CONFIG["pivot_lookback_weekly"] if is_weekly else DEFAULT_CONFIG["pivot_lookback_daily"],
         base_duration=base_duration,
         is_weekly=is_weekly,
-        min_band_pct=0.8 if is_weekly else 0.6,
-        max_band_pct=3.2 if is_weekly else 2.4,
+        min_band_pct=1.2 if is_weekly else 0.9,
+        max_band_pct=4.0 if is_weekly else 3.0,
     )
 
     plt.rcParams.update({
-        "font.size": 28,
-        "axes.titlesize": 34,
-        "axes.labelsize": 28,
-        "xtick.labelsize": 24,
-        "ytick.labelsize": 24,
-        "legend.fontsize": 22,
+        "font.size": 84,
+        "axes.titlesize": 102,
+        "axes.labelsize": 84,
+        "xtick.labelsize": 72,
+        "ytick.labelsize": 72,
+        "legend.fontsize": 66,
     })
     fig, (ax1, ax2) = plt.subplots(
         2,
         1,
-        figsize=(24, 14),
+        figsize=(34, 22),
         sharex=True,
-        gridspec_kw={"height_ratios": [4.4, 1.1]},
+        gridspec_kw={"height_ratios": [4.8, 1.15]},
     )
 
-    ax1.plot(x, close.values, label="Close", linewidth=3.4)
+    ax1.plot(x, close.values, label="Close", linewidth=7.0)
     if ma_fast is not None:
-        ax1.plot(x, ma_fast.values, label=("10W MA" if is_weekly else "50D MA"), linewidth=2.8, alpha=0.95)
-    if ma_mid is not None:
-        ax1.plot(x, ma_mid.values, label=("30W MA" if is_weekly else "150D MA"), linewidth=2.4, alpha=0.9)
+        ax1.plot(x, ma_fast.values, label=("10W MA" if is_weekly else "50D MA"), linewidth=5.6, alpha=0.96)
     if ma_slow is not None:
-        ax1.plot(x, ma_slow.values, label="200D MA", linewidth=2.2, alpha=0.88)
+        ax1.plot(x, ma_slow.values, label=("30W MA" if is_weekly else "200D MA"), linewidth=5.0, alpha=0.92)
 
     if pd.notna(pivot_low) and pd.notna(pivot_high):
-        ax1.axhspan(float(pivot_low), float(pivot_high), alpha=0.22, label="Pivot zone")
-        ax1.axhline(float(pivot_low), linestyle="--", linewidth=1.6, alpha=0.55)
-        ax1.axhline(float(pivot_high), linestyle="--", linewidth=1.6, alpha=0.55)
+        ax1.axhspan(float(pivot_low), float(pivot_high), alpha=0.24, label="Pivot zone")
+        ax1.axhline(float(pivot_low), linestyle="--", linewidth=2.2, alpha=0.45)
+        ax1.axhline(float(pivot_high), linestyle="--", linewidth=2.2, alpha=0.45)
 
     suffix = "W" if is_weekly else "D"
     y_span = float(high.max() - low.min()) if np.isfinite(high.max()) and np.isfinite(low.min()) else 0.0
-    label_pad = y_span * 0.018
+    label_pad = y_span * 0.016
+    min_separation = y_span * 0.05
+    placed_positions = []
+
     for peak_i, trough_i, depth, duration in pair_seq:
         trough_x = x[trough_i]
         trough_y = float(low.iloc[trough_i])
+        label_x = trough_x
         label_y = trough_y - label_pad
+
+        for prev_x, prev_y in placed_positions:
+            if abs(trough_i - prev_x) <= (4 if is_weekly else 8) and abs(label_y - prev_y) < min_separation:
+                label_y = prev_y - min_separation
+
+        placed_positions.append((trough_i, label_y))
+        rounded_depth = int(round(depth))
         ax1.annotate(
-            f"(-{depth:.1f}%, {duration}{suffix})",
+            f"(-{rounded_depth}%, {duration}{suffix})",
             xy=(trough_x, trough_y),
-            xytext=(trough_x, label_y),
+            xytext=(label_x, label_y),
             textcoords="data",
-            ha="left",
+            ha="center",
             va="top",
-            fontsize=22,
+            fontsize=58,
             fontweight="bold",
-            bbox=dict(boxstyle="round,pad=0.22", alpha=0.14),
+            bbox=dict(boxstyle="round,pad=0.24", alpha=0.12),
         )
 
-    ax1.set_title(f"{title} | {symbol} | {setup_bucket} | {stage}", pad=16)
-    ax1.grid(True, alpha=0.20)
+    ax1.set_title(f"{title} | {symbol} | {setup_bucket} | {stage}", pad=22)
+    ax1.grid(True, alpha=0.18)
     ax1.legend(loc="upper left", ncol=2)
-    ax1.tick_params(axis="both", labelsize=24)
+    ax1.tick_params(axis="both", labelsize=72, pad=10)
     ax1.set_ylabel("Price")
     ax1.margins(x=0)
-    margin_top = y_span * 0.08 if y_span > 0 else 0.0
-    margin_bottom = y_span * 0.10 if y_span > 0 else 0.0
+    ax1.set_xlim(x[0], x[-1])
+    margin_top = y_span * 0.10 if y_span > 0 else 0.0
+    margin_bottom = y_span * 0.16 if y_span > 0 else 0.0
     ax1.set_ylim(max(0, float(low.min()) - margin_bottom), float(high.max()) + margin_top)
 
-    bar_width = 4 if is_weekly else 1
+    bar_width = 4 if is_weekly else 0.9
     ax2.bar(x, volume.values, width=bar_width, alpha=0.85)
     vol_ma = volume.rolling(10 if is_weekly else 20).mean()
     if vol_ma.notna().sum() == len(volume):
-        ax2.plot(x, vol_ma.values, linewidth=2.2, label=("10W Vol MA" if is_weekly else "20D Vol MA"))
-    ax2.grid(True, alpha=0.20)
+        ax2.plot(x, vol_ma.values, linewidth=4.0, label=("10W Vol MA" if is_weekly else "20D Vol MA"))
+    ax2.grid(True, alpha=0.18)
     ax2.set_ylabel("Vol")
-    ax2.tick_params(axis="both", labelsize=22)
+    ax2.tick_params(axis="both", labelsize=64, pad=8)
     ax2.margins(x=0)
+    ax2.set_xlim(x[0], x[-1])
     if vol_ma.notna().sum() == len(volume):
         ax2.legend(loc="upper left")
 
     fig.tight_layout()
     outfile.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(outfile, dpi=220, bbox_inches="tight", pad_inches=0.18)
+    fig.savefig(outfile, dpi=240, bbox_inches="tight", pad_inches=0.12)
     plt.close(fig)
 
 def export_all_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path) -> Dict[str, str]:
