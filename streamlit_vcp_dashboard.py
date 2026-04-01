@@ -120,12 +120,27 @@ def classify_stock(row: pd.Series) -> str:
     score = pd.to_numeric(row.get("final_combined_score", row.get("combined_score")), errors="coerce")
     rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
     rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
-    if stage == "Stage 3" and pd.notna(score) and score >= 60:
-        return "Cautious"
-    if stage == "Stage 2" and pd.notna(score) and score >= 60:
-        return "Strong"
-    if stage in {"Stage 3", "Stage 4"}:
+
+    if stage == "Stage 2":
+        if pd.notna(score) and score >= 70:
+            return "Strong"
+        return "Developing"
+
+    if stage == "Stage 1":
+        if pd.notna(rs3) and pd.notna(rs6) and rs3 < 0 and rs6 < 0:
+            return "Cautious"
+        return "Developing"
+
+    if stage == "Stage 3":
+        if pd.notna(score) and score >= 65:
+            return "Cautious"
+        if pd.notna(rs3) and rs3 > 0 and pd.notna(rs6) and rs6 >= 0:
+            return "Cautious"
         return "Weak"
+
+    if stage == "Stage 4":
+        return "Weak"
+
     if pd.notna(rs3) and pd.notna(rs6) and rs3 < 0 and rs6 < 0:
         return "Weak"
     return "Developing"
@@ -161,10 +176,10 @@ def safe_image_bytes(path):
 
 def stage_display(stage: str) -> str:
     return {
-        "Stage 1": "Accumulation",
-        "Stage 2": "Uptrend",
-        "Stage 3": "Distribution",
-        "Stage 4": "Downtrend",
+        "Stage 1": "Base",
+        "Stage 2": "Advancing",
+        "Stage 3": "Topping",
+        "Stage 4": "Declining",
     }.get(stage, stage or "Unknown")
 
 def trend_text(row: pd.Series) -> str:
@@ -188,47 +203,53 @@ def one_line_explanation(row: pd.Series) -> str:
     rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
     score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
 
-    if label == "Strong" and stage == "Stage 2":
+    if stage == "Stage 2" and label == "Strong":
         if pd.notna(rank_change) and rank_change > 0:
-            return f"Uptrend is intact and relative position improved by {int(rank_change)} places."
+            return f"Advancing trend is intact and relative position improved by {int(rank_change)} places."
         if pd.notna(rank) and rank <= 10:
-            return "Strong trend with a top-ranked setup in the current scan."
+            return "This is a top-ranked Stage 2 leader in the current scan."
         if pd.notna(rs3) and rs3 > 0 and pd.notna(rs6) and rs6 > 0:
             return "Trend and medium-term relative strength are aligned on the upside."
-        return "Price structure is healthy and the stock is behaving like a leader."
+        return "Structure is acting like a leadership candidate rather than a repair candidate."
 
-    if label == "Developing":
-        if stage == "Stage 1":
-            return "Base is forming, so this is more of a watchlist candidate than a leadership name."
-        if stage == "Stage 2":
-            return "Trend is positive, but conviction is still developing versus stronger leaders."
-        if pd.notna(score) and score >= 50:
-            return "Mixed signals, but enough improvement to keep it on a watchlist."
-        return "Early improvement is visible, though the setup is not fully mature yet."
+    if stage == "Stage 1":
+        if pd.notna(score) and score >= 65:
+            return "Base is tightening, but this is still a watchlist setup until a cleaner Stage 2 transition appears."
+        if pd.notna(rs3) and rs3 < 0:
+            return "The stock is still repairing after weakness, so the base needs more time."
+        return "This looks like a base or repair zone, not a confirmed advancing trend yet."
 
-    if label == "Cautious" or stage == "Stage 3":
+    if label == "Developing" and stage == "Stage 2":
+        return "Trend is positive, but conviction is still lower than the strongest Stage 2 leaders."
+
+    if stage == "Stage 3" or label == "Cautious":
         if pd.notna(prev_rank) and pd.notna(rank) and rank > prev_rank:
             return "Structure is losing momentum and rank is slipping versus peers."
-        return "The stock still has some strength, but distribution risk is now higher."
+        return "This is a transition or distribution-type structure, so failed rallies are a risk here."
 
     if stage == "Stage 4":
-        return "Downtrend remains dominant, so this is better treated as avoid-for-now."
+        return "Declining structure remains dominant, so this is better treated as avoid-for-now."
+
     if pd.notna(rs3) and pd.notna(rs6) and rs3 < 0 and rs6 < 0:
         return f"Relative strength is weak across timeframes and lagging {industry} peers."
-    return "Current structure is weak, so it is not a priority candidate right now."
+
+    if pd.notna(score) and score >= 50:
+        return "Mixed signals are present, so keep it on a watchlist rather than treating it like leadership."
+
+    return "Current structure is weak or incomplete, so it is not a priority candidate right now."
 
 
 def guided_workflow_steps(market_label: str) -> list:
     first_step = {
         "Risk On": "Start with Stage 2 names and the strongest industries.",
-        "Mixed": "Be selective and focus on top-ranked names with aligned daily and weekly charts.",
-        "Risk Off": "Use the dashboard mainly to track improving names and avoid forcing setups.",
+        "Mixed": "Be selective and focus on top-ranked Stage 2 names or the tightest Stage 1 bases.",
+        "Risk Off": "Use the dashboard mainly to track improving bases and avoid forcing Stage 2 labels.",
     }.get(market_label, "Start with the highest-ranked names and confirm on both timeframes.")
     return [
         f"Step 1: Read market tone first. Today the model reads: {market_label}. {first_step}",
-        "Step 2: Open a stock and compare daily and weekly structure before giving it attention.",
-        "Step 3: Prefer improving ranks and stronger industries over isolated laggards.",
-        "Step 4: Use Portfolio and Alerts tabs to monitor structure changes over time.",
+        "Step 2: Treat Stage 1 as a base or repair zone, and treat Stage 2 as the primary leadership phase.",
+        "Step 3: Prefer improving ranks, stronger industries, and daily-weekly alignment over isolated laggards.",
+        "Step 4: Use Portfolio and Alerts tabs to monitor stage transitions over time.",
     ]
 
 def portfolio_assistant(current: pd.DataFrame) -> list:
@@ -282,7 +303,7 @@ def company_choices(df: pd.DataFrame):
 def render_disclosure():
     st.markdown("""
 <div class="disclosure">
-This dashboard is an informational analytics tool. It shows rule-based classifications and market summaries. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.
+This dashboard is an informational analytics tool. It shows rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, not an actionable uptrend by itself. Stage 2 is the primary leadership phase. The tool does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.
 </div>
 """, unsafe_allow_html=True)
 
@@ -626,7 +647,7 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
 st.title("Market Structure Radar")
 view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
 show_pro_quick_read = view_mode == "Pro"
-st.caption("Pro mode adds a quick-read summary on stock cards. Beginner mode keeps cards cleaner.")
+st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
 tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
 with tabs[0]:
@@ -636,7 +657,7 @@ with tabs[0]:
     with c1:
         render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
     with c2:
-        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Strong stocks improving materially")
+        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stage 2 leaders improving materially")
     with c3:
         render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currenlty")
 
@@ -751,10 +772,10 @@ with tabs[2]:
 with tabs[3]:
     st.markdown("### Market")
     c1, c2, c3, c4 = st.columns(4)
-    with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Accumulation")
-    with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Uptrend")
-    with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Distribution")
-    with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Downtrend")
+    with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
+    with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Advancing trend")
+    with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Topping / transition")
+    with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Declining trend")
 
     if industry.empty:
         st.info("Industry data not available.")
@@ -796,9 +817,18 @@ with tabs[4]:
   <div class="stock-title">How to read this dashboard</div>
   <ul class="list-tight">
     <li>Start with <b>Market tone</b>. Today it reads <b>{current_market_tone}</b>.</li>
-    <li>Then scan only <b>Opportunity</b> and <b>Watch</b> names first.</li>
-    <li>Read the <b>Quick read</b> and the <b>Quick read</b> before opening charts.</li>
+    <li>Then scan <b>Strong</b> Stage 2 names first, and use Stage 1 names mainly as watchlist bases.</li>
+    <li>Read the <b>Quick read</b> before opening charts.</li>
     <li>Use daily and weekly charts together. When both agree, the setup is cleaner.</li>
+  </ul>
+</div>
+<div class="learn-card">
+  <div class="stock-title">How the stage model should be read</div>
+  <ul class="list-tight">
+    <li><b>Stage 1</b>: base / repair zone. Not a confirmed uptrend yet.</li>
+    <li><b>Stage 2</b>: advancing trend. This is the main leadership phase.</li>
+    <li><b>Stage 3</b>: topping or transition. Failed rallies and distribution risk matter more here.</li>
+    <li><b>Stage 4</b>: declining trend. Weak structure remains dominant.</li>
   </ul>
 </div>
 <div class="learn-card">
@@ -806,16 +836,7 @@ with tabs[4]:
   <ul class="list-tight">
     <li>The app describes structure, trend, rank and improvement.</li>
     <li>It avoids direct buy, sell, target, stop-loss or allocation advice.</li>
-    <li>Use terms like <b>fits momentum criteria</b>, <b>building structure</b>, or <b>weak structure</b>.</li>
-  </ul>
-</div>
-<div class="learn-card">
-  <div class="stock-title">Simple labels</div>
-  <ul class="list-tight">
-    <li><b>Opportunity</b>: strong setup in an uptrend.</li>
-    <li><b>Watch</b>: improving, but still developing.</li>
-    <li><b>Caution</b>: strength is fading or becoming unstable.</li>
-    <li><b>Avoid</b>: weak structure right now.</li>
+    <li>Use terms like <b>advancing trend</b>, <b>tightening base</b>, <b>transition structure</b>, or <b>weak structure</b>.</li>
   </ul>
 </div>
 """, unsafe_allow_html=True)
@@ -878,10 +899,10 @@ with tabs[5]:
         p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
-        with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Accumulation")
-        with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Uptrend")
-        with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Distribution")
-        with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Downtrend")
+        with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Base / repair")
+        with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Advancing trend")
+        with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Topping / transition")
+        with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Declining trend")
 
         st.markdown("### Portfolio assistant")
         for msg in portfolio_assistant(current):
@@ -1009,5 +1030,5 @@ with tabs[7]:
 
 with tabs[8]:
     st.markdown("### Disclaimer")
-    st.write("This tool is for informational purposes only. It presents rule-based classifications and market summaries. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
+    st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, while Stage 2 is the main advancing phase. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
     render_disclosure()
