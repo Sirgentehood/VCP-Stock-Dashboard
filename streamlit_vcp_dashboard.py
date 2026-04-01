@@ -395,7 +395,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
         f"</div>"
-        # f"</div>"
+        f"</div>"
         f"<div class='stock-title'>{quick_read_html}</div>"
         f"{extra_change}"
         f"</div>"
