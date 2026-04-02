@@ -122,9 +122,7 @@ def classify_stock(row: pd.Series) -> str:
     rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
 
     if stage == "Stage 2":
-        if pd.notna(score) and score >= 70:
-            return "Strong"
-        return "Developing"
+        return "Strong"
 
     if stage == "Stage 1":
         if pd.notna(rs3) and pd.notna(rs6) and rs3 < 0 and rs6 < 0:
@@ -132,11 +130,7 @@ def classify_stock(row: pd.Series) -> str:
         return "Developing"
 
     if stage == "Stage 3":
-        if pd.notna(score) and score >= 65:
-            return "Cautious"
-        if pd.notna(rs3) and rs3 > 0 and pd.notna(rs6) and rs6 >= 0:
-            return "Cautious"
-        return "Weak"
+        return "Cautious"
 
     if stage == "Stage 4":
         return "Weak"
@@ -575,7 +569,7 @@ def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     return out
 
 def get_stock_rank(ticker: str) -> str:
-    return rank_lookup(top_movers, ticker, ["current_rank"])
+    return rank_lookup(combined, ticker, ["current_rank"])
 
 def get_display_stock_rank(ticker: str) -> str:
     return get_stock_rank(ticker)
@@ -784,6 +778,8 @@ with tabs[3]:
         stage2 = stage2_count_by_industry(combined)
         if "Industry" in view.columns:
             view = view.merge(stage2, on="Industry", how="left")
+stage_counts_df = combined.groupby(["Industry","stage"]).size().unstack(fill_value=0).reset_index()
+view = view.merge(stage_counts_df, on="Industry", how="left")
         sort_col = None
         for candidate in ["avg_combined_score","current_rank","rs_rank"]:
             if candidate in view.columns:
@@ -800,13 +796,7 @@ with tabs[3]:
             st.markdown("#### Industry strength")
             st.dataframe(view[[c for c in ["Industry","Rank","Stage 2 Stocks"] if c in view.columns]], use_container_width=True, hide_index=True, height=520)
         with right:
-            st.markdown("#### Industry changes")
-            if industry_changes.empty:
-                st.info("Industry changes data not available.")
-            else:
-                cols = [c for c in ["Industry","current_rank","prev_rank","rank_change"] if c in industry_changes.columns]
-                renamed = industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"})
-                st.dataframe(renamed, use_container_width=True, hide_index=True, height=520)
+            
     render_disclosure()
 
 with tabs[4]:
