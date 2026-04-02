@@ -792,10 +792,31 @@ view = view.merge(stage_counts_df, on="Industry", how="left")
         if "Stage 2 Stocks" in view.columns:
             view["Stage 2 Stocks"] = view["Stage 2 Stocks"].fillna(0).astype(int)
         left, right = st.columns(2)
+
         with left:
             st.markdown("#### Industry strength")
-            st.dataframe(view[[c for c in ["Industry","Rank","Stage 2 Stocks"] if c in view.columns]], use_container_width=True, hide_index=True, height=520)
-        with right:
+        
+            view = industry.copy()
+        
+            stage2 = stage2_count_by_industry(combined)
+            view = view.merge(stage2, on="Industry", how="left")
+        
+            # Add stage counts
+            stage_counts_df = combined.groupby(["Industry","stage"]).size().unstack(fill_value=0).reset_index()
+            view = view.merge(stage_counts_df, on="Industry", how="left")
+        
+            sort_col = None
+            for candidate in ["avg_combined_score","current_rank","rs_rank"]:
+                if candidate in view.columns:
+                    sort_col = candidate
+                    break
+        
+            if sort_col:
+                view[sort_col] = pd.to_numeric(view[sort_col], errors="coerce")
+                view = view.sort_values(sort_col, ascending=(sort_col!="avg_combined_score"))
+        
+            st.dataframe(view, use_container_width=True, hide_index=True)
+        # with right:
             
     render_disclosure()
 
