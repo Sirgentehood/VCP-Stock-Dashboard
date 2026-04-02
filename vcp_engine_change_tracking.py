@@ -353,76 +353,263 @@ index_df: pd.DataFrame, index_symbol: str, ma_fast: int, ma_slow: int) -> Market
 
 
 def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -> str:
+    """
+    Rule-based stage classifier closer to Weinstein / Minervini chart behaviour.
+
+    Philosophy:
+    - Stage 2: confirmed advancing structure
+    - Stage 4: confirmed declining structure
+    - Stage 1: post-decline stabilization / basing
+    - Stage 3: topping, failed trend, or ambiguous distribution before full Stage 4
+
+    This version is intentionally harder to classify as Stage 1 than the old one.
+    Borderline weak names should usually become Stage 3, not Stage 1.
+    """
     if len(close) < 260:
         return "Unknown"
 
-    last = float(close.iloc[-1])
-    ma50_series = close.rolling(50).mean()
-    ma150_series = close.rolling(150).mean()
-    ma200_series = close.rolling(200).mean()
+    c = close.dropna().astype(float)
+    if len(c) < 260:
+        return "Unknown"
 
-    ma50_slope_pct = slope_pct(ma50_series, 20)
-    ma150_slope_pct = slope_pct(ma150_series, 20)
-    ma200_slope_pct = slope_pct(ma200_series, 20)
+    last = float(c.iloc[-1])
 
-    high_52w = float(close.iloc[-252:].max())
-    low_52w = float(close.iloc[-252:].min())
+    ma50_series = c.rolling(50).mean()
+    ma150_series = c.rolling(150).mean()
+    ma200_series = c.rolling(200).mean()
+
+    ma50_now = float(ma50_series.iloc[-1]) if pd.notna(ma50_series.iloc[-1]) else float(ma50)
+    ma150_now = float(ma150_series.iloc[-1]) if pd.notna(ma150_series.iloc[-1]) else float(ma150)
+    ma200_now = float(ma200_series.iloc[-1]) if pd.notna(ma200_series.iloc[-1]) else float(ma200)
+
+    ma50_slope = slope_pct(ma50_series, 20)
+    ma150_slope = slope_pct(ma150_series, 20)
+    ma200_slope = slope_pct(ma200_series, 20)
+
+    high_52w = float(c.iloc[-252:].max())
+    low_52w = float(c.iloc[-252:].min())
+
     dist_from_high = (last / high_52w - 1) * 100 if high_52w > 0 else np.nan
     advance_from_low = (last / low_52w - 1) * 100 if low_52w > 0 else np.nan
 
-    ret_13w = pct_return(close, 63)
-    ret_26w = pct_return(close, 126)
-    range_10w = ((close.iloc[-50:].max() / close.iloc[-50:].min()) - 1) * 100 if close.iloc[-50:].min() > 0 else np.nan
-    range_26w = ((close.iloc[-126:].max() / close.iloc[-126:].min()) - 1) * 100 if close.iloc[-126:].min() > 0 else np.nan
+    ret_4w = pct_return(c, 21)
+    ret_13w = pct_return(c, 63)
+    ret_26w = pct_return(c, 126)
 
-    strong_trend = (
-        last > ma50 > ma150 > ma200
-        and pd.notna(ma50_slope_pct) and ma50_slope_pct > 0
-        and pd.notna(ma150_slope_pct) and ma150_slope_pct >= 0
-        and pd.notna(ma200_slope_pct) and ma200_slope_pct >= -0.0002
-        and pd.notna(dist_from_high) and dist_from_high >= -20
-        and pd.notna(advance_from_low) and advance_from_low >= 30
-        and pd.notna(ret_13w) and ret_13w > 0
+    range_8w = ((c.iloc[-40:].max() / c.iloc[-40:].min()) - 1) * 100 if c.iloc[-40:].min() > 0 else np.nan
+    range_13w = ((c.iloc[-63:].max() / c.iloc[-63:].min()) - 1) * 100 if c.iloc[-63:].min() > 0 else np.nan
+    range_26w = ((c.iloc[-126:].max() / c.iloc[-126:].min()) - 1) * 100 if c.iloc[-126:].min() > 0 else np.nan
+
+    def _turning_points(series: pd.Series, order: int = 5) -> Tuple[List[int], List[int]]:
+        vals = series.values
+        peaks: List[int] = []
+        troughs: List[int] = []
+        for i in range(order, len(vals) - order):
+            window = vals[i - order:i + order + 1]
+            center = vals[i]
+            if not np.isfinite(center):
+                continue
+            if center == np.max(window) and np.sum(window == center) == 1:
+                peaks.append(i)
+            if center == np.min(window) and np.sum(window == center) == 1:
+                troughs.append(i)
+        return peaks, troughs
+
+    def _recent_structure(series: pd.Series, lookback: int = 90, order: int = 5) -> dict:
+        s = series.iloc[-lookback:].copy()
+        peaks, troughs = _turning_points(s, order=order)
+
+        recent_peaks = [float(s.iloc[i]) for i in peaks[-3:]]
+        recent_troughs = [float(s.iloc[i]) for i in troughs[-3:]]
+
+        lower_highs = (
+            len(recent_peaks) >= 2 and
+            all(recent_peaks[i] < recent_peaks[i - 1] for i in range(1, len(recent_peaks)))
+        )
+        higher_highs = (
+            len(recent_peaks) >= 2 and
+            all(recent_peaks[i] > recent_peaks[i - 1] for i in range(1, len(recent_peaks)))
+        )
+        lower_lows = (
+            len(recent_troughs) >= 2 and
+            all(recent_troughs[i] < recent_troughs[i - 1] for i in range(1, len(recent_troughs)))
+        )
+        higher_lows = (
+            len(recent_troughs) >= 2 and
+            all(recent_troughs[i] > recent_troughs[i - 1] for i in range(1, len(recent_troughs)))
+        )
+
+        return {
+            "recent_peaks": recent_peaks,
+            "recent_troughs": recent_troughs,
+            "lower_highs": lower_highs,
+            "higher_highs": higher_highs,
+            "lower_lows": lower_lows,
+            "higher_lows": higher_lows,
+        }
+
+    structure = _recent_structure(c, lookback=90, order=5)
+    lower_highs = structure["lower_highs"]
+    higher_highs = structure["higher_highs"]
+    lower_lows = structure["lower_lows"]
+    higher_lows = structure["higher_lows"]
+
+    ma_stack_bull = last > ma50_now > ma150_now > ma200_now
+    ma_stack_bear = last < ma50_now < ma150_now < ma200_now
+
+    near_ma150 = pd.notna(ma150_now) and 0.93 * ma150_now <= last <= 1.07 * ma150_now
+    near_ma200 = pd.notna(ma200_now) and 0.93 * ma200_now <= last <= 1.07 * ma200_now
+    near_long_term_ma = near_ma150 or near_ma200
+
+    above_50 = pd.notna(ma50_now) and last > ma50_now
+    above_150 = pd.notna(ma150_now) and last > ma150_now
+    above_200 = pd.notna(ma200_now) and last > ma200_now
+
+    below_50 = pd.notna(ma50_now) and last < ma50_now
+    below_150 = pd.notna(ma150_now) and last < ma150_now
+    below_200 = pd.notna(ma200_now) and last < ma200_now
+
+    ma50_falling = pd.notna(ma50_slope) and ma50_slope < -0.0005
+    ma50_rising = pd.notna(ma50_slope) and ma50_slope > 0.0005
+    ma150_falling = pd.notna(ma150_slope) and ma150_slope < -0.00025
+    ma150_rising = pd.notna(ma150_slope) and ma150_slope > 0.00025
+    ma200_falling = pd.notna(ma200_slope) and ma200_slope < -0.0001
+    ma200_rising = pd.notna(ma200_slope) and ma200_slope > 0.0001
+    ma200_flat = pd.notna(ma200_slope) and -0.00035 <= ma200_slope <= 0.00035
+
+    stage2_score = 0
+    if ma_stack_bull:
+        stage2_score += 3
+    if ma50_rising:
+        stage2_score += 2
+    if ma150_rising:
+        stage2_score += 1
+    if ma200_rising or ma200_flat:
+        stage2_score += 1
+    if pd.notna(ret_13w) and ret_13w > 8:
+        stage2_score += 2
+    if pd.notna(ret_26w) and ret_26w > 15:
+        stage2_score += 1
+    if pd.notna(dist_from_high) and dist_from_high >= -15:
+        stage2_score += 1
+    if pd.notna(advance_from_low) and advance_from_low >= 30:
+        stage2_score += 1
+    if higher_highs:
+        stage2_score += 1
+    if higher_lows:
+        stage2_score += 2
+    if above_50 and above_150 and above_200:
+        stage2_score += 1
+
+    strong_stage2 = (
+        stage2_score >= 10 and
+        ma_stack_bull and
+        ma50_rising and
+        above_200 and
+        pd.notna(dist_from_high) and dist_from_high >= -20
     )
-    if strong_trend:
+    if strong_stage2:
         return "Stage 2"
 
-    clear_downtrend = (
-        last < ma50 < ma150 < ma200
-        and pd.notna(ma50_slope_pct) and ma50_slope_pct < 0
-        and pd.notna(ma150_slope_pct) and ma150_slope_pct <= 0
-        and pd.notna(ma200_slope_pct) and ma200_slope_pct < 0
-        and pd.notna(advance_from_low) and advance_from_low <= 35
+    stage4_score = 0
+    if ma_stack_bear:
+        stage4_score += 3
+    if ma50_falling:
+        stage4_score += 2
+    if ma150_falling:
+        stage4_score += 1
+    if ma200_falling:
+        stage4_score += 2
+    if pd.notna(ret_13w) and ret_13w < -8:
+        stage4_score += 2
+    if pd.notna(ret_26w) and ret_26w < -15:
+        stage4_score += 2
+    if pd.notna(dist_from_high) and dist_from_high <= -25:
+        stage4_score += 2
+    if lower_highs:
+        stage4_score += 2
+    if lower_lows:
+        stage4_score += 2
+    if below_50 and below_150 and below_200:
+        stage4_score += 1
+
+    strong_stage4 = (
+        stage4_score >= 10 and
+        below_200 and
+        ma50_falling and
+        lower_highs and
+        lower_lows
     )
-    if clear_downtrend:
+    if strong_stage4:
         return "Stage 4"
 
-    basing = (
-        pd.notna(ma200_slope_pct) and -0.0012 <= ma200_slope_pct <= 0.0015
-        and pd.notna(range_10w) and range_10w <= 35
-        and pd.notna(range_26w) and range_26w <= 80
-        and 0.9 * ma200 <= last <= 1.15 * high_52w
-        and last >= 0.85 * ma150
-        and pd.notna(dist_from_high) and dist_from_high <= 0
-        and pd.notna(ret_26w) and ret_26w > -20
+    stage1_score = 0
+    if near_long_term_ma:
+        stage1_score += 2
+    if ma200_flat:
+        stage1_score += 2
+    if pd.notna(ma150_slope) and -0.0004 <= ma150_slope <= 0.0005:
+        stage1_score += 1
+    if pd.notna(range_8w) and range_8w <= 18:
+        stage1_score += 2
+    if pd.notna(range_13w) and range_13w <= 28:
+        stage1_score += 1
+    if pd.notna(range_26w) and range_26w <= 55:
+        stage1_score += 1
+    if pd.notna(ret_13w) and -8 <= ret_13w <= 12:
+        stage1_score += 1
+    if pd.notna(ret_26w) and -20 <= ret_26w <= 20:
+        stage1_score += 1
+    if pd.notna(dist_from_high) and -35 <= dist_from_high <= -5:
+        stage1_score += 1
+    if pd.notna(advance_from_low) and 5 <= advance_from_low <= 45:
+        stage1_score += 1
+    if not lower_lows:
+        stage1_score += 1
+    if not lower_highs:
+        stage1_score += 1
+
+    valid_stage1 = (
+        stage1_score >= 9 and
+        near_long_term_ma and
+        ma200_flat and
+        not (lower_highs and lower_lows) and
+        not (pd.notna(ret_13w) and ret_13w < -10) and
+        not (below_200 and ma50_falling and ma200_falling)
     )
-    if basing and last <= ma50 * 1.12:
+    if valid_stage1:
         return "Stage 1"
 
-    topping_or_distribution = (
-        (last < ma50 and pd.notna(dist_from_high) and dist_from_high <= -10 and pd.notna(ret_13w) and ret_13w <= 5)
-        or (pd.notna(ma50_slope_pct) and ma50_slope_pct <= 0 and last < ma50 and last >= ma200 * 0.9)
-        or (pd.notna(range_10w) and range_10w > 20 and pd.notna(dist_from_high) and dist_from_high <= -8 and last > ma200 * 0.9)
-    )
-    if topping_or_distribution:
+    stage3_score = 0
+    if below_50:
+        stage3_score += 2
+    if pd.notna(dist_from_high) and dist_from_high <= -10:
+        stage3_score += 2
+    if pd.notna(ret_4w) and ret_4w < 0:
+        stage3_score += 1
+    if pd.notna(ret_13w) and ret_13w <= 5:
+        stage3_score += 1
+    if lower_highs:
+        stage3_score += 2
+    if lower_lows:
+        stage3_score += 1
+    if pd.notna(range_8w) and range_8w > 18:
+        stage3_score += 1
+    if above_200 and below_50:
+        stage3_score += 1
+    if below_150 and not ma_stack_bear:
+        stage3_score += 1
+    if ma50_falling:
+        stage3_score += 1
+
+    if stage3_score >= 5:
         return "Stage 3"
 
-    if last > ma150 and pd.notna(ma200_slope_pct) and ma200_slope_pct >= 0:
+    if stage2_score >= 8 and above_150 and not below_50:
         return "Stage 2"
-    if last < ma200 and pd.notna(ma200_slope_pct) and ma200_slope_pct < 0:
+    if stage4_score >= 8 and below_200:
         return "Stage 4"
-    return "Stage 1"
-    if ma200_slope >= 0 and dist_from_low <= 25 and last <= ma150:
+    if stage1_score >= 8 and ma200_flat and near_long_term_ma:
         return "Stage 1"
     return "Stage 3"
 
@@ -510,39 +697,63 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     required = {"Open", "High", "Low", "Close", "Volume"}
     if not required.issubset(df.columns):
         return None
-    df = df.dropna(subset=["Close", "Volume"]).copy()
+
+    df = df.dropna(subset=["Open", "High", "Low", "Close", "Volume"]).copy()
     if len(df) < config["min_history"]:
         return None
 
-    close = df["Close"]
-    volume = df["Volume"]
+    close = df["Close"].astype(float)
+    high = df["High"].astype(float)
+    low = df["Low"].astype(float)
+    volume = df["Volume"].astype(float)
+
     weekly_df = resample_weekly(df)
     if len(weekly_df) < 60:
         return None
-    weekly_close = weekly_df["Close"]
+    weekly_close = weekly_df["Close"].astype(float)
+    weekly_high = weekly_df["High"].astype(float)
+    weekly_low = weekly_df["Low"].astype(float)
 
     close_now = float(close.iloc[-1])
     ma50 = float(close.rolling(50).mean().iloc[-1])
     ma150 = float(close.rolling(150).mean().iloc[-1])
     ma200 = float(close.rolling(200).mean().iloc[-1])
+    ma50_series = close.rolling(50).mean()
+    ma150_series = close.rolling(150).mean()
+    ma200_series = close.rolling(200).mean()
     stage = determine_stage(close, ma50, ma150, ma200)
 
     high_52w = float(close.iloc[-252:].max())
     low_52w = float(close.iloc[-252:].min())
-    dist_from_high = (close_now / high_52w - 1) * 100
-    advance_from_low = (close_now / low_52w - 1) * 100
+    dist_from_high = (close_now / high_52w - 1) * 100 if high_52w > 0 else np.nan
+    advance_from_low = (close_now / low_52w - 1) * 100 if low_52w > 0 else np.nan
 
-    trend_template_ok = stage == "Stage 2" and close_now > ma50 > ma150 > ma200 and rolling_slope(close.rolling(200).mean(), 20) > 0 and dist_from_high >= -15 and advance_from_low >= 30
+    ma50_slope_pct = slope_pct(ma50_series, 20)
+    ma150_slope_pct = slope_pct(ma150_series, 20)
+    ma200_slope_pct = slope_pct(ma200_series, 20)
+    weekly_ma10 = float(weekly_close.rolling(10).mean().iloc[-1]) if len(weekly_close) >= 10 else np.nan
+    weekly_ma30 = float(weekly_close.rolling(30).mean().iloc[-1]) if len(weekly_close) >= 30 else np.nan
+
     market_regime_ok = regime.regime_label != "risk_off"
 
     daily_window = df.iloc[-140:]
-    daily_depths, daily_durations, daily_base_duration = detect_vcp_contractions(daily_window["High"], daily_window["Low"], daily_window["Close"], config["swing_order_daily"], config["max_contractions"], config["min_contraction_days_daily"], config["min_contraction_depth_pct_daily"])
+    daily_depths, daily_durations, daily_base_duration = detect_vcp_contractions(
+        daily_window["High"], daily_window["Low"], daily_window["Close"],
+        config["swing_order_daily"], config["max_contractions"],
+        config["min_contraction_days_daily"], config["min_contraction_depth_pct_daily"]
+    )
     daily_contraction_score_val = contraction_score(daily_depths)
 
     weekly_window = weekly_df.iloc[-52:]
-    weekly_depths, weekly_durations, weekly_base_duration = detect_vcp_contractions(weekly_window["High"], weekly_window["Low"], weekly_window["Close"], config["swing_order_weekly"], config["max_contractions"], config["min_contraction_days_weekly"], config["min_contraction_depth_pct_weekly"])
+    weekly_depths, weekly_durations, weekly_base_duration = detect_vcp_contractions(
+        weekly_window["High"], weekly_window["Low"], weekly_window["Close"],
+        config["swing_order_weekly"], config["max_contractions"],
+        config["min_contraction_days_weekly"], config["min_contraction_depth_pct_weekly"]
+    )
     weekly_contraction_score_val = contraction_score(weekly_depths)
-    weekly_quality = vcp_quality_label(weekly_contraction_score_val, weekly_base_duration, weekly_depths, config["min_base_duration_weeks"])
+    weekly_quality = vcp_quality_label(
+        weekly_contraction_score_val, weekly_base_duration, weekly_depths, config["min_base_duration_weeks"]
+    )
 
     volume_dryup_ratio = volume_ratio(volume, config["volume_short_window"], config["volume_long_window"])
     breakout_volume_ratio = recent_breakout_volume_ratio(volume, config["volume_long_window"])
@@ -555,32 +766,176 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     bm_6m = pct_return(benchmark_df["Close"], 126)
     rs_3m = stock_3m - bm_3m if pd.notna(stock_3m) and pd.notna(bm_3m) else np.nan
     rs_6m = stock_6m - bm_6m if pd.notna(stock_6m) and pd.notna(bm_6m) else np.nan
+    rs_combo = np.nanmean([rs_3m, rs_6m])
 
-    daily_pivot = compute_pivot(df["High"], config["pivot_lookback_daily"], daily_base_duration)
+    daily_pivot = compute_pivot(high, config["pivot_lookback_daily"], daily_base_duration)
     daily_breakout_distance = (close_now / daily_pivot - 1) * 100 if pd.notna(daily_pivot) and daily_pivot > 0 else np.nan
-    near_pivot_ok = pd.notna(daily_breakout_distance) and config["near_pivot_min_pct"] <= daily_breakout_distance <= config["near_pivot_max_pct"]
-    breakout_today = bool(pd.notna(daily_breakout_distance) and daily_breakout_distance > 0 and pd.notna(breakout_volume_ratio) and breakout_volume_ratio >= config["breakout_volume_ratio"])
-
-    weekly_pivot = compute_pivot(weekly_df["High"], config["pivot_lookback_weekly"], weekly_base_duration)
+    weekly_pivot = compute_pivot(weekly_high, config["pivot_lookback_weekly"], weekly_base_duration)
     weekly_breakout_distance = (float(weekly_close.iloc[-1]) / weekly_pivot - 1) * 100 if pd.notna(weekly_pivot) and weekly_pivot > 0 else np.nan
 
-    recent_range_pct = (close.iloc[-config["recent_range_days"]:].max() - close.iloc[-config["recent_range_days"]:].min()) / close.iloc[-config["recent_range_days"]:].max() * 100
-    tight_range_ok = recent_range_pct <= config["recent_range_max_pct"]
+    recent_range_pct = (
+        (close.iloc[-config["recent_range_days"]:].max() - close.iloc[-config["recent_range_days"]:].min()) /
+        close.iloc[-config["recent_range_days"]:].max() * 100
+    ) if len(close) >= config["recent_range_days"] else np.nan
+    tight_range_ok = pd.notna(recent_range_pct) and recent_range_pct <= config["recent_range_max_pct"]
 
-    daily_vcp_ok = len(daily_depths) >= 2 and daily_base_duration >= config["min_base_duration_days"] and daily_contraction_score_val >= 0.5 and daily_depths[-1] <= config["max_latest_contraction_pct"]
-    weekly_vcp_ok = len(weekly_depths) >= 2 and weekly_base_duration >= config["min_base_duration_weeks"] and weekly_contraction_score_val >= config["min_weekly_strength_score"]
+    price_above_ma50 = close_now > ma50
+    price_above_ma150 = close_now > ma150
+    price_above_ma200 = close_now > ma200
+    ma_stack_bull = close_now > ma50 > ma150 > ma200
+    ma_stack_bear = close_now < ma50 < ma150 < ma200
 
-    daily_bucket = classify_daily_bucket(trend_template_ok, daily_vcp_ok, near_pivot_ok, breakout_today, tight_range_ok, market_regime_ok)
+    weekly_range_12w = ((weekly_close.iloc[-12:].max() / weekly_close.iloc[-12:].min()) - 1) * 100 if len(weekly_close) >= 12 and weekly_close.iloc[-12:].min() > 0 else np.nan
+    weekly_range_20w = ((weekly_close.iloc[-20:].max() / weekly_close.iloc[-20:].min()) - 1) * 100 if len(weekly_close) >= 20 and weekly_close.iloc[-20:].min() > 0 else np.nan
+    recent_low_6w = float(low.iloc[-30:].min()) if len(low) >= 30 else np.nan
+    no_recent_breakdown = pd.notna(recent_low_6w) and close_now >= recent_low_6w * 1.03
+
+    stage2_trend_template = (
+        stage == "Stage 2"
+        and ma_stack_bull
+        and pd.notna(ma50_slope_pct) and ma50_slope_pct > 0.0005
+        and pd.notna(ma150_slope_pct) and ma150_slope_pct >= 0
+        and pd.notna(ma200_slope_pct) and ma200_slope_pct >= -0.00015
+        and pd.notna(dist_from_high) and dist_from_high >= -18
+        and pd.notna(advance_from_low) and advance_from_low >= 30
+        and pd.notna(rs_combo) and rs_combo >= 0
+    )
+
+    stage1_base_ready = (
+        stage == "Stage 1"
+        and pd.notna(ma200_slope_pct) and -0.00035 <= ma200_slope_pct <= 0.00035
+        and pd.notna(ma150_slope_pct) and ma150_slope_pct >= -0.00035
+        and price_above_ma150
+        and price_above_ma200
+        and pd.notna(dist_from_high) and -30 <= dist_from_high <= -3
+        and pd.notna(weekly_range_12w) and weekly_range_12w <= 20
+        and pd.notna(weekly_range_20w) and weekly_range_20w <= 35
+        and pd.notna(rs_combo) and rs_combo >= -5
+        and no_recent_breakdown
+        and not ma_stack_bear
+    )
+
+    strong_daily_vcp = (
+        len(daily_depths) >= 2
+        and daily_base_duration >= config["min_base_duration_days"]
+        and daily_contraction_score_val >= 0.60
+        and daily_depths[-1] <= min(config["max_latest_contraction_pct"], 8.0)
+        and pd.notna(volume_dryup_ratio) and volume_dryup_ratio <= 0.90
+    )
+    strict_stage1_daily_vcp = (
+        strong_daily_vcp
+        and daily_depths[0] <= 30
+        and max(daily_depths) <= 30
+        and pd.notna(daily_breakout_distance) and -4.0 <= daily_breakout_distance <= 1.5
+        and tight_range_ok
+    )
+    weekly_vcp_ok = (
+        len(weekly_depths) >= 2
+        and weekly_base_duration >= config["min_base_duration_weeks"]
+        and weekly_contraction_score_val >= max(config["min_weekly_strength_score"], 0.55)
+        and weekly_quality in {"strong", "moderate"}
+    )
+
+    near_pivot_stage2_ok = (
+        pd.notna(daily_breakout_distance)
+        and -5.0 <= daily_breakout_distance <= 1.5
+        and tight_range_ok
+        and pd.notna(breakout_volume_ratio) and breakout_volume_ratio >= 0.85
+    )
+    near_pivot_stage1_ok = (
+        pd.notna(daily_breakout_distance)
+        and -3.0 <= daily_breakout_distance <= 1.0
+        and tight_range_ok
+        and pd.notna(volume_dryup_ratio) and volume_dryup_ratio <= 0.90
+        and no_recent_breakdown
+    )
+    near_pivot_ok = near_pivot_stage2_ok if stage == "Stage 2" else near_pivot_stage1_ok if stage == "Stage 1" else False
+
+    breakout_today = bool(
+        pd.notna(daily_breakout_distance)
+        and daily_breakout_distance > 0
+        and pd.notna(breakout_volume_ratio)
+        and breakout_volume_ratio >= config["breakout_volume_ratio"]
+        and stage2_trend_template
+        and strong_daily_vcp
+    )
+
+    daily_vcp_ok = strong_daily_vcp if stage == "Stage 2" else strict_stage1_daily_vcp if stage == "Stage 1" else False
+    trend_template_ok = stage2_trend_template
+
+    if stage == "Stage 1" and (not stage1_base_ready or not strict_stage1_daily_vcp):
+        daily_bucket = "watchlist"
+    else:
+        daily_bucket = classify_daily_bucket(
+            trend_template_ok if stage == "Stage 2" else False,
+            daily_vcp_ok,
+            near_pivot_ok,
+            breakout_today,
+            tight_range_ok,
+            market_regime_ok,
+        )
+        if stage == "Stage 1" and daily_bucket == "building_setup":
+            daily_bucket = "watchlist"
+
     weekly_bucket = classify_weekly_bucket(stage, weekly_vcp_ok, weekly_breakout_distance, weekly_quality)
+    if stage == "Stage 1" and (not stage1_base_ready or not weekly_vcp_ok):
+        weekly_bucket = "weekly_watchlist"
 
-    daily_score = score_daily(stage, trend_template_ok, market_regime_ok, liquidity_ok, near_pivot_ok, breakout_today, daily_contraction_score_val, daily_base_duration, dist_from_high, volume_dryup_ratio, breakout_volume_ratio, rs_3m, rs_6m)
-    weekly_score = score_weekly(stage, weekly_contraction_score_val, weekly_base_duration, weekly_breakout_distance, weekly_quality, rs_3m, rs_6m)
+    daily_score = score_daily(
+        stage,
+        trend_template_ok,
+        market_regime_ok,
+        liquidity_ok,
+        near_pivot_ok,
+        breakout_today,
+        daily_contraction_score_val,
+        daily_base_duration,
+        dist_from_high,
+        volume_dryup_ratio,
+        breakout_volume_ratio,
+        rs_3m,
+        rs_6m,
+    )
+    weekly_score = score_weekly(
+        stage,
+        weekly_contraction_score_val,
+        weekly_base_duration,
+        weekly_breakout_distance,
+        weekly_quality,
+        rs_3m,
+        rs_6m,
+    )
+
+    if stage == "Stage 1":
+        if not stage1_base_ready:
+            daily_score -= 12
+            weekly_score -= 8
+        elif not strict_stage1_daily_vcp:
+            daily_score -= 8
+            weekly_score -= 5
+        if breakout_today:
+            daily_score -= 8
+        if pd.notna(daily_breakout_distance) and daily_breakout_distance > 0:
+            daily_score -= 3
+
+    if stage == "Stage 3":
+        daily_score -= 8
+        weekly_score -= 6
+    elif stage == "Stage 4":
+        daily_score -= 12
+        weekly_score -= 10
+
+    daily_score = round(float(max(0.0, daily_score)), 2)
+    weekly_score = round(float(max(0.0, weekly_score)), 2)
+
     combo_bucket = combined_bucket(daily_bucket, weekly_bucket)
     combined_score = round(0.55 * daily_score + 0.45 * weekly_score, 2)
 
     notes = [stage]
     if trend_template_ok:
         notes.append("trend_template_ok")
+    if stage1_base_ready:
+        notes.append("stage1_base_ready")
     if daily_vcp_ok:
         notes.append("daily_vcp_ok")
     if weekly_vcp_ok:
@@ -591,6 +946,14 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
         notes.append("daily_breakout_volume")
     if weekly_quality == "strong":
         notes.append("weekly_strong")
+    if stage == "Stage 1" and not strict_stage1_daily_vcp:
+        notes.append("stage1_not_actionable")
+    if stage == "Stage 1" and not stage1_base_ready:
+        notes.append("stage1_needs_more_base")
+    if stage == "Stage 3":
+        notes.append("distribution_risk")
+    if stage == "Stage 4":
+        notes.append("downtrend")
 
     return VCPScoreCard(
         ticker, round(close_now, 2), round(ma50, 2), round(ma150, 2), round(ma200, 2), stage,
@@ -682,12 +1045,13 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     if df.empty:
         return
 
-    display_bars = 180 if not is_weekly else 104
+    target_display_bars = 180 if not is_weekly else 104
     fast_window = 10 if is_weekly else 50
     slow_window = 30 if is_weekly else 200
-    history_buffer = display_bars + slow_window + 40
+    min_visible_bars = 55 if is_weekly else 120
+    history_buffer = target_display_bars + slow_window + (20 if is_weekly else 60)
 
-    working_df = df.copy().tail(history_buffer)
+    working_df = df.copy().tail(history_buffer).copy()
     if working_df.empty:
         return
 
@@ -695,22 +1059,36 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     ma_fast_all = close_all.rolling(fast_window).mean()
     ma_slow_all = close_all.rolling(slow_window).mean()
 
-    start_idx = max(0, len(working_df) - display_bars)
+    default_start_idx = max(0, len(working_df) - target_display_bars)
 
-    def _first_valid_full_window(series: pd.Series, needed_len: int) -> Optional[int]:
+    def _first_full_window_start(series: pd.Series, target_len: int) -> Optional[int]:
         valid = np.where(series.notna().values)[0]
         if len(valid) == 0:
             return None
         first_valid = int(valid[0])
-        return first_valid if len(series) - first_valid >= needed_len else None
+        if len(series) - first_valid >= target_len:
+            return first_valid
+        return None
 
-    fast_first_valid = _first_valid_full_window(ma_fast_all, display_bars)
-    slow_first_valid = _first_valid_full_window(ma_slow_all, display_bars)
+    visible_bars = target_display_bars
+    start_idx = default_start_idx
 
-    if slow_first_valid is not None:
-        start_idx = max(start_idx, slow_first_valid)
-    elif fast_first_valid is not None:
-        start_idx = max(start_idx, fast_first_valid)
+    # Ensure the selected moving averages are visible across the full plotted window.
+    if is_weekly:
+        max_bars_with_slow = len(working_df) - slow_window + 1
+        if max_bars_with_slow > 0:
+            visible_bars = min(target_display_bars, max(max_bars_with_slow, min_visible_bars))
+            start_idx = max(0, len(working_df) - visible_bars)
+        else:
+            visible_bars = min(target_display_bars, len(working_df))
+            start_idx = max(0, len(working_df) - visible_bars)
+    else:
+        slow_full_start = _first_full_window_start(ma_slow_all, target_display_bars)
+        fast_full_start = _first_full_window_start(ma_fast_all, target_display_bars)
+        if slow_full_start is not None:
+            start_idx = max(default_start_idx, slow_full_start)
+        elif fast_full_start is not None:
+            start_idx = max(default_start_idx, fast_full_start)
 
     plot_df = working_df.iloc[start_idx:].copy()
     if plot_df.empty:
@@ -722,8 +1100,9 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     volume = plot_df["Volume"].astype(float)
     x = plot_df.index
 
-    ma_fast = ma_fast_all.iloc[start_idx:]
-    ma_slow = ma_slow_all.iloc[start_idx:]
+    ma_fast = ma_fast_all.iloc[start_idx:].copy()
+    ma_slow = ma_slow_all.iloc[start_idx:].copy()
+
     if ma_fast.notna().sum() < len(plot_df):
         ma_fast = None
     if ma_slow.notna().sum() < len(plot_df):
@@ -743,86 +1122,117 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
         DEFAULT_CONFIG["pivot_lookback_weekly"] if is_weekly else DEFAULT_CONFIG["pivot_lookback_daily"],
         base_duration=base_duration,
         is_weekly=is_weekly,
-        min_band_pct=1.2 if is_weekly else 0.9,
-        max_band_pct=4.0 if is_weekly else 3.0,
+        min_band_pct=1.6 if is_weekly else 1.15,
+        max_band_pct=4.8 if is_weekly else 3.6,
     )
 
     plt.rcParams.update({
-        "font.size": 84,
-        "axes.titlesize": 102,
-        "axes.labelsize": 84,
-        "xtick.labelsize": 72,
-        "ytick.labelsize": 72,
-        "legend.fontsize": 66,
+        "font.size": 42,
+        "axes.titlesize": 51,
+        "axes.labelsize": 42,
+        "xtick.labelsize": 36,
+        "ytick.labelsize": 36,
+        "legend.fontsize": 33,
     })
+
     fig, (ax1, ax2) = plt.subplots(
         2,
         1,
         figsize=(34, 22),
         sharex=True,
-        gridspec_kw={"height_ratios": [4.8, 1.15]},
+        gridspec_kw={"height_ratios": [4.8, 1.0]},
     )
 
-    ax1.plot(x, close.values, label="Close", linewidth=7.0)
+    ax1.plot(x, close.values, label="Close", linewidth=5.0)
     if ma_fast is not None:
-        ax1.plot(x, ma_fast.values, label=("10W MA" if is_weekly else "50D MA"), linewidth=5.6, alpha=0.96)
+        ax1.plot(x, ma_fast.values, label=("10W MA" if is_weekly else "50DMA"), linewidth=3.8, alpha=0.96)
     if ma_slow is not None:
-        ax1.plot(x, ma_slow.values, label=("30W MA" if is_weekly else "200D MA"), linewidth=5.0, alpha=0.92)
+        ax1.plot(x, ma_slow.values, label=("30W MA" if is_weekly else "200DMA"), linewidth=3.5, alpha=0.92)
 
     if pd.notna(pivot_low) and pd.notna(pivot_high):
-        ax1.axhspan(float(pivot_low), float(pivot_high), alpha=0.24, label="Pivot zone")
-        ax1.axhline(float(pivot_low), linestyle="--", linewidth=2.2, alpha=0.45)
-        ax1.axhline(float(pivot_high), linestyle="--", linewidth=2.2, alpha=0.45)
+        ax1.axhspan(float(pivot_low), float(pivot_high), alpha=0.22, label="Pivot zone")
+        ax1.axhline(float(pivot_low), linestyle="--", linewidth=1.8, alpha=0.40)
+        ax1.axhline(float(pivot_high), linestyle="--", linewidth=1.8, alpha=0.40)
 
     suffix = "W" if is_weekly else "D"
     y_span = float(high.max() - low.min()) if np.isfinite(high.max()) and np.isfinite(low.min()) else 0.0
-    label_pad = y_span * 0.016
-    min_separation = y_span * 0.05
-    placed_positions = []
+    if y_span <= 0:
+        y_span = max(float(high.max()) * 0.08, 1.0)
+
+    base_label_gap = y_span * (0.065 if is_weekly else 0.045)
+    horizontal_step = 2 if is_weekly else 4
+    placed = []
+
+    def _find_label_slot(bar_idx: int, anchor_y: float):
+        candidates = []
+        for level in range(0, 8):
+            if level == 0:
+                candidates.append((0, 0))
+            else:
+                direction = -1 if level % 2 else 1
+                magnitude = (level + 1) // 2
+                candidates.append((direction * magnitude * horizontal_step, direction * magnitude * base_label_gap))
+
+        best = None
+        best_penalty = None
+        for x_shift, y_shift in candidates:
+            cand_idx = min(max(bar_idx + x_shift, 0), len(x) - 1)
+            cand_y = anchor_y + y_shift
+            penalty = abs(x_shift) * 0.9 + abs(y_shift) / max(base_label_gap, 1e-9)
+            overlap = False
+            for prev_idx, prev_y in placed:
+                if abs(cand_idx - prev_idx) <= (3 if is_weekly else 6) and abs(cand_y - prev_y) < base_label_gap * 0.90:
+                    overlap = True
+                    penalty += 100
+                    break
+            if not overlap:
+                return cand_idx, cand_y
+            if best is None or penalty < best_penalty:
+                best = (cand_idx, cand_y)
+                best_penalty = penalty
+        return best if best is not None else (bar_idx, anchor_y)
 
     for peak_i, trough_i, depth, duration in pair_seq:
-        trough_x = x[trough_i]
-        trough_y = float(low.iloc[trough_i])
-        label_x = trough_x
-        label_y = trough_y - label_pad
-
-        for prev_x, prev_y in placed_positions:
-            if abs(trough_i - prev_x) <= (4 if is_weekly else 8) and abs(label_y - prev_y) < min_separation:
-                label_y = prev_y - min_separation
-
-        placed_positions.append((trough_i, label_y))
+        trough_price = float(low.iloc[trough_i])
+        anchor_y = trough_price - y_span * 0.02
+        label_idx, label_y = _find_label_slot(trough_i, anchor_y)
+        placed.append((label_idx, label_y))
         rounded_depth = int(round(depth))
         ax1.annotate(
             f"(-{rounded_depth}%, {duration}{suffix})",
-            xy=(trough_x, trough_y),
-            xytext=(label_x, label_y),
+            xy=(x[trough_i], trough_price),
+            xytext=(x[label_idx], label_y),
             textcoords="data",
             ha="center",
             va="top",
-            fontsize=58,
+            fontsize=28,
             fontweight="bold",
-            bbox=dict(boxstyle="round,pad=0.24", alpha=0.12),
+            bbox=dict(boxstyle="round,pad=0.18", alpha=0.10),
         )
 
-    ax1.set_title(f"{title} | {symbol} | {setup_bucket} | {stage}", pad=22)
+    ax1.set_title(f"{title} | {symbol} | {setup_bucket} | {stage}", pad=16)
     ax1.grid(True, alpha=0.18)
     ax1.legend(loc="upper left", ncol=2)
-    ax1.tick_params(axis="both", labelsize=72, pad=10)
+    ax1.tick_params(axis="both", labelsize=36, pad=8)
     ax1.set_ylabel("Price")
     ax1.margins(x=0)
     ax1.set_xlim(x[0], x[-1])
-    margin_top = y_span * 0.10 if y_span > 0 else 0.0
-    margin_bottom = y_span * 0.16 if y_span > 0 else 0.0
+
+    margin_top = y_span * 0.10
+    margin_bottom = y_span * 0.18
     ax1.set_ylim(max(0, float(low.min()) - margin_bottom), float(high.max()) + margin_top)
 
     bar_width = 4 if is_weekly else 0.9
     ax2.bar(x, volume.values, width=bar_width, alpha=0.85)
     vol_ma = volume.rolling(10 if is_weekly else 20).mean()
     if vol_ma.notna().sum() == len(volume):
-        ax2.plot(x, vol_ma.values, linewidth=4.0, label=("10W Vol MA" if is_weekly else "20D Vol MA"))
+        ax2.plot(x, vol_ma.values, linewidth=2.8, label=("10W Vol MA" if is_weekly else "20D Vol MA"))
+
     ax2.grid(True, alpha=0.18)
-    ax2.set_ylabel("Vol")
-    ax2.tick_params(axis="both", labelsize=64, pad=8)
+    ax2.set_ylabel("Volume chart")
+    ax2.set_yticks([])
+    ax2.tick_params(axis="y", which="both", length=0, labelleft=False)
+    ax2.tick_params(axis="x", labelsize=34, pad=8)
     ax2.margins(x=0)
     ax2.set_xlim(x[0], x[-1])
     if vol_ma.notna().sum() == len(volume):
@@ -830,7 +1240,7 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
 
     fig.tight_layout()
     outfile.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(outfile, dpi=240, bbox_inches="tight", pad_inches=0.12)
+    fig.savefig(outfile, dpi=240, bbox_inches="tight", pad_inches=0.08)
     plt.close(fig)
 
 def export_all_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path) -> Dict[str, str]:
