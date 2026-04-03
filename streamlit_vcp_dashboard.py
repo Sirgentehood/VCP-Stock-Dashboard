@@ -67,12 +67,12 @@ st.markdown("""
 }
 .nav-link.active {background: rgba(55,95,220,0.22); border-color: rgba(55,95,220,0.45);}
 .stock-card-wrap {position:relative; margin-bottom:0.48rem;}
-.stock-card-overlay {
-  position:absolute; inset:0; z-index:1; border-radius:16px; text-decoration:none;
+.stock-card-link {
+  display:block; text-decoration:none; color:inherit; border-radius:16px;
 }
-.stock-card-overlay:hover + .stock-card {border-color: rgba(55,95,220,0.45);}
-.stock-card-content {position:relative; z-index:2;}
-.card-actions {display:flex; gap:0.5rem; margin-top:0.7rem; position:relative; z-index:3;}
+.stock-card-link:hover .stock-card {border-color: rgba(55,95,220,0.45);}
+.stock-card-content {position:relative;}
+.card-actions {display:flex; gap:0.5rem; margin-top:0.7rem; position:relative;}
 .card-action-btn {
   display:inline-block; padding:0.32rem 0.7rem; border-radius:999px; text-decoration:none;
   font-size:0.78rem; font-weight:800; border:1px solid rgba(255,255,255,0.18);
@@ -545,26 +545,27 @@ def render_stock_card(row: pd.Series, *, active_tab: str, top_movers: pd.DataFra
     card_open_url = app_url(tab="Stocks", stock=ticker)
     html = f"""
 <div class='stock-card-wrap'>
-  <a class='stock-card-overlay' href='{card_open_url}' aria-label='Open {ticker_short} charts'></a>
-  <div class='stock-card {stage_cls}'>
-    <div class='stock-card-content'>
-      <div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>
-        <div style='min-width:0;'>
-          <div class='stock-title'>{company} ({ticker_short})</div>
-          <div class='meta-line'>{stage_raw} * {trend} * {stage_display(stage_raw)}</div>
+  <a class='stock-card-link' href='{card_open_url}' aria-label='Open {ticker_short} charts'>
+    <div class='stock-card {stage_cls}'>
+      <div class='stock-card-content'>
+        <div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>
+          <div style='min-width:0;'>
+            <div class='stock-title'>{company} ({ticker_short})</div>
+            <div class='meta-line'>{stage_raw} * {trend} * {stage_display(stage_raw)}</div>
+          </div>
+          <div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>
+            <div class='status-pill {style["css"]}'>{label}</div>
+            <div class='rank-text'>Rank {stock_rank}</div>
+            {change_html}
+          </div>
         </div>
-        <div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>
-          <div class='status-pill {style["css"]}'>{label}</div>
-          <div class='rank-text'>Rank {stock_rank}</div>
-          {change_html}
-        </div>
+        {beginner_html}
+        {quick_read_html}
+        {extra_change}
       </div>
-      {beginner_html}
-      {quick_read_html}
-      {extra_change}
-      {actions_html}
     </div>
-  </div>
+  </a>
+  {actions_html}
 </div>
 """
     st.markdown(html, unsafe_allow_html=True)
