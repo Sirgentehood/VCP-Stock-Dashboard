@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 import math
-from urllib.parse import parse_qsl
 
 st.set_page_config(page_title="Market Structure Radar", layout="wide", initial_sidebar_state="collapsed")
 
@@ -56,35 +55,6 @@ st.markdown("""
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.18; margin-top: 0.06rem; margin-bottom: 0.02rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.04rem; line-height: 1.1;}
 .stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03); padding-top: 0.72rem; padding-bottom: 0.72rem;}
-.card-form {margin: 0; padding: 0;}
-.card-button {
-  display:block; width:100%;
-  border:none; background:transparent; padding:0; margin:0;
-  text-align:inherit; color:inherit; cursor:pointer;
-}
-.card-button:hover {transform:translateY(-1px);}
-.app-nav [data-testid="stRadio"] > div {
-  gap: 1.1rem;
-  flex-wrap: wrap;
-  border-bottom: 1px solid rgba(255,255,255,0.10);
-  padding-bottom: 0.15rem;
-}
-.app-nav [data-testid="stRadio"] label {
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  border-radius: 0;
-  padding: 0.55rem 0.15rem 0.45rem 0.15rem;
-  margin-bottom: -1px;
-}
-.app-nav [data-testid="stRadio"] label p {
-  font-size: 1rem;
-  font-weight: 700;
-}
-.app-nav [data-testid="stRadio"] label:has(input:checked) {
-  background: transparent;
-  border-color: rgba(55,95,220,0.90);
-}
 .stage-card-1 {background: var(--stage1-bg); border-color: var(--stage1-border);}
 .stage-card-2 {background: var(--stage2-bg); border-color: var(--stage2-border);}
 .stage-card-3 {background: var(--stage3-bg); border-color: var(--stage3-border);}
@@ -410,24 +380,7 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
     return auto_rank(match, preferred_cols)
 
 
-
-TAB_OPTIONS = ["Home", "Stocks", "Movers", "Market", "How to Use", "Portfolio", "Alerts", "Advanced", "Disclaimer"]
-
-def set_query_params(**params):
-    cleaned = {k: str(v) for k, v in params.items() if v not in [None, ""]}
-    st.query_params.clear()
-    for key, value in cleaned.items():
-        st.query_params[key] = value
-
-def build_card_params(tab_name: str, ticker: str, extra_params: dict | None = None) -> dict:
-    params = {"tab": tab_name, "ticker": str(ticker)}
-    if extra_params:
-        for key, value in extra_params.items():
-            if value not in [None, ""]:
-                params[key] = value
-    return params
-
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False, click_params: dict | None = None):
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
@@ -450,12 +403,15 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
+    # rank_html =
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{company} ({ticker})</div>"
+        # f"<div class='stock-title'>{stage_raw} * {trend} * {phase}</div>"
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
+        # f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
@@ -465,13 +421,6 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"{extra_change}"
         f"</div>"
     )
-    if click_params:
-        hidden_inputs = "".join(
-            f"<input type='hidden' name='{key}' value='{value}'>"
-            for key, value in click_params.items()
-            if value not in [None, ""]
-        )
-        html = f"<form class='card-form' method='get'>{hidden_inputs}<button class='card-button' type='submit'>{html}</button></form>"
     st.markdown(html, unsafe_allow_html=True)
 
 def stage_count_summary(combined_df: pd.DataFrame):
@@ -696,26 +645,12 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
 st.title("Market Structure Radar")
-query_tab = st.query_params.get("tab", "Home")
-default_tab = query_tab if query_tab in TAB_OPTIONS else "Home"
-if st.session_state.get("active_tab_nav") != default_tab:
-    st.session_state["active_tab_nav"] = default_tab
-
 view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
 show_pro_quick_read = view_mode == "Pro"
 st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
-st.markdown('<div class="app-nav">', unsafe_allow_html=True)
-active_tab = st.radio("Navigate", TAB_OPTIONS, horizontal=True, label_visibility="collapsed", key="active_tab_nav")
-st.markdown('</div>', unsafe_allow_html=True)
+tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
-ticker_param = str(st.query_params.get("ticker", "")).strip()
-if st.query_params.get("tab") != active_tab:
-    params = {"tab": active_tab}
-    if ticker_param and active_tab in {"Stocks", "Portfolio"}:
-        params["ticker"] = ticker_param
-    set_query_params(**params)
-
-if active_tab == "Home":
+with tabs[0]:
     current_market_tone = market_tone(regime, combined)
     st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
@@ -736,12 +671,12 @@ if active_tab == "Home":
         else:
             for _, r in top_changed_df.iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank, click_params=build_card_params("Stocks", r["ticker"]))
+                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
     with right:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, click_params=build_card_params("Stocks", r["ticker"]))
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
     st.divider()
     st.markdown("#### Guided workflow")
@@ -752,15 +687,9 @@ if active_tab == "Home":
 
     render_disclosure()
 
-if active_tab == "Stocks":
+with tabs[1]:
     ranked = combined.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
     names = ranked["Company Name"].dropna().astype(str).tolist()
-    if ticker_param and "ticker" in ranked.columns:
-        matches = ranked.index[ranked["ticker"].astype(str).str.strip() == ticker_param].tolist()
-        if not matches:
-            matches = ranked.index[ranked["ticker"].astype(str).str.replace(".NS", "", regex=False) == ticker_param.replace(".NS", "")].tolist()
-        if matches:
-            st.session_state["selected_stock_index"] = int(matches[0])
     if "selected_stock_index" not in st.session_state:
         st.session_state["selected_stock_index"] = 0
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
@@ -812,10 +741,10 @@ if active_tab == "Stocks":
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
         stock_rank = get_stock_rank(r["ticker"])
-        card(r, use_stage_color=True, stock_rank=stock_rank, click_params=build_card_params("Stocks", r["ticker"]))
+        card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
-if active_tab == "Movers":
+with tabs[2]:
     st.markdown("### Movers")
     # st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
     if moves.empty:
@@ -832,15 +761,15 @@ if active_tab == "Movers":
             st.markdown(f"#### Biggest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, click_params=build_card_params("Stocks", r["ticker"]))
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
         with c2:
             st.markdown(f"#### Major downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, click_params=build_card_params("Stocks", r["ticker"]))
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
     render_disclosure()
 
-if active_tab == "Market":
+with tabs[3]:
     st.markdown("### Market")
     c1, c2, c3, c4 = st.columns(4)
     with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
@@ -880,7 +809,7 @@ if active_tab == "Market":
                 st.dataframe(renamed, use_container_width=True, hide_index=True, height=520)
     render_disclosure()
 
-if active_tab == "How to Use":
+with tabs[4]:
     current_market_tone = market_tone(regime, combined)
     left, right = st.columns([1.05, 0.95])
     with left:
@@ -919,7 +848,7 @@ if active_tab == "How to Use":
             st.info("Stage image not found.")
     render_disclosure()
 
-if active_tab == "Portfolio":
+with tabs[5]:
     if "portfolio_names" not in st.session_state:
         st.session_state["portfolio_names"] = []
     if "custom_portfolio_names" not in st.session_state:
@@ -967,12 +896,6 @@ if active_tab == "Portfolio":
         st.info("No stocks added yet.")
     else:
         current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(MAX_PORTFOLIO_STOCKS).copy()
-        if ticker_param and "ticker" in current.columns and not current.empty:
-            matches = current.reset_index(drop=True).index[current.reset_index(drop=True)["ticker"].astype(str).str.strip() == ticker_param].tolist()
-            if not matches:
-                matches = current.reset_index(drop=True).index[current.reset_index(drop=True)["ticker"].astype(str).str.replace(".NS", "", regex=False) == ticker_param.replace(".NS", "")].tolist()
-            if matches:
-                st.session_state["portfolio_chart_index"] = int(matches[0])
         p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
@@ -988,7 +911,7 @@ if active_tab == "Portfolio":
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, click_params=build_card_params("Portfolio", r["ticker"]))
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
@@ -1039,7 +962,7 @@ if active_tab == "Portfolio":
 
     render_disclosure()
 
-if active_tab == "Alerts":
+with tabs[6]:
     st.markdown("### Alerts")
     st.markdown("#### Triggered alert candidates from the latest scan")
     if alert_candidates.empty:
@@ -1047,7 +970,7 @@ if active_tab == "Alerts":
     else:
         for _, r in alert_candidates.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank, click_params=build_card_params("Stocks", r["ticker"]))
+            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
 
     st.divider()
     st.markdown("#### How to add alerts for users")
@@ -1078,7 +1001,7 @@ if active_tab == "Alerts":
 # - dedupe_key''', language="text")
     render_disclosure()
 
-if active_tab == "Advanced":
+with tabs[7]:
     def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
         wanted = [c for c in ["Company Name","ticker","label","classification","stage","Industry"] if c in df.columns]
         out = df[wanted].copy() if wanted else df.copy()
@@ -1105,7 +1028,7 @@ if active_tab == "Advanced":
         st.dataframe(industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}), use_container_width=True, hide_index=True, height=320)
     render_disclosure()
 
-if active_tab == "Disclaimer":
+with tabs[8]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, while Stage 2 is the main advancing phase. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
     render_disclosure()
