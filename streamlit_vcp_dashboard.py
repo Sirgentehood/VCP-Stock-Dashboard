@@ -25,20 +25,20 @@ st.markdown("""
   --stage3-border: rgba(212,160,23,0.28);
   --stage4-border: rgba(170,80,180,0.34);
 }
-.block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
+.block-container {padding-top: 0.3rem; padding-bottom: 1.5rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1200px;}
 [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {display:none;}
 .stTabs [data-baseweb="tab"] {font-size: 1.15rem; font-weight: 700;}
 .stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
 .hero-card, .stock-card, .list-card, .learn-card {
-  border: 2px solid var(--card-border);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   padding: 0.8rem 0.9rem;
 }
-.hero-card {padding: 0.95rem 1rem; background: rgba(255,255,255,0.03);}
+.hero-card {padding: 0.85rem 1rem; background: rgba(255,255,255,0.03);}
 .kicker {font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);}
 .big-number {font-size: 1.34rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
 .muted {color: var(--muted);}
-.status-pill {display:inline-block; font-size:0.74rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap;}
+.status-pill {display:inline-block; font-size:0.7rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; opacity:0.85;}
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
@@ -54,23 +54,72 @@ st.markdown("""
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.18; margin-top: 0.06rem; margin-bottom: 0.02rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.04rem; line-height: 1.1;}
-.stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03); padding-top: 0.72rem; padding-bottom: 0.72rem;}
+.stock-card {margin-bottom: 0.5rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding-top: 0.72rem; padding-bottom: 0.72rem;}
 .stage-card-1 {background: var(--stage1-bg); border-color: var(--stage1-border);}
 .stage-card-2 {background: var(--stage2-bg); border-color: var(--stage2-border);}
 .stage-card-3 {background: var(--stage3-bg); border-color: var(--stage3-border);}
 .stage-card-4 {background: var(--stage4-bg); border-color: var(--stage4-border);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
-.rank-text {font-size: 0.84rem; font-weight: 700; color: var(--muted); margin-top: 0.18rem;}
+.rank-text {font-size: 0.78rem; font-weight: 800; color: #8ab4ff; background: rgba(55,95,220,0.15); padding: 0.18rem 0.5rem; border-radius: 6px; margin-top: 0.2rem;}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
 .change-text {font-size: 0.88rem; margin-top: 0.06rem; line-height: 1.18;}
+
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0.6rem 0.8rem;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  background: rgba(255,255,255,0.02);
+  margin-bottom:0.65rem;
+}
+.nav-left {
+  display:flex;
+  gap:1.2rem;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.brand-mark {font-weight:800; font-size:1rem;}
+.nav-item {
+  font-weight:600;
+  font-size:0.95rem;
+  opacity:0.8;
+}
+.login-btn {
+  padding:0.4rem 0.8rem;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.2);
+  font-weight:700;
+  background: rgba(255,255,255,0.03);
+}
+.hero-strip {
+  display:flex;
+  gap:0.75rem;
+  margin-bottom:0.7rem;
+  flex-wrap:wrap;
+}
+.hero-strip .hero-card {
+  flex:1;
+  min-width:220px;
+}
+.mode-badge {
+  font-size:0.8rem;
+  opacity:0.78;
+  margin-bottom:0.35rem;
+}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
+  .topbar {padding:0.55rem 0.65rem;}
+  .nav-left {gap:0.8rem;}
+  .hero-strip .hero-card {min-width:100%;}
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -316,6 +365,37 @@ def render_summary_card(title: str, value: str, subtitle: str):
 </div>
 """, unsafe_allow_html=True)
 
+
+def render_topbar():
+    st.markdown("""
+<div class="topbar">
+  <div class="nav-left">
+    <div class="brand-mark">Radar</div>
+    <div class="nav-item">Dashboard</div>
+    <div class="nav-item">Stocks</div>
+    <div class="nav-item">Movers</div>
+    <div class="nav-item">Market</div>
+    <div class="nav-item">Portfolio</div>
+    <div class="nav-item">Alerts</div>
+  </div>
+  <div class="login-btn">Login</div>
+</div>
+""", unsafe_allow_html=True)
+
+
+def render_mode_badge(view_mode: str):
+    st.markdown(f"""<div class="mode-badge">Mode: <b>{view_mode}</b></div>""", unsafe_allow_html=True)
+
+
+def render_hero_strip(current_market_tone: str, stage2_count: int, top_industry: str):
+    st.markdown(f"""
+<div class="hero-strip">
+  <div class="hero-card"><div class="kicker">Market</div><div class="big-number">{current_market_tone}</div><div class="muted">Use this before reviewing any stock</div></div>
+  <div class="hero-card"><div class="kicker">Stage 2</div><div class="big-number">{stage2_count}</div><div class="muted">Advancing trend names in current scan</div></div>
+  <div class="hero-card"><div class="kicker">Top industry</div><div class="big-number">{top_industry}</div><div class="muted">Industry leadership at a glance</div></div>
+</div>
+""", unsafe_allow_html=True)
+
 def _stage_card_class(stage_raw: str) -> str:
     return {
         "Stage 1": "stage-card-1",
@@ -404,6 +484,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
     # rank_html =
+    actions = """<div style='margin-top:0.45rem; display:flex; gap:0.4rem; flex-wrap:wrap;'><div class='action-pill action-watch'>⭐ Watchlist</div><div class='action-pill action-opportunity'>🔔 Alert</div></div>"""
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
@@ -419,6 +500,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"</div>"
         f"<div class='stock-title'>{quick_read_html}</div>"
         f"{extra_change}"
+        f"{actions}"
         f"</div>"
     )
     st.markdown(html, unsafe_allow_html=True)
@@ -644,14 +726,18 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
-st.title("Market Structure Radar")
+current_market_tone = market_tone(regime, combined)
+
+render_topbar()
+st.markdown("<h3 style='margin-bottom:0.2rem;'>Market Structure Radar</h3>", unsafe_allow_html=True)
 view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
 show_pro_quick_read = view_mode == "Pro"
+render_mode_badge(view_mode)
 st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
+render_hero_strip(current_market_tone, stage_counts["Stage 2"], top_industry_text(industry))
 tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
 with tabs[0]:
-    current_market_tone = market_tone(regime, combined)
     st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -688,6 +774,7 @@ with tabs[0]:
     render_disclosure()
 
 with tabs[1]:
+    st.markdown("### Stock Analysis")
     ranked = combined.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
     names = ranked["Company Name"].dropna().astype(str).tolist()
     if "selected_stock_index" not in st.session_state:
@@ -701,6 +788,7 @@ with tabs[1]:
         st.session_state["selected_stock_index"] = selected_index
         st.rerun()
 
+    st.divider()
     row = ranked.iloc[st.session_state["selected_stock_index"]]
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
@@ -810,7 +898,6 @@ with tabs[3]:
     render_disclosure()
 
 with tabs[4]:
-    current_market_tone = market_tone(regime, combined)
     left, right = st.columns([1.05, 0.95])
     with left:
         st.markdown(f"""<div class="learn-card">
