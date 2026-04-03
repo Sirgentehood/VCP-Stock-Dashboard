@@ -67,21 +67,6 @@ st.markdown("""
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
 .change-text {font-size: 0.88rem; margin-top: 0.06rem; line-height: 1.18;}
-.topbar {position: sticky; top: 0; z-index: 999; background: rgba(14,17,23,0.96); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 0.8rem 0.9rem; margin-bottom: 0.7rem; backdrop-filter: blur(10px);}
-.topbar-title {font-size: 1.08rem; font-weight: 800; line-height: 1.1;}
-.topbar-subtitle {font-size: 0.84rem; color: var(--muted); margin-top: 0.14rem;}
-.mono-pill {display:inline-block; font-size:0.72rem; font-weight:800; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid rgba(255,255,255,0.12); margin-right:0.35rem;}
-.free-pill {background: rgba(255,255,255,0.05);}
-.premium-pill {background: rgba(30,201,119,0.14); color: var(--strong); border-color: rgba(30,201,119,0.3);}
-.upgrade-banner {border: 1px solid rgba(30,201,119,0.28); background: linear-gradient(135deg, rgba(30,201,119,0.12), rgba(55,95,220,0.12)); border-radius: 16px; padding: 0.85rem 0.95rem; margin-bottom: 0.7rem;}
-.upgrade-title {font-size: 1rem; font-weight: 800; margin-bottom: 0.18rem;}
-.upgrade-copy {font-size: 0.9rem; color: var(--muted); line-height: 1.35;}
-.lock-chip {display:inline-block; font-size:0.72rem; font-weight:800; padding:0.18rem 0.48rem; border-radius:999px; background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.3); margin-top: 0.34rem;}
-.cta-row {display:flex; flex-wrap:wrap; gap:0.38rem; margin-top:0.45rem;}
-.cta-btn {display:inline-block; font-size:0.78rem; font-weight:800; padding:0.32rem 0.62rem; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);}
-.cta-primary {background: rgba(30,201,119,0.14); color: var(--strong); border-color: rgba(30,201,119,0.32);}
-.cta-secondary {background: rgba(55,95,220,0.12); color: #9db9ff; border-color: rgba(55,95,220,0.3);}
-.limit-note {font-size: 0.82rem; color: var(--muted); margin-top: 0.22rem;}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
@@ -96,8 +81,7 @@ LABELS = {
     "Cautious": {"css": "status-cautious"},
 }
 
-FREE_PORTFOLIO_STOCKS = 5
-PREMIUM_PORTFOLIO_STOCKS = 25
+MAX_PORTFOLIO_STOCKS = 25
 
 @st.cache_data(show_spinner=False)
 def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
@@ -323,43 +307,6 @@ This dashboard is an informational analytics tool. It shows rule-based stage cla
 </div>
 """, unsafe_allow_html=True)
 
-
-def portfolio_limit(is_premium: bool) -> int:
-    return PREMIUM_PORTFOLIO_STOCKS if is_premium else FREE_PORTFOLIO_STOCKS
-
-def teaser_text(text: str, keep_words: int = 12) -> str:
-    words = str(text).split()
-    if len(words) <= keep_words:
-        return str(text)
-    return " ".join(words[:keep_words]) + "..."
-
-def render_topbar(is_premium: bool):
-    plan_label = "Premium Preview" if is_premium else "Free Preview"
-    plan_class = "premium-pill" if is_premium else "free-pill"
-    st.markdown(f"""
-<div class="topbar">
-  <div style="display:flex; justify-content:space-between; gap:0.75rem; align-items:flex-start; flex-wrap:wrap;">
-    <div>
-      <div class="topbar-title">Market Structure Radar</div>
-      <div class="topbar-subtitle">Turn market structure into watchlists, alerts, and repeat engagement.</div>
-    </div>
-    <div style="display:flex; align-items:center; gap:0.42rem; flex-wrap:wrap;">
-      <span class="mono-pill {plan_class}">{plan_label}</span>
-      <span class="mono-pill free-pill">Login</span>
-      <span class="mono-pill premium-pill">Upgrade Pro</span>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-def render_upgrade_banner(title: str, body: str):
-    st.markdown(f"""
-<div class="upgrade-banner">
-  <div class="upgrade-title">{title}</div>
-  <div class="upgrade-copy">{body}</div>
-</div>
-""", unsafe_allow_html=True)
-
 def render_summary_card(title: str, value: str, subtitle: str):
     st.markdown(f"""
 <div class="hero-card">
@@ -433,7 +380,7 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
     return auto_rank(match, preferred_cols)
 
 
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False, is_premium: bool = True):
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
     company = row.get("Company Name", row.get("ticker", "Stock"))
@@ -452,24 +399,19 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
-    quick_read_html = ""
-    if show_quick_read:
-        if is_premium:
-            quick_read_html = f"<div class='change-text'><b>Why this stock matters today:</b> {explanation}</div>"
-        else:
-            quick_read_html = (
-                f"<div class='change-text'><b>Why this stock matters today:</b> {teaser_text(explanation, keep_words=11)}</div>"
-                f"<div class='lock-chip'>🔒 Unlock full analysis</div>"
-            )
+    quick_read_html = f"<div class='change-text'><b>Quick read:</b> {explanation}</div>" if show_quick_read else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
+    # rank_html =
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{company} ({ticker})</div>"
+        # f"<div class='stock-title'>{stage_raw} * {trend} * {phase}</div>"
         f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
+        # f"<div class='stock-subtitle'>{row.get('Industry', 'Unknown')}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
@@ -480,64 +422,6 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"</div>"
     )
     st.markdown(html, unsafe_allow_html=True)
-
-def ensure_portfolio_state():
-    if "portfolio_names" not in st.session_state:
-        st.session_state["portfolio_names"] = []
-    if "custom_portfolio_names" not in st.session_state:
-        st.session_state["custom_portfolio_names"] = []
-
-def add_to_watchlist(company_name: str, limit: int):
-    ensure_portfolio_state()
-    current = st.session_state.get("portfolio_names", [])
-    updated = dedupe_names(current + [company_name], limit=limit)
-    st.session_state["portfolio_names"] = updated
-    st.session_state["custom_portfolio_names"] = dedupe_names(updated, limit=limit)
-
-def render_inline_stock_details(row: pd.Series, detail_key: str):
-    ticker = str(row.get("ticker", ""))
-    ticker_short = ticker.replace(".NS", "")
-    st.markdown(f"#### {ticker_short} details")
-    c1, c2 = st.columns(2)
-    with c1:
-        daily_rank = get_display_stock_rank(ticker)
-        st.markdown(f"**Daily • {ticker_short} • {row.get('stage', '')} • Rank {daily_rank}**")
-        dpath = resolve_chart_path(daily_dir, ticker, "_daily.png")
-        if dpath:
-            st.image(safe_image_bytes(dpath), use_container_width=True)
-        else:
-            st.info("Daily chart not available.")
-    with c2:
-        weekly_rank = get_display_stock_rank(ticker)
-        st.markdown(f"**Weekly • {ticker_short} • {row.get('stage', '')} • Rank {weekly_rank}**")
-        wpath = resolve_chart_path(weekly_dir, ticker, "_weekly.png")
-        if wpath:
-            st.image(safe_image_bytes(wpath), use_container_width=True)
-        else:
-            st.info("Weekly chart not available.")
-
-def render_stock_card_block(row: pd.Series, context_key: str, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False, is_premium: bool = True, enable_watchlist: bool = True):
-    card(row, pct=pct, use_stage_color=use_stage_color, show_change_text=show_change_text, stock_rank=stock_rank, show_quick_read=show_quick_read, is_premium=is_premium)
-    company = str(row.get("Company Name", row.get("ticker", "Stock")))
-    ticker = str(row.get("ticker", "")).replace(".NS", "")
-    detail_state_key = f"open_stock_card_{context_key}"
-    col1, col2 = st.columns(2)
-    with col1:
-        open_now = st.button(f"Open {ticker}", use_container_width=True, key=f"{context_key}_open_{ticker}")
-        if open_now:
-            current_open = st.session_state.get(detail_state_key)
-            st.session_state[detail_state_key] = "" if current_open == ticker else ticker
-            st.rerun()
-    with col2:
-        if enable_watchlist:
-            added = company in st.session_state.get("portfolio_names", [])
-            label = "Added to watchlist" if added else "Add to watchlist"
-            clicked = st.button(label, use_container_width=True, key=f"{context_key}_watch_{ticker}", disabled=added)
-            if clicked and not added:
-                add_to_watchlist(company, current_max_portfolio_stocks)
-                st.success(f"{company} added to Portfolio watchlist.")
-    if st.session_state.get(detail_state_key) == ticker:
-        render_inline_stock_details(row, detail_state_key)
 
 def stage_count_summary(combined_df: pd.DataFrame):
     counts = combined_df["stage"].value_counts() if "stage" in combined_df.columns else pd.Series(dtype=int)
@@ -675,9 +559,7 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
 alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 
-current_max_portfolio_stocks = PREMIUM_PORTFOLIO_STOCKS
-
-def dedupe_names(names: list, limit: int = PREMIUM_PORTFOLIO_STOCKS) -> list:
+def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     out = []
     seen = set()
     for name in names:
@@ -760,27 +642,16 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         names = combined.loc[combined["label"] == "Strong", "Company Name"].dropna().tolist()
     elif name in INDUSTRY_PORTFOLIOS:
         names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
-    return dedupe_names(names, limit=current_max_portfolio_stocks)
+    return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
-plan_mode = st.radio("Access preview", ["Free", "Premium"], horizontal=True, index=0)
-is_premium = plan_mode == "Premium"
-current_max_portfolio_stocks = portfolio_limit(is_premium)
-render_topbar(is_premium)
-
-top_a, top_b = st.columns([1.45, 1])
-with top_a:
-    view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
-with top_b:
-    st.markdown(f"<div class='limit-note'>Portfolio limit: <b>{current_max_portfolio_stocks}</b> stocks in this preview. Premium unlocks alerts and full analysis.</div>", unsafe_allow_html=True)
-
+st.title("Market Structure Radar")
+view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
 show_pro_quick_read = view_mode == "Pro"
-st.caption("Free preview shows teaser insights. Premium preview shows the full quick-read layer. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
+st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
 tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
 with tabs[0]:
     current_market_tone = market_tone(regime, combined)
-    if not is_premium:
-        render_upgrade_banner("Free preview active", "You are showing teaser-level quick reads and basic tracking only. Unlock full stock-level analysis, larger portfolios, and live alerting in Pro.")
     st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -800,12 +671,12 @@ with tabs[0]:
         else:
             for _, r in top_changed_df.iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                render_stock_card_block(r, "home_changed", use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank, is_premium=is_premium)
+                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
     with right:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            render_stock_card_block(r, "home_top", use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
     st.divider()
     st.markdown("#### Guided workflow")
@@ -817,8 +688,6 @@ with tabs[0]:
     render_disclosure()
 
 with tabs[1]:
-    if not is_premium:
-        render_upgrade_banner("Stock deep dives are partially locked", "The free view can still browse stocks, but the quick-read layer is shortened. Premium is where this page becomes truly sticky for users.")
     ranked = combined.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
     names = ranked["Company Name"].dropna().astype(str).tolist()
     if "selected_stock_index" not in st.session_state:
@@ -836,7 +705,7 @@ with tabs[1]:
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
     stock_rank = get_stock_rank(row["ticker"])
-    render_stock_card_block(row, "stocks_selected", use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
+    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -872,7 +741,7 @@ with tabs[1]:
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
         stock_rank = get_stock_rank(r["ticker"])
-        render_stock_card_block(r, "stocks_browse", use_stage_color=True, stock_rank=stock_rank, is_premium=is_premium)
+        card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
 with tabs[2]:
@@ -892,12 +761,12 @@ with tabs[2]:
             st.markdown(f"#### Biggest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                render_stock_card_block(r, "movers_up", pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
         with c2:
             st.markdown(f"#### Major downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                render_stock_card_block(r, "movers_down", pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
     render_disclosure()
 
 with tabs[3]:
@@ -980,8 +849,6 @@ with tabs[4]:
     render_disclosure()
 
 with tabs[5]:
-    if not is_premium:
-        render_upgrade_banner("Portfolio is your best upsell surface", "Keep the free portfolio intentionally tight. Premium can unlock up to 25 tracked stocks, richer summaries, and persistent alerts.")
     if "portfolio_names" not in st.session_state:
         st.session_state["portfolio_names"] = []
     if "custom_portfolio_names" not in st.session_state:
@@ -999,31 +866,28 @@ with tabs[5]:
     previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
     if selected_portfolio != previous_portfolio:
         if previous_portfolio == "Custom":
-            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
         if selected_portfolio == "Custom":
-            st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("custom_portfolio_names", []), limit=current_max_portfolio_stocks)
+            st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("custom_portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
         else:
             st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
         st.session_state["portfolio_chart_index"] = 0
         st.session_state["portfolio_selection_prev"] = selected_portfolio
 
-    st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+    st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
     if selected_portfolio == "Custom":
-        st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+        st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
 
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
-    portfolio_full = len(st.session_state["portfolio_names"]) >= current_max_portfolio_stocks
+    portfolio_full = len(st.session_state["portfolio_names"]) >= MAX_PORTFOLIO_STOCKS
     selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name", disabled=portfolio_full)
     if portfolio_full:
-        if is_premium:
-            st.warning(f"Portfolio is limited to {current_max_portfolio_stocks} stocks.")
-        else:
-            st.warning(f"Free preview is limited to {current_max_portfolio_stocks} stocks. Upgrade Pro to unlock {PREMIUM_PORTFOLIO_STOCKS} tracked names plus alert delivery.")
+        st.warning(f"Portfolio is limited to {MAX_PORTFOLIO_STOCKS} stocks.")
     if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
-        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=current_max_portfolio_stocks)
+        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=MAX_PORTFOLIO_STOCKS)
         if selected_portfolio == "Custom":
-            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
         if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
             st.session_state["portfolio_chart_index"] = max(0, len(st.session_state["portfolio_names"]) - 1)
         st.rerun()
@@ -1031,7 +895,7 @@ with tabs[5]:
     if not st.session_state["portfolio_names"]:
         st.info("No stocks added yet.")
     else:
-        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(current_max_portfolio_stocks).copy()
+        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(MAX_PORTFOLIO_STOCKS).copy()
         p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
@@ -1047,14 +911,14 @@ with tabs[5]:
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            render_stock_card_block(r, "portfolio_list", use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium, enable_watchlist=False)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
         if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
             st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
             if selected_portfolio == "Custom":
-                st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+                st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
             st.session_state["portfolio_chart_index"] = min(st.session_state["portfolio_chart_index"], max(0, len(st.session_state["portfolio_names"]) - 1))
             st.rerun()
 
@@ -1100,19 +964,16 @@ with tabs[5]:
 
 with tabs[6]:
     st.markdown("### Alerts")
-    if not is_premium:
-        render_upgrade_banner("Free users can see examples, not distribution", "Keep alerts visible as proof of value, but reserve real delivery by email, Telegram, WhatsApp, or push for the paid tier.")
     st.markdown("#### Triggered alert candidates from the latest scan")
     if alert_candidates.empty:
         st.info("No alert candidates found in the latest data.")
     else:
         for _, r in alert_candidates.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            render_stock_card_block(r, "alerts_list", use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank, is_premium=is_premium)
+            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
 
     st.divider()
     st.markdown("#### How to add alerts for users")
-    st.markdown(f"<div class='limit-note'>Current preview mode: <b>{'Premium' if is_premium else 'Free'}</b>. Free can showcase alert candidates; Premium should handle saved rules and outbound delivery.</div>", unsafe_allow_html=True)
     a1, a2, a3 = st.columns(3)
     with a1:
         st.markdown('<div class="assist-box"><div class="assist-title">1. Store user rules</div><div class="assist-text">Save watchlists and alert rules in a database: entered Stage 2, breakout, rank improvement, or weak structure.</div></div>', unsafe_allow_html=True)
