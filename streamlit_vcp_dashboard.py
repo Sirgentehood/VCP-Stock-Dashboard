@@ -127,6 +127,29 @@ div[data-testid="stDecoration"], header[data-testid="stHeader"] {display:none !i
 .stage-accent-2 {box-shadow: inset 3px 0 0 var(--stage2-border);}
 .stage-accent-3 {box-shadow: inset 3px 0 0 var(--stage3-border);}
 .stage-accent-4 {box-shadow: inset 3px 0 0 var(--stage4-border);}
+
+.open-card-btn button {
+  width:100%;
+  text-align:left !important;
+  justify-content:flex-start !important;
+  align-items:flex-start !important;
+  white-space:pre-wrap !important;
+  line-height:1.35 !important;
+  border-radius:16px !important;
+  border:0 !important;
+  background:transparent !important;
+  color:inherit !important;
+  padding:0 !important;
+  box-shadow:none !important;
+}
+.open-card-btn button:hover {
+  background:transparent !important;
+  color:inherit !important;
+}
+.open-card-btn button:focus {
+  box-shadow:none !important;
+}
+
 .stock-name-btn button {
   justify-content:flex-start !important; padding-left:0 !important; padding-right:0 !important;
   background:transparent !important; border:none !important; font-size:1.02rem !important; font-weight:700 !important;
@@ -528,20 +551,26 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
 
+    button_lines = [
+        f"{company} ({ticker})",
+        f"{stage_raw} * {trend} * {phase}",
+    ]
+    if show_quick_read:
+        button_lines.append(f"Quick read: {explanation}")
+    if show_change_text:
+        button_lines.append(show_change_text)
+    open_label = "
+".join(button_lines)
+
     st.markdown(f"<div class='stock-shell {stage_cls}'>", unsafe_allow_html=True)
     top_left, top_right = st.columns([4.5, 1.4])
     with top_left:
-        st.markdown("<div class='stock-name-btn'>", unsafe_allow_html=True)
-        if st.button(f"{company} ({ticker})", key=f"open_stock_{cid}"):
+        st.markdown("<div class='open-card-btn'>", unsafe_allow_html=True)
+        if st.button(open_label, key=f"open_stock_{cid}", use_container_width=True):
             st.session_state["active_page"] = "Stocks"
             st.session_state["selected_stock_ticker"] = ticker
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>", unsafe_allow_html=True)
-        if show_quick_read:
-            st.markdown(f"<div class='small-muted'><b>Quick read:</b> {explanation}</div>", unsafe_allow_html=True)
-        if show_change_text:
-            st.markdown(f"<div class='small-muted'>{show_change_text}</div>", unsafe_allow_html=True)
     with top_right:
         st.markdown(status_html + rank_html + change_html, unsafe_allow_html=True)
 
