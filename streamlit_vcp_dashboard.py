@@ -25,20 +25,20 @@ st.markdown("""
   --stage3-border: rgba(212,160,23,0.28);
   --stage4-border: rgba(170,80,180,0.34);
 }
-.block-container {padding-top: 0.3rem; padding-bottom: 1.5rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1200px;}
+.block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {display:none;}
 .stTabs [data-baseweb="tab"] {font-size: 1.15rem; font-weight: 700;}
 .stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
 .hero-card, .stock-card, .list-card, .learn-card {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 2px solid var(--card-border);
   border-radius: 16px;
   padding: 0.8rem 0.9rem;
 }
-.hero-card {padding: 0.85rem 1rem; background: rgba(255,255,255,0.03);}
+.hero-card {padding: 0.95rem 1rem; background: rgba(255,255,255,0.03);}
 .kicker {font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);}
 .big-number {font-size: 1.34rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
 .muted {color: var(--muted);}
-.status-pill {display:inline-block; font-size:0.7rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; opacity:0.85;}
+.status-pill {display:inline-block; font-size:0.74rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap;}
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
@@ -54,118 +54,27 @@ st.markdown("""
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.18; margin-top: 0.06rem; margin-bottom: 0.02rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.04rem; line-height: 1.1;}
-.stock-card {margin-bottom: 0.5rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding-top: 0.72rem; padding-bottom: 0.72rem;}
+.stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03); padding-top: 0.72rem; padding-bottom: 0.72rem;}
 .stage-card-1 {background: var(--stage1-bg); border-color: var(--stage1-border);}
 .stage-card-2 {background: var(--stage2-bg); border-color: var(--stage2-border);}
 .stage-card-3 {background: var(--stage3-bg); border-color: var(--stage3-border);}
 .stage-card-4 {background: var(--stage4-bg); border-color: var(--stage4-border);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
-.rank-text {font-size: 0.78rem; font-weight: 800; color: #8ab4ff; background: rgba(55,95,220,0.15); padding: 0.18rem 0.5rem; border-radius: 6px; margin-top: 0.2rem;}
+.rank-text {font-size: 0.84rem; font-weight: 700; color: var(--muted); margin-top: 0.18rem;}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
 .change-text {font-size: 0.88rem; margin-top: 0.06rem; line-height: 1.18;}
-div[data-testid="stDecoration"], header[data-testid="stHeader"] {display:none !important;}
-.block-container {padding-top: 0.05rem !important;}
-
-.topbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0.6rem 0.8rem;
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  background: rgba(255,255,255,0.02);
-  margin-bottom:0.65rem;
-}
-.nav-left {
-  display:flex;
-  gap:1.2rem;
-  align-items:center;
-  flex-wrap:wrap;
-}
-.brand-mark {font-weight:800; font-size:1rem;}
-.nav-item {
-  font-weight:600;
-  font-size:0.95rem;
-  opacity:0.8;
-}
-.login-btn {
-  padding:0.4rem 0.8rem;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.2);
-  font-weight:700;
-  background: rgba(255,255,255,0.03);
-}
-.hero-strip {
-  display:flex;
-  gap:0.75rem;
-  margin-bottom:0.7rem;
-  flex-wrap:wrap;
-}
-.hero-strip .hero-card {
-  flex:1;
-  min-width:220px;
-}
-.mode-badge {
-  font-size:0.8rem;
-  opacity:0.78;
-  margin-bottom:0.35rem;
-}
-
-.topbar-wrap {position: sticky; top: 0.15rem; z-index: 100; backdrop-filter: blur(8px);}
-.topbar-shell {border:1px solid rgba(255,255,255,0.08); border-radius:14px; background: rgba(15,23,42,0.72); padding:0.45rem 0.6rem; margin-bottom:0.65rem;}
-.nav-button button, .login-button button {
-  width:100%; border-radius:999px !important; font-weight:700 !important;
-  min-height:2.2rem !important;
-}
-.others-select [data-baseweb="select"] > div {border-radius:999px !important; min-height:2.2rem !important; background:rgba(255,255,255,0.03);}
-.stock-shell {border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:0.8rem 0.9rem; margin-bottom:0.5rem; background: rgba(255,255,255,0.02);}
-.stage-accent-1 {box-shadow: inset 3px 0 0 var(--stage1-border);}
-.stage-accent-2 {box-shadow: inset 3px 0 0 var(--stage2-border);}
-.stage-accent-3 {box-shadow: inset 3px 0 0 var(--stage3-border);}
-.stage-accent-4 {box-shadow: inset 3px 0 0 var(--stage4-border);}
-
-.open-card-btn button {
-  width:100%;
-  text-align:left !important;
-  justify-content:flex-start !important;
-  align-items:flex-start !important;
-  white-space:pre-wrap !important;
-  line-height:1.35 !important;
-  border-radius:16px !important;
-  border:0 !important;
-  background:transparent !important;
-  color:inherit !important;
-  padding:0 !important;
-  box-shadow:none !important;
-}
-.open-card-btn button:hover {
-  background:transparent !important;
-  color:inherit !important;
-}
-.open-card-btn button:focus {
-  box-shadow:none !important;
-}
-
-.stock-name-btn button {
-  justify-content:flex-start !important; padding-left:0 !important; padding-right:0 !important;
-  background:transparent !important; border:none !important; font-size:1.02rem !important; font-weight:700 !important;
-  color: white !important; box-shadow:none !important;
-}
-.stock-name-btn button:hover {color:#8ab4ff !important;}
-.card-actions-row .stButton button {border-radius:999px !important; min-height:2rem !important; font-weight:700 !important;}
-.small-muted {font-size:0.88rem; color: var(--muted); line-height: 1.2;}
+.card-link {text-decoration:none !important; color:inherit !important; display:block;}
+.card-link:hover {text-decoration:none !important; color:inherit !important;}
+.stock-card-clickable {cursor:pointer; transition: all 0.15s ease;}
+.stock-card-clickable:hover {transform: translateY(-2px); border-color: rgba(138,180,255,0.45);}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
-  .topbar {padding:0.55rem 0.65rem;}
-  .nav-left {gap:0.8rem;}
-  .hero-strip .hero-card {min-width:100%;}
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -177,6 +86,13 @@ LABELS = {
 }
 
 MAX_PORTFOLIO_STOCKS = 25
+
+if "portfolio_names" not in st.session_state:
+    st.session_state["portfolio_names"] = []
+if "custom_portfolio_names" not in st.session_state:
+    st.session_state["custom_portfolio_names"] = []
+if "manual_alert_names" not in st.session_state:
+    st.session_state["manual_alert_names"] = []
 
 @st.cache_data(show_spinner=False)
 def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
@@ -395,6 +311,27 @@ def company_choices(df: pd.DataFrame):
     tmp = tmp.drop_duplicates(subset=["Company Name"], keep="first")
     return dict(zip(tmp["Company Name"], tmp["ticker"]))
 
+
+def add_to_watchlist(company_name: str):
+    updated = dedupe_names(st.session_state.get("portfolio_names", []) + [company_name], limit=MAX_PORTFOLIO_STOCKS)
+    st.session_state["portfolio_names"] = updated
+    st.session_state["custom_portfolio_names"] = dedupe_names(
+        st.session_state.get("custom_portfolio_names", []) + [company_name],
+        limit=MAX_PORTFOLIO_STOCKS,
+    )
+    st.toast(f"Added {company_name} to Watchlist. See it in the Portfolio tab.")
+
+def add_to_alerts(company_name: str):
+    st.session_state["manual_alert_names"] = dedupe_names(
+        st.session_state.get("manual_alert_names", []) + [company_name],
+        limit=MAX_PORTFOLIO_STOCKS,
+    )
+    st.toast(f"Added {company_name} to Alerts. See it in the Alerts tab.")
+
+def stock_link(ticker: str) -> str:
+    ticker_short = str(ticker).replace(".NS", "")
+    return f"?stock={ticker_short}"
+
 def render_disclosure():
     st.markdown("""
 <div class="disclosure">
@@ -408,53 +345,6 @@ def render_summary_card(title: str, value: str, subtitle: str):
   <div class="kicker">{title}</div>
   <div class="big-number">{value}</div>
   <div class="muted">{subtitle}</div>
-</div>
-""", unsafe_allow_html=True)
-
-
-def render_topbar(active_page: str):
-    pages = ["Dashboard", "Stocks", "Movers", "Market", "Portfolio", "Alerts"]
-    page_map = {"Dashboard": "Home", "Stocks": "Stocks", "Movers": "Movers", "Market": "Market", "Portfolio": "Portfolio", "Alerts": "Alerts"}
-    st.markdown("<div class='topbar-wrap'><div class='topbar-shell'>", unsafe_allow_html=True)
-    cols = st.columns([1.0, 1.15, 1.0, 1.0, 1.0, 1.1, 1.0, 1.25, 0.9])
-    with cols[0]:
-        st.markdown("<div class='brand-mark' style='padding-top:0.45rem;'>Radar</div>", unsafe_allow_html=True)
-    for idx, label in enumerate(pages, start=1):
-        with cols[idx]:
-            st.markdown("<div class='nav-button'>", unsafe_allow_html=True)
-            if st.button(label, key=f"nav_{label}", type="primary" if active_page == page_map[label] else "secondary", use_container_width=True):
-                st.session_state["active_page"] = page_map[label]
-                if label == "Dashboard":
-                    st.session_state["selected_stock_ticker"] = ""
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-    with cols[7]:
-        other_default = "Others"
-        if active_page in ["How to Use", "Advanced", "Disclaimer"]:
-            other_default = active_page
-        st.markdown("<div class='others-select'>", unsafe_allow_html=True)
-        other_choice = st.selectbox("Others", ["Others", "How to Use", "Advanced", "Disclaimer"], index=["Others", "How to Use", "Advanced", "Disclaimer"].index(other_default), label_visibility="collapsed", key="topbar_others")
-        st.markdown("</div>", unsafe_allow_html=True)
-        if other_choice != "Others" and active_page != other_choice:
-            st.session_state["active_page"] = other_choice
-            st.rerun()
-    with cols[8]:
-        st.markdown("<div class='login-button'>", unsafe_allow_html=True)
-        if st.button("Login", key="nav_login", use_container_width=True):
-            st.toast("Login flow placeholder.")
-        st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div></div>", unsafe_allow_html=True)
-
-def render_mode_badge(view_mode: str):
-    st.markdown(f"""<div class="mode-badge">Mode: <b>{view_mode}</b></div>""", unsafe_allow_html=True)
-
-
-def render_hero_strip(current_market_tone: str, stage2_count: int, top_industry: str):
-    st.markdown(f"""
-<div class="hero-strip">
-  <div class="hero-card"><div class="kicker">Market</div><div class="big-number">{current_market_tone}</div><div class="muted">Use this before reviewing any stock</div></div>
-  <div class="hero-card"><div class="kicker">Stage 2</div><div class="big-number">{stage2_count}</div><div class="muted">Advancing trend names in current scan</div></div>
-  <div class="hero-card"><div class="kicker">Top industry</div><div class="big-number">{top_industry}</div><div class="muted">Industry leadership at a glance</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -523,13 +413,17 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
 
 
 
-
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
-    if "_card_counter" not in st.session_state:
-        st.session_state["_card_counter"] = 0
-    st.session_state["_card_counter"] += 1
-    cid = st.session_state["_card_counter"]
-
+def card(
+    row: pd.Series,
+    pct=None,
+    use_stage_color=False,
+    show_change_text: str = "",
+    stock_rank: str = "n/a",
+    show_quick_read: bool = False,
+    clickable: bool = True,
+    show_actions: bool = False,
+    action_key_prefix: str = "",
+):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
     company = str(row.get("Company Name", row.get("ticker", "Stock")))
@@ -539,52 +433,52 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     trend = trend_text(row)
     phase = stage_display(stage_raw)
     explanation = one_line_explanation(row)
-    stage_cls = ""
+    classes = []
     if use_stage_color:
-        stage_cls = {"Stage 1":"stage-accent-1","Stage 2":"stage-accent-2","Stage 3":"stage-accent-3","Stage 4":"stage-accent-4"}.get(stage_raw, "")
-
+        stage_cls = _stage_card_class(stage_raw)
+        if stage_cls:
+            classes.append(stage_cls)
+    if clickable:
+        classes.append("stock-card-clickable")
     change_html = ""
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
-
+    extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
+    quick_read_html = f"<div class='change-text'><b>Quick read:</b> {explanation}</div>" if show_quick_read else ""
+    class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
 
-    button_lines = [
-        f"{company} ({ticker})",
-        f"{stage_raw} * {trend} * {phase}",
-    ]
-    if show_quick_read:
-        button_lines.append(f"Quick read: {explanation}")
-    if show_change_text:
-        button_lines.append(show_change_text)
-    open_label = "\n".join(button_lines)
+    card_inner = (
+        f"<div class='stock-card {class_attr}'>"
+        f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
+        f"<div style='min-width:0;'>"
+        f"<div class='stock-title'>{company} ({ticker})</div>"
+        f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
+        f"</div>"
+        f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
+        f"{status_html}{rank_html}{change_html}"
+        f"</div>"
+        f"</div>"
+        f"<div class='stock-title'>{quick_read_html}</div>"
+        f"{extra_change}"
+        f"</div>"
+    )
 
-    st.markdown(f"<div class='stock-shell {stage_cls}'>", unsafe_allow_html=True)
-    top_left, top_right = st.columns([4.5, 1.4])
-    with top_left:
-        st.markdown("<div class='open-card-btn'>", unsafe_allow_html=True)
-        if st.button(open_label, key=f"open_stock_{cid}", use_container_width=True):
-            st.session_state["active_page"] = "Stocks"
-            st.session_state["selected_stock_ticker"] = ticker
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-    with top_right:
-        st.markdown(status_html + rank_html + change_html, unsafe_allow_html=True)
+    html = f"<a class='card-link' href='{stock_link(ticker_full)}'>{card_inner}</a>" if clickable else card_inner
+    st.markdown(html, unsafe_allow_html=True)
 
-    a1, a2 = st.columns(2)
-    with a1:
-        st.markdown("<div class='card-actions-row'>", unsafe_allow_html=True)
-        if st.button("Add to Watchlist", key=f"watch_{cid}", use_container_width=True):
-            add_to_watchlist(ticker)
-        st.markdown("</div>", unsafe_allow_html=True)
-    with a2:
-        st.markdown("<div class='card-actions-row'>", unsafe_allow_html=True)
-        if st.button("Add to Alerts", key=f"alert_{cid}", use_container_width=True):
-            add_to_alerts(ticker)
-        st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    if show_actions:
+        c1, c2 = st.columns(2)
+        watch_key = f"{action_key_prefix}_watch_{ticker}"
+        alert_key = f"{action_key_prefix}_alert_{ticker}"
+        with c1:
+            if st.button("Add to Watchlist", key=watch_key, use_container_width=True):
+                add_to_watchlist(company)
+        with c2:
+            if st.button("Add to Alert", key=alert_key, use_container_width=True):
+                add_to_alerts(company)
 
 def stage_count_summary(combined_df: pd.DataFrame):
     counts = combined_df["stage"].value_counts() if "stage" in combined_df.columns else pd.Series(dtype=int)
@@ -722,6 +616,22 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
 alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 
+query_params = st.query_params
+selected_stock_ticker = query_params.get("stock", "")
+if isinstance(selected_stock_ticker, list):
+    selected_stock_ticker = selected_stock_ticker[0] if selected_stock_ticker else ""
+selected_stock_ticker = str(selected_stock_ticker).strip()
+
+def get_row_by_ticker(df: pd.DataFrame, ticker: str):
+    if df.empty or not ticker:
+        return None
+    work = df.copy()
+    work["ticker_norm"] = work["ticker"].astype(str).str.replace(".NS", "", regex=False)
+    match = work[work["ticker_norm"] == str(ticker).replace(".NS", "")]
+    if match.empty:
+        return None
+    return match.iloc[0]
+
 def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     out = []
     seen = set()
@@ -807,83 +717,47 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
+st.title("Market Structure Radar")
 
+if selected_stock_ticker:
+    selected_row = get_row_by_ticker(combined, selected_stock_ticker)
+    if selected_row is not None:
+        st.markdown("### Selected stock")
+        selected_rank = get_stock_rank(selected_row["ticker"])
+        card(
+            selected_row,
+            use_stage_color=True,
+            stock_rank=selected_rank,
+            show_quick_read=True,
+            clickable=False,
+            show_actions=True,
+            action_key_prefix="selected_stock",
+        )
+        sdpath = resolve_chart_path(daily_dir, selected_row["ticker"], "_daily.png")
+        swpath = resolve_chart_path(weekly_dir, selected_row["ticker"], "_weekly.png")
+        sc1, sc2 = st.columns(2)
+        ticker_short = str(selected_row["ticker"]).replace(".NS", "")
+        with sc1:
+            st.markdown(f"#### Daily * {ticker_short} * {selected_row.get('stage', '')} * Daily Rank {selected_rank}")
+            if sdpath:
+                st.image(safe_image_bytes(sdpath), use_container_width=True)
+            else:
+                st.info("Daily chart not available.")
+        with sc2:
+            st.markdown(f"#### Weekly * {ticker_short} * {selected_row.get('stage', '')} * Weekly Rank {selected_rank}")
+            if swpath:
+                st.image(safe_image_bytes(swpath), use_container_width=True)
+            else:
+                st.info("Weekly chart not available.")
+        st.divider()
 
-def ticker_to_company_name(df: pd.DataFrame, stock_value: str):
-    if not stock_value or df.empty or "ticker" not in df.columns:
-        return None
-    work = df[[c for c in ["ticker", "Company Name"] if c in df.columns]].dropna().copy()
-    if work.empty:
-        return None
-    work["ticker_clean"] = work["ticker"].astype(str).str.replace(".NS", "", regex=False).str.strip()
-    match = work.loc[work["ticker_clean"] == str(stock_value).strip()]
-    if match.empty:
-        return None
-    return str(match.iloc[0]["Company Name"]).strip()
+view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
+show_pro_quick_read = view_mode == "Pro"
+st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
+tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
-
-def ensure_app_state():
-    if "active_page" not in st.session_state:
-        st.session_state["active_page"] = "Home"
-    if "selected_stock_ticker" not in st.session_state:
-        st.session_state["selected_stock_ticker"] = ""
-    if "watchlist_names" not in st.session_state:
-        st.session_state["watchlist_names"] = []
-    if "alert_names" not in st.session_state:
-        st.session_state["alert_names"] = []
-    if "portfolio_names" not in st.session_state:
-        st.session_state["portfolio_names"] = []
-    if "custom_portfolio_names" not in st.session_state:
-        st.session_state["custom_portfolio_names"] = []
-    if "portfolio_chart_index" not in st.session_state:
-        st.session_state["portfolio_chart_index"] = 0
-    if "portfolio_selection" not in st.session_state:
-        st.session_state["portfolio_selection"] = "Watchlist"
-    if "portfolio_selection_prev" not in st.session_state:
-        st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
-
-
-def open_stock(ticker: str):
-    st.session_state["selected_stock_ticker"] = str(ticker).replace(".NS", "")
-    st.session_state["active_page"] = "Stocks"
-
-
-def add_to_watchlist(ticker: str):
-    company_name = ticker_to_company_name(combined, ticker)
-    if not company_name:
-        return
-    updated = dedupe_names(st.session_state.get("watchlist_names", []) + [company_name], limit=MAX_PORTFOLIO_STOCKS)
-    st.session_state["watchlist_names"] = updated
-    st.session_state["custom_portfolio_names"] = updated.copy()
-    if st.session_state.get("portfolio_selection", "Watchlist") == "Watchlist":
-        st.session_state["portfolio_names"] = updated.copy()
-    st.toast(f"Added {company_name} to Watchlist. See it in the Portfolio tab.")
-
-
-def add_to_alerts(ticker: str):
-    company_name = ticker_to_company_name(combined, ticker)
-    if not company_name:
-        return
-    updated = dedupe_names(st.session_state.get("alert_names", []) + [company_name], limit=MAX_PORTFOLIO_STOCKS)
-    st.session_state["alert_names"] = updated
-    st.toast(f"Added {company_name} to Alerts. See it in the Alerts tab.")
-
-
-def get_selected_stock_index(ranked: pd.DataFrame) -> int:
-    names = ranked["Company Name"].dropna().astype(str).tolist()
-    if not names:
-        return 0
-    if "selected_stock_index" not in st.session_state:
-        st.session_state["selected_stock_index"] = 0
-    selected_ticker = st.session_state.get("selected_stock_ticker", "")
-    if selected_ticker and "ticker" in ranked.columns:
-        match = ranked.index[ranked["ticker"].astype(str).str.replace(".NS", "", regex=False) == selected_ticker].tolist()
-        if match:
-            st.session_state["selected_stock_index"] = int(match[0])
-    return max(0, min(st.session_state["selected_stock_index"], len(names)-1))
-
-
-def render_home(show_pro_quick_read: bool, current_market_tone: str):
+with tabs[0]:
+    current_market_tone = market_tone(regime, combined)
     st.markdown("### Today’s Summary")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -891,8 +765,10 @@ def render_home(show_pro_quick_read: bool, current_market_tone: str):
     with c2:
         render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stage 2 leaders improving materially")
     with c3:
-        render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currently")
+        render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currenlty")
 
+   
+    # st.divider()
     left, right = st.columns([1.25, 1])
     with left:
         st.markdown("#### Top names that changed")
@@ -901,42 +777,45 @@ def render_home(show_pro_quick_read: bool, current_market_tone: str):
         else:
             for _, r in top_changed_df.iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
+                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank, show_actions=True, action_key_prefix="home_changed")
     with right:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, show_actions=True, action_key_prefix="home_top")
 
     st.divider()
     st.markdown("#### Guided workflow")
     workflow_cols = st.columns(len(guided_workflow_steps(current_market_tone)))
     for col, step_text in zip(workflow_cols, guided_workflow_steps(current_market_tone)):
         with col:
-            st.markdown(f"<div class='assist-box'><div class='assist-text'>{step_text}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{step_text}</div></div>""", unsafe_allow_html=True)
+
     render_disclosure()
 
-
-def render_stocks(show_pro_quick_read: bool):
-    st.markdown("### Stock Analysis")
+with tabs[1]:
     ranked = combined.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
     names = ranked["Company Name"].dropna().astype(str).tolist()
-    if not names:
-        st.info("No stock data available.")
-        return
+    if "selected_stock_index" not in st.session_state:
+        st.session_state["selected_stock_index"] = 0
+    if selected_stock_ticker:
+        match_idx = ranked.index[ranked["ticker"].astype(str).str.replace(".NS", "", regex=False) == selected_stock_ticker.replace(".NS", "")]
+        if len(match_idx) > 0:
+            st.session_state["selected_stock_index"] = int(match_idx[0])
+    st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
+    current_index = st.session_state["selected_stock_index"]
 
-    current_index = get_selected_stock_index(ranked)
-    selected_name = st.selectbox("Select stock", names, index=current_index, key="stocks_select_name_ordered")
+    selected_name = st.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
     selected_index = names.index(selected_name)
-    st.session_state["selected_stock_index"] = selected_index
+    if selected_index != current_index:
+        st.session_state["selected_stock_index"] = selected_index
+        st.rerun()
 
-    row = ranked.iloc[selected_index]
-    st.session_state["selected_stock_ticker"] = str(row["ticker"]).replace(".NS", "")
+    row = ranked.iloc[st.session_state["selected_stock_index"]]
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
     stock_rank = get_stock_rank(row["ticker"])
-    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
-    st.divider()
+    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, clickable=False, show_actions=True, action_key_prefix="stocks_selected")
 
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -958,28 +837,26 @@ def render_stocks(show_pro_quick_read: bool):
 
     nav1, nav2 = st.columns(2)
     with nav1:
-        prev2 = st.button("Previous", use_container_width=True, disabled=(selected_index == 0), key="stocks_prev_bottom")
+        prev2 = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key=f"stocks_prev_bottom_{st.session_state['selected_stock_index']}")
     with nav2:
-        next2 = st.button("Next", use_container_width=True, disabled=(selected_index >= len(names) - 1), key="stocks_next_bottom")
-    if prev2 and selected_index > 0:
-        st.session_state["selected_stock_index"] = selected_index - 1
-        st.session_state["selected_stock_ticker"] = str(ranked.iloc[selected_index - 1]["ticker"]).replace(".NS", "")
+        next2 = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key=f"stocks_next_bottom_{st.session_state['selected_stock_index']}")
+    if prev2 and st.session_state["selected_stock_index"] > 0:
+        st.session_state["selected_stock_index"] -= 1
         st.rerun()
-    if next2 and selected_index < len(names) - 1:
-        st.session_state["selected_stock_index"] = selected_index + 1
-        st.session_state["selected_stock_ticker"] = str(ranked.iloc[selected_index + 1]["ticker"]).replace(".NS", "")
+    if next2 and st.session_state["selected_stock_index"] < len(names) - 1:
+        st.session_state["selected_stock_index"] += 1
         st.rerun()
 
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
         stock_rank = get_stock_rank(r["ticker"])
-        card(r, use_stage_color=True, stock_rank=stock_rank)
+        card(r, use_stage_color=True, stock_rank=stock_rank, show_actions=True, action_key_prefix="stocks_browse")
     render_disclosure()
 
-
-def render_movers(show_pro_quick_read: bool):
+with tabs[2]:
     st.markdown("### Movers")
+    # st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
     if moves.empty:
         st.info("Price move data not found yet.")
     else:
@@ -994,16 +871,15 @@ def render_movers(show_pro_quick_read: bool):
             st.markdown(f"#### Biggest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, show_actions=True, action_key_prefix="movers_up")
         with c2:
             st.markdown(f"#### Major downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, show_actions=True, action_key_prefix="movers_down")
     render_disclosure()
 
-
-def render_market():
+with tabs[3]:
     st.markdown("### Market")
     c1, c2, c3, c4 = st.columns(4)
     with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
@@ -1043,9 +919,8 @@ def render_market():
                 st.dataframe(renamed, use_container_width=True, hide_index=True, height=520)
     render_disclosure()
 
-
-def render_how_to_use(current_market_tone: str):
-    st.markdown("### How to Use")
+with tabs[4]:
+    current_market_tone = market_tone(regime, combined)
     left, right = st.columns([1.05, 0.95])
     with left:
         st.markdown(f"""<div class="learn-card">
@@ -1053,7 +928,7 @@ def render_how_to_use(current_market_tone: str):
   <ul class="list-tight">
     <li>Start with <b>Market tone</b>. Today it reads <b>{current_market_tone}</b>.</li>
     <li>Then scan <b>Strong</b> Stage 2 names first, and use Stage 1 names mainly as watchlist bases.</li>
-    <li>Click the <b>stock name</b> to open charts in the Stocks page.</li>
+    <li>Read the <b>Quick read</b> before opening charts.</li>
     <li>Use daily and weekly charts together. When both agree, the setup is cleaner.</li>
   </ul>
 </div>
@@ -1083,30 +958,36 @@ def render_how_to_use(current_market_tone: str):
             st.info("Stage image not found.")
     render_disclosure()
 
+with tabs[5]:
+    st.caption("Stocks added from cards appear here in the Watchlist.")
+    if "portfolio_names" not in st.session_state:
+        st.session_state["portfolio_names"] = []
+    if "custom_portfolio_names" not in st.session_state:
+        st.session_state["custom_portfolio_names"] = []
+    if "portfolio_chart_index" not in st.session_state:
+        st.session_state["portfolio_chart_index"] = 0
+    if "portfolio_selection" not in st.session_state:
+        st.session_state["portfolio_selection"] = "Custom"
+    if "portfolio_selection_prev" not in st.session_state:
+        st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
 
-def render_portfolio(show_pro_quick_read: bool):
-    st.markdown("### Portfolio")
-    portfolio_options = ["Watchlist", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
-    selected_portfolio = st.selectbox("Portfolio section", portfolio_options, key="portfolio_selection")
-    previous_portfolio = st.session_state.get("portfolio_selection_prev", "Watchlist")
+    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
+    selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
+    previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
     if selected_portfolio != previous_portfolio:
-        if previous_portfolio == "Watchlist":
-            st.session_state["watchlist_names"] = dedupe_names(st.session_state.get("portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
-            st.session_state["custom_portfolio_names"] = st.session_state["watchlist_names"].copy()
-        if selected_portfolio == "Watchlist":
-            current_watch = dedupe_names(st.session_state.get("watchlist_names", []), limit=MAX_PORTFOLIO_STOCKS)
-            st.session_state["portfolio_names"] = current_watch.copy()
-            st.session_state["custom_portfolio_names"] = current_watch.copy()
+        if previous_portfolio == "Custom":
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+        if selected_portfolio == "Custom":
+            st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("custom_portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
         else:
             st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
         st.session_state["portfolio_chart_index"] = 0
         st.session_state["portfolio_selection_prev"] = selected_portfolio
 
-    st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
-    if selected_portfolio == "Watchlist":
-        st.session_state["watchlist_names"] = dedupe_names(st.session_state.get("portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
-        st.session_state["custom_portfolio_names"] = st.session_state["watchlist_names"].copy()
+    st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+    if selected_portfolio == "Custom":
+        st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
 
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
@@ -1116,104 +997,87 @@ def render_portfolio(show_pro_quick_read: bool):
         st.warning(f"Portfolio is limited to {MAX_PORTFOLIO_STOCKS} stocks.")
     if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
         st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=MAX_PORTFOLIO_STOCKS)
-        if selected_portfolio == "Watchlist":
-            st.session_state["watchlist_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
-            st.session_state["custom_portfolio_names"] = st.session_state["watchlist_names"].copy()
+        if selected_portfolio == "Custom":
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+        if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
+            st.session_state["portfolio_chart_index"] = max(0, len(st.session_state["portfolio_names"]) - 1)
         st.rerun()
 
     if not st.session_state["portfolio_names"]:
         st.info("No stocks added yet.")
-        render_disclosure()
-        return
+    else:
+        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(MAX_PORTFOLIO_STOCKS).copy()
+        p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
+        c1, c2, c3, c4, c5 = st.columns(5)
+        with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
+        with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Base / repair")
+        with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Advancing trend")
+        with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Topping / transition")
+        with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Declining trend")
 
-    current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(MAX_PORTFOLIO_STOCKS).copy()
-    p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
-    c1, c2, c3, c4, c5 = st.columns(5)
-    with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
-    with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Base / repair")
-    with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Advancing trend")
-    with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Topping / transition")
-    with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Declining trend")
+        st.markdown("### Portfolio assistant")
+        for msg in portfolio_assistant(current):
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{msg}</div></div>""", unsafe_allow_html=True)
 
-    st.markdown("### Portfolio assistant")
-    for msg in portfolio_assistant(current):
-        st.markdown(f"<div class='assist-box'><div class='assist-text'>{msg}</div></div>", unsafe_allow_html=True)
+        st.divider()
+        for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
+            stock_rank = get_stock_rank(r["ticker"])
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
 
-    st.divider()
-    for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
-        stock_rank = get_stock_rank(r["ticker"])
-        card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+        removable = [""] + sorted(st.session_state["portfolio_names"])
+        selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
+        if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
+            st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
+            if selected_portfolio == "Custom":
+                st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+            st.session_state["portfolio_chart_index"] = min(st.session_state["portfolio_chart_index"], max(0, len(st.session_state["portfolio_names"]) - 1))
+            st.rerun()
 
-    removable = [""] + sorted(st.session_state["portfolio_names"])
-    selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
-    if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
-        st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
-        if selected_portfolio == "Watchlist":
-            st.session_state["watchlist_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
-            st.session_state["custom_portfolio_names"] = st.session_state["watchlist_names"].copy()
-        st.rerun()
+        portfolio_ordered = current.sort_values("final_combined_score", ascending=False).reset_index(drop=True)
+        if not portfolio_ordered.empty:
+            st.divider()
+            st.markdown("### Portfolio charts")
+            st.session_state["portfolio_chart_index"] = max(0, min(st.session_state["portfolio_chart_index"], len(portfolio_ordered) - 1))
+            prow = portfolio_ordered.iloc[st.session_state["portfolio_chart_index"]]
+            pticker_short = str(prow["ticker"]).replace(".NS", "")
 
-    portfolio_ordered = current.sort_values("final_combined_score", ascending=False).reset_index(drop=True)
-    if portfolio_ordered.empty:
-        render_disclosure()
-        return
+            pc1, pc2 = st.columns(2)
+            with pc1:
+                pdaily_rank = get_display_stock_rank(prow["ticker"])
+                st.markdown(f"#### Daily * {pticker_short} * {prow.get('stage', '')} * Daily Stock Rank {pdaily_rank}")
+                pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
+                if pdpath:
+                    st.image(safe_image_bytes(pdpath), use_container_width=True)
+                else:
+                    st.info("Daily chart not available.")
+            with pc2:
+                pweekly_rank = get_display_stock_rank(prow["ticker"])
+                st.markdown(f"#### Weekly * {pticker_short} * {prow.get('stage', '')} * Weekly Stock Rank {pweekly_rank}")
+                pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
+                if pwpath:
+                    st.image(safe_image_bytes(pwpath), use_container_width=True)
+                else:
+                    st.info("Weekly chart not available.")
 
-    selected_ticker = st.session_state.get("selected_stock_ticker", "")
-    if selected_ticker and "ticker" in portfolio_ordered.columns:
-        match = portfolio_ordered.index[portfolio_ordered["ticker"].astype(str).str.replace(".NS", "", regex=False) == selected_ticker].tolist()
-        if match:
-            st.session_state["portfolio_chart_index"] = int(match[0])
-    st.divider()
-    st.markdown("### Portfolio charts")
-    st.session_state["portfolio_chart_index"] = max(0, min(st.session_state["portfolio_chart_index"], len(portfolio_ordered) - 1))
-    prow = portfolio_ordered.iloc[st.session_state["portfolio_chart_index"]]
-    pticker_short = str(prow["ticker"]).replace(".NS", "")
-
-    pc1, pc2 = st.columns(2)
-    with pc1:
-        pdaily_rank = get_display_stock_rank(prow["ticker"])
-        st.markdown(f"#### Daily * {pticker_short} * {prow.get('stage', '')} * Daily Stock Rank {pdaily_rank}")
-        pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
-        if pdpath:
-            st.image(safe_image_bytes(pdpath), use_container_width=True)
-        else:
-            st.info("Daily chart not available.")
-    with pc2:
-        pweekly_rank = get_display_stock_rank(prow["ticker"])
-        st.markdown(f"#### Weekly * {pticker_short} * {prow.get('stage', '')} * Weekly Stock Rank {pweekly_rank}")
-        pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
-        if pwpath:
-            st.image(safe_image_bytes(pwpath), use_container_width=True)
-        else:
-            st.info("Weekly chart not available.")
-
-    nav1, nav2 = st.columns(2)
-    with nav1:
-        pprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] == 0), key="portfolio_prev")
-    with nav2:
-        pnext = st.button("Next", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1), key="portfolio_next")
-    if pprev and st.session_state["portfolio_chart_index"] > 0:
-        st.session_state["portfolio_chart_index"] -= 1
-        st.rerun()
-    if pnext and st.session_state["portfolio_chart_index"] < len(portfolio_ordered) - 1:
-        st.session_state["portfolio_chart_index"] += 1
-        st.rerun()
+            nav1, nav2 = st.columns(2)
+            with nav1:
+                pprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] == 0), key="portfolio_prev")
+            with nav2:
+                pnext = st.button("Next", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1), key="portfolio_next")
+            if pprev and st.session_state["portfolio_chart_index"] > 0:
+                st.session_state["portfolio_chart_index"] -= 1
+                st.rerun()
+            if pnext and st.session_state["portfolio_chart_index"] < len(portfolio_ordered) - 1:
+                st.session_state["portfolio_chart_index"] += 1
+                st.rerun()
 
     render_disclosure()
 
-
-def render_alerts():
+with tabs[6]:
     st.markdown("### Alerts")
-    st.markdown("#### My alert list")
-    if not st.session_state.get("alert_names", []):
-        st.info("No stocks added to alerts yet.")
-    else:
-        alert_df = combined[combined["Company Name"].isin(st.session_state["alert_names"])].copy().sort_values("final_combined_score", ascending=False)
-        for _, r in alert_df.iterrows():
-            stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank)
-
-    st.divider()
+    if st.session_state.get("manual_alert_names"):
+        st.markdown("#### Added alerts")
+        st.info(", ".join(st.session_state["manual_alert_names"]))
     st.markdown("#### Triggered alert candidates from the latest scan")
     if alert_candidates.empty:
         st.info("No alert candidates found in the latest data.")
@@ -1231,10 +1095,27 @@ def render_alerts():
         st.markdown('<div class="assist-box"><div class="assist-title">2. Run after each scan</div><div class="assist-text">After CSV generation, compare the latest snapshot vs previous snapshot and create alert events only for new changes.</div></div>', unsafe_allow_html=True)
     with a3:
         st.markdown('<div class="assist-box"><div class="assist-title">3. Send neutral notifications</div><div class="assist-text">Use email, Telegram, WhatsApp or push notifications with neutral wording like “entered Stage 2” or “rank improved”.</div></div>', unsafe_allow_html=True)
+
+    st.markdown("#### Suggested MVP alert schema")
+#     st.code(
+# '''alerts_rule
+# - user_id
+# - ticker
+# - rule_type  # entered_stage_2 / daily_breakout / weekly_breakout / rank_improved / turned_weak
+# - threshold  # optional, e.g. 5 ranks
+# - channel    # email / telegram / whatsapp / in_app
+# - is_active
+
+# alerts_event
+# - user_id
+# - ticker
+# - rule_type
+# - triggered_at
+# - message
+# - dedupe_key''', language="text")
     render_disclosure()
 
-
-def render_advanced():
+with tabs[7]:
     def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
         wanted = [c for c in ["Company Name","ticker","label","classification","stage","Industry"] if c in df.columns]
         out = df[wanted].copy() if wanted else df.copy()
@@ -1247,7 +1128,6 @@ def render_advanced():
         else:
             out = out.rename(columns={"label":"Classification"})
         return out
-
     st.markdown("### Advanced")
     with st.expander("Overall ranked", expanded=True):
         st.dataframe(keep_simple(combined), use_container_width=True, hide_index=True, height=360)
@@ -1262,41 +1142,7 @@ def render_advanced():
         st.dataframe(industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}), use_container_width=True, hide_index=True, height=320)
     render_disclosure()
 
-
-def render_disclaimer_page():
+with tabs[8]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, while Stage 2 is the main advancing phase. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
     render_disclosure()
-
-
-ensure_app_state()
-current_market_tone = market_tone(regime, combined)
-st.session_state["_card_counter"] = 0
-
-render_topbar(st.session_state.get("active_page", "Home"))
-st.markdown("<h3 style='margin-bottom:0.2rem;'>Market Structure Radar</h3>", unsafe_allow_html=True)
-view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
-show_pro_quick_read = view_mode == "Pro"
-render_mode_badge(view_mode)
-st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
-render_hero_strip(current_market_tone, stage_counts["Stage 2"], top_industry_text(industry))
-
-selected_page = st.session_state.get("active_page", "Home")
-if selected_page == "Home":
-    render_home(show_pro_quick_read, current_market_tone)
-elif selected_page == "Stocks":
-    render_stocks(show_pro_quick_read)
-elif selected_page == "Movers":
-    render_movers(show_pro_quick_read)
-elif selected_page == "Market":
-    render_market()
-elif selected_page == "How to Use":
-    render_how_to_use(current_market_tone)
-elif selected_page == "Portfolio":
-    render_portfolio(show_pro_quick_read)
-elif selected_page == "Alerts":
-    render_alerts()
-elif selected_page == "Advanced":
-    render_advanced()
-else:
-    render_disclaimer_page()
