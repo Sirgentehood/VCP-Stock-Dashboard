@@ -115,6 +115,13 @@ components.html(
           if (clickStocksTab() || attempts > 30) clearInterval(timer);
         }, 200);
       }
+      window.parent.__msrNavigateSameTab = function(url) {
+        try {
+          window.parent.location.assign(url);
+        } catch (e) {
+          window.location.assign(url);
+        }
+      };
     })();
     </script>
     """,
@@ -473,10 +480,14 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         alert_names = st.session_state.get("alert_names", [])
         watch_text = "⭐ Watchlist" if company not in watch_names else "✓ Watchlist"
         alert_text = "🔔 Alerts" if company not in alert_names else "✓ Alerts"
+        watch_url = _watchlist_url(company)
+        alert_url = _alert_url(company)
         inner_html += (
             "<div class='card-actions'>"
-            f"<a class='card-action-btn card-action-watch' href='{_watchlist_url(company)}'>{watch_text}</a>"
-            f"<a class='card-action-btn card-action-alert' href='{_alert_url(company)}'>{alert_text}</a>"
+            f"<a class='card-action-btn card-action-watch' href='javascript:void(0)' "
+            f"onclick=\"event.stopPropagation(); window.parent.__msrNavigateSameTab('{watch_url}'); return false;\">{watch_text}</a>"
+            f"<a class='card-action-btn card-action-alert' href='javascript:void(0)' "
+            f"onclick=\"event.stopPropagation(); window.parent.__msrNavigateSameTab('{alert_url}'); return false;\">{alert_text}</a>"
             "</div>"
         )
 
@@ -484,7 +495,12 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
 
     if clickable:
         click_url = _click_stock_url(str(row.get("ticker", "")))
-        html = f"<div onclick=\"window.location.href='{click_url}'\">{inner_html}</div>"
+        html = (
+            f"<div role='button' tabindex='0' "
+            f"onclick=\"window.parent.__msrNavigateSameTab('{click_url}')\" "
+            f"onkeydown=\"if(event.key==='Enter' || event.key===' '){{event.preventDefault(); window.parent.__msrNavigateSameTab('{click_url}')}}\">"
+            f"{inner_html}</div>"
+        )
     else:
         html = inner_html
     st.markdown(html, unsafe_allow_html=True)
