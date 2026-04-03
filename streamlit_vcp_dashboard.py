@@ -25,20 +25,20 @@ st.markdown("""
   --stage3-border: rgba(212,160,23,0.28);
   --stage4-border: rgba(170,80,180,0.34);
 }
-.block-container {padding-top: 0.3rem; padding-bottom: 1.5rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1200px;}
+.block-container {padding-top: 0.45rem; padding-bottom: 1.2rem; padding-left: 0.7rem; padding-right: 0.7rem; max-width: 1400px;}
 [data-testid="stSidebar"], section[data-testid="stSidebar"], [data-testid="collapsedControl"] {display:none;}
 .stTabs [data-baseweb="tab"] {font-size: 1.15rem; font-weight: 700;}
 .stTabs [data-baseweb="tab-list"] {gap: 0.55rem; margin-top: 0.1rem;}
 .hero-card, .stock-card, .list-card, .learn-card {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 2px solid var(--card-border);
   border-radius: 16px;
   padding: 0.8rem 0.9rem;
 }
-.hero-card {padding: 0.85rem 1rem; background: rgba(255,255,255,0.03);}
+.hero-card {padding: 0.95rem 1rem; background: rgba(255,255,255,0.03);}
 .kicker {font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);}
 .big-number {font-size: 1.34rem; font-weight: 800; margin-top: 0.08rem; margin-bottom: 0.1rem;}
 .muted {color: var(--muted);}
-.status-pill {display:inline-block; font-size:0.7rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; opacity:0.85;}
+.status-pill {display:inline-block; font-size:0.74rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap;}
 .status-strong {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
 .status-developing {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
 .status-weak {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
@@ -54,84 +54,38 @@ st.markdown("""
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.18; margin-top: 0.06rem; margin-bottom: 0.02rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.04rem; line-height: 1.1;}
-.stock-card {margin-bottom: 0.5rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding-top: 0.72rem; padding-bottom: 0.72rem;}
+.stock-card {margin-bottom: 0.42rem; background: rgba(255,255,255,0.03); padding-top: 0.72rem; padding-bottom: 0.72rem;}
 .stage-card-1 {background: var(--stage1-bg); border-color: var(--stage1-border);}
 .stage-card-2 {background: var(--stage2-bg); border-color: var(--stage2-border);}
 .stage-card-3 {background: var(--stage3-bg); border-color: var(--stage3-border);}
 .stage-card-4 {background: var(--stage4-bg); border-color: var(--stage4-border);}
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
-.rank-text {font-size: 0.78rem; font-weight: 800; color: #8ab4ff; background: rgba(55,95,220,0.15); padding: 0.18rem 0.5rem; border-radius: 6px; margin-top: 0.2rem;}
+.rank-text {font-size: 0.84rem; font-weight: 700; color: var(--muted); margin-top: 0.18rem;}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
 .list-tight {margin: 0.2rem 0 0 1rem; padding: 0;}
 .change-text {font-size: 0.88rem; margin-top: 0.06rem; line-height: 1.18;}
-div[data-testid="stDecoration"], header[data-testid="stHeader"] {display:none !important;}
-.block-container {padding-top: 0.05rem !important;}
-.nav-radio-wrap {position: sticky; top: 0.2rem; z-index: 100; margin-bottom: 0.75rem;}
-.card-link-wrap {display:block; text-decoration:none !important; color:inherit !important;}
-.card-link-wrap:hover {text-decoration:none !important;}
-.stock-card-clickable {cursor:pointer; transition: all 0.15s ease;}
-.stock-card-clickable:hover {transform: translateY(-2px); border-color: rgba(138,180,255,0.5); background: rgba(255,255,255,0.05);}
-.card-actions {margin-top:0.45rem; display:flex; gap:0.4rem; flex-wrap:wrap;}
-.card-action-link {text-decoration:none !important;}
-[data-testid="stRadio"] [role="radiogroup"] {gap: 0.45rem; flex-wrap: wrap;}
-[data-testid="stRadio"] label {background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:0.45rem 0.85rem; border-radius:999px;}
-[data-testid="stRadio"] label:has(input:checked) {background: rgba(55,95,220,0.18); border-color: rgba(138,180,255,0.45);}
-
-.topbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0.6rem 0.8rem;
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  background: rgba(255,255,255,0.02);
-  margin-bottom:0.65rem;
-}
-.nav-left {
-  display:flex;
-  gap:1.2rem;
-  align-items:center;
-  flex-wrap:wrap;
-}
-.brand-mark {font-weight:800; font-size:1rem;}
-.nav-item {
-  font-weight:600;
-  font-size:0.95rem;
-  opacity:0.8;
-}
-.login-btn {
-  padding:0.4rem 0.8rem;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.2);
-  font-weight:700;
-  background: rgba(255,255,255,0.03);
-}
-.hero-strip {
-  display:flex;
-  gap:0.75rem;
-  margin-bottom:0.7rem;
-  flex-wrap:wrap;
-}
-.hero-strip .hero-card {
-  flex:1;
-  min-width:220px;
-}
-.mode-badge {
-  font-size:0.8rem;
-  opacity:0.78;
-  margin-bottom:0.35rem;
-}
+.topbar {position: sticky; top: 0; z-index: 999; background: rgba(14,17,23,0.96); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 0.8rem 0.9rem; margin-bottom: 0.7rem; backdrop-filter: blur(10px);}
+.topbar-title {font-size: 1.08rem; font-weight: 800; line-height: 1.1;}
+.topbar-subtitle {font-size: 0.84rem; color: var(--muted); margin-top: 0.14rem;}
+.mono-pill {display:inline-block; font-size:0.72rem; font-weight:800; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid rgba(255,255,255,0.12); margin-right:0.35rem;}
+.free-pill {background: rgba(255,255,255,0.05);}
+.premium-pill {background: rgba(30,201,119,0.14); color: var(--strong); border-color: rgba(30,201,119,0.3);}
+.upgrade-banner {border: 1px solid rgba(30,201,119,0.28); background: linear-gradient(135deg, rgba(30,201,119,0.12), rgba(55,95,220,0.12)); border-radius: 16px; padding: 0.85rem 0.95rem; margin-bottom: 0.7rem;}
+.upgrade-title {font-size: 1rem; font-weight: 800; margin-bottom: 0.18rem;}
+.upgrade-copy {font-size: 0.9rem; color: var(--muted); line-height: 1.35;}
+.lock-chip {display:inline-block; font-size:0.72rem; font-weight:800; padding:0.18rem 0.48rem; border-radius:999px; background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.3); margin-top: 0.34rem;}
+.cta-row {display:flex; flex-wrap:wrap; gap:0.38rem; margin-top:0.45rem;}
+.cta-btn {display:inline-block; font-size:0.78rem; font-weight:800; padding:0.32rem 0.62rem; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);}
+.cta-primary {background: rgba(30,201,119,0.14); color: var(--strong); border-color: rgba(30,201,119,0.32);}
+.cta-secondary {background: rgba(55,95,220,0.12); color: #9db9ff; border-color: rgba(55,95,220,0.3);}
+.limit-note {font-size: 0.82rem; color: var(--muted); margin-top: 0.22rem;}
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
-  .topbar {padding:0.55rem 0.65rem;}
-  .nav-left {gap:0.8rem;}
-  .hero-strip .hero-card {min-width:100%;}
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -142,7 +96,8 @@ LABELS = {
     "Cautious": {"css": "status-cautious"},
 }
 
-MAX_PORTFOLIO_STOCKS = 25
+FREE_PORTFOLIO_STOCKS = 5
+PREMIUM_PORTFOLIO_STOCKS = 25
 
 @st.cache_data(show_spinner=False)
 def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
@@ -368,43 +323,49 @@ This dashboard is an informational analytics tool. It shows rule-based stage cla
 </div>
 """, unsafe_allow_html=True)
 
+
+def portfolio_limit(is_premium: bool) -> int:
+    return PREMIUM_PORTFOLIO_STOCKS if is_premium else FREE_PORTFOLIO_STOCKS
+
+def teaser_text(text: str, keep_words: int = 12) -> str:
+    words = str(text).split()
+    if len(words) <= keep_words:
+        return str(text)
+    return " ".join(words[:keep_words]) + "..."
+
+def render_topbar(is_premium: bool):
+    plan_label = "Premium Preview" if is_premium else "Free Preview"
+    plan_class = "premium-pill" if is_premium else "free-pill"
+    st.markdown(f"""
+<div class="topbar">
+  <div style="display:flex; justify-content:space-between; gap:0.75rem; align-items:flex-start; flex-wrap:wrap;">
+    <div>
+      <div class="topbar-title">Market Structure Radar</div>
+      <div class="topbar-subtitle">Turn market structure into watchlists, alerts, and repeat engagement.</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.42rem; flex-wrap:wrap;">
+      <span class="mono-pill {plan_class}">{plan_label}</span>
+      <span class="mono-pill free-pill">Login</span>
+      <span class="mono-pill premium-pill">Upgrade Pro</span>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+def render_upgrade_banner(title: str, body: str):
+    st.markdown(f"""
+<div class="upgrade-banner">
+  <div class="upgrade-title">{title}</div>
+  <div class="upgrade-copy">{body}</div>
+</div>
+""", unsafe_allow_html=True)
+
 def render_summary_card(title: str, value: str, subtitle: str):
     st.markdown(f"""
 <div class="hero-card">
   <div class="kicker">{title}</div>
   <div class="big-number">{value}</div>
   <div class="muted">{subtitle}</div>
-</div>
-""", unsafe_allow_html=True)
-
-
-def render_topbar():
-    st.markdown("""
-<div class="topbar">
-  <div class="nav-left">
-    <div class="brand-mark">Radar</div>
-    <div class="nav-item">Dashboard</div>
-    <div class="nav-item">Stocks</div>
-    <div class="nav-item">Movers</div>
-    <div class="nav-item">Market</div>
-    <div class="nav-item">Portfolio</div>
-    <div class="nav-item">Alerts</div>
-  </div>
-  <a class='login-btn' href='?page=Home'>Login</a>
-</div>
-""", unsafe_allow_html=True)
-
-
-def render_mode_badge(view_mode: str):
-    st.markdown(f"""<div class="mode-badge">Mode: <b>{view_mode}</b></div>""", unsafe_allow_html=True)
-
-
-def render_hero_strip(current_market_tone: str, stage2_count: int, top_industry: str):
-    st.markdown(f"""
-<div class="hero-strip">
-  <div class="hero-card"><div class="kicker">Market</div><div class="big-number">{current_market_tone}</div><div class="muted">Use this before reviewing any stock</div></div>
-  <div class="hero-card"><div class="kicker">Stage 2</div><div class="big-number">{stage2_count}</div><div class="muted">Advancing trend names in current scan</div></div>
-  <div class="hero-card"><div class="kicker">Top industry</div><div class="big-number">{top_industry}</div><div class="muted">Industry leadership at a glance</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -472,19 +433,16 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
     return auto_rank(match, preferred_cols)
 
 
-
-
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False, is_premium: bool = True, show_cta: bool = True):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
-    company = str(row.get("Company Name", row.get("ticker", "Stock")))
-    ticker_full = str(row.get("ticker", ""))
-    ticker = ticker_full.replace(".NS", "")
+    company = row.get("Company Name", row.get("ticker", "Stock"))
+    ticker = str(row.get("ticker", "")).replace(".NS", "")
     stage_raw = str(row.get("stage", "Unknown"))
     trend = trend_text(row)
     phase = stage_display(stage_raw)
     explanation = one_line_explanation(row)
-    classes = ["stock-card-clickable"]
+    classes = []
     if use_stage_color:
         stage_cls = _stage_card_class(stage_raw)
         if stage_cls:
@@ -494,16 +452,29 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
-    quick_read_html = f"<div class='change-text'><b>Quick read:</b> {explanation}</div>" if show_quick_read else ""
+    quick_read_html = ""
+    if show_quick_read:
+        if is_premium:
+            quick_read_html = f"<div class='change-text'><b>Why this stock matters today:</b> {explanation}</div>"
+        else:
+            quick_read_html = (
+                f"<div class='change-text'><b>Why this stock matters today:</b> {teaser_text(explanation, keep_words=11)}</div>"
+                f"<div class='lock-chip'>🔒 Unlock full analysis</div>"
+            )
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
-    open_href = f"?page=Stocks&stock={ticker}"
-    watch_href = f"?page=Portfolio&action=watch&stock={ticker}"
-    alert_href = f"?page=Alerts&stock={ticker}"
+    if show_cta:
+        cta_html = (
+            "<div class='cta-row'>"
+            "<span class='cta-btn cta-secondary'>Add to Watchlist</span>"
+            + ("<span class='cta-btn cta-primary'>Premium insights active</span>" if is_premium else "<span class='cta-btn cta-primary'>Upgrade for alerts</span>")
+            + "</div>"
+        )
+    else:
+        cta_html = ""
     html = (
         f"<div class='stock-card {class_attr}'>"
-        f"<a class='card-link-wrap' href='{open_href}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{company} ({ticker})</div>"
@@ -515,11 +486,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"</div>"
         f"<div class='stock-title'>{quick_read_html}</div>"
         f"{extra_change}"
-        f"</a>"
-        f"<div class='card-actions'>"
-        f"<a class='card-action-link action-pill action-watch' href='{watch_href}'>⭐ Watchlist</a>"
-        f"<a class='card-action-link action-pill action-opportunity' href='{alert_href}'>🔔 Alerts</a>"
-        f"</div>"
+        f"{cta_html}"
         f"</div>"
     )
     st.markdown(html, unsafe_allow_html=True)
@@ -660,7 +627,9 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
 alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 
-def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
+current_max_portfolio_stocks = PREMIUM_PORTFOLIO_STOCKS
+
+def dedupe_names(names: list, limit: int = PREMIUM_PORTFOLIO_STOCKS) -> list:
     out = []
     seen = set()
     for name in names:
@@ -743,104 +712,29 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         names = combined.loc[combined["label"] == "Strong", "Company Name"].dropna().tolist()
     elif name in INDUSTRY_PORTFOLIOS:
         names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
-    return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
+    return dedupe_names(names, limit=current_max_portfolio_stocks)
 
+plan_mode = st.radio("Access preview", ["Free", "Premium"], horizontal=True, index=0)
+is_premium = plan_mode == "Premium"
+current_max_portfolio_stocks = portfolio_limit(is_premium)
+render_topbar(is_premium)
 
+top_a, top_b = st.columns([1.45, 1])
+with top_a:
+    view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
+with top_b:
+    st.markdown(f"<div class='limit-note'>Portfolio limit: <b>{current_max_portfolio_stocks}</b> stocks in this preview. Premium unlocks alerts and full analysis.</div>", unsafe_allow_html=True)
 
-def get_query_value(key: str, default: str = "") -> str:
-    try:
-        value = st.query_params.get(key, default)
-    except Exception:
-        return default
-    if isinstance(value, list):
-        return value[0] if value else default
-    return value
-
-
-def ticker_to_company_name(df: pd.DataFrame, stock_value: str):
-    if not stock_value or df.empty or "ticker" not in df.columns:
-        return None
-    work = df[[c for c in ["ticker", "Company Name"] if c in df.columns]].dropna().copy()
-    if work.empty:
-        return None
-    work["ticker_clean"] = work["ticker"].astype(str).str.replace(".NS", "", regex=False).str.strip()
-    match = work.loc[work["ticker_clean"] == str(stock_value).strip()]
-    if match.empty:
-        return None
-    return str(match.iloc[0]["Company Name"]).strip()
-
-
-def ensure_watchlist_state():
-    if "portfolio_names" not in st.session_state:
-        st.session_state["portfolio_names"] = []
-    if "custom_portfolio_names" not in st.session_state:
-        st.session_state["custom_portfolio_names"] = []
-    if "portfolio_chart_index" not in st.session_state:
-        st.session_state["portfolio_chart_index"] = 0
-    if "portfolio_selection" not in st.session_state:
-        st.session_state["portfolio_selection"] = "Watchlist"
-    if "portfolio_selection_prev" not in st.session_state:
-        st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
-
-
-def handle_query_actions(combined_df: pd.DataFrame):
-    ensure_watchlist_state()
-    action = get_query_value("action", "")
-    stock = get_query_value("stock", "")
-    page = get_query_value("page", "Home") or "Home"
-    if action == "watch" and stock:
-        company_name = ticker_to_company_name(combined_df, stock)
-        if company_name:
-            updated = dedupe_names(st.session_state.get("custom_portfolio_names", []) + [company_name], limit=MAX_PORTFOLIO_STOCKS)
-            st.session_state["custom_portfolio_names"] = updated
-            st.session_state["portfolio_names"] = updated.copy()
-            st.session_state["portfolio_selection"] = "Watchlist"
-            st.session_state["portfolio_selection_prev"] = "Watchlist"
-            st.session_state["portfolio_chart_index"] = 0
-            st.session_state["watchlist_message"] = f"Added {company_name} to Watchlist."
-        try:
-            st.query_params.clear()
-            st.query_params.update({"page": page, "stock": stock})
-        except Exception:
-            pass
-
-
-def render_floating_nav(default_page: str) -> str:
-    pages = ["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"]
-    if default_page not in pages:
-        default_page = "Home"
-    st.markdown('<div class="nav-radio-wrap">', unsafe_allow_html=True)
-    selected_page = st.radio("Navigation", pages, horizontal=True, label_visibility="collapsed", index=pages.index(default_page), key="main_nav")
-    st.markdown('</div>', unsafe_allow_html=True)
-    try:
-        current_stock = get_query_value("stock", "")
-        payload = {"page": selected_page}
-        if current_stock:
-            payload["stock"] = current_stock
-        st.query_params.clear()
-        st.query_params.update(payload)
-    except Exception:
-        pass
-    return selected_page
-
-current_market_tone = market_tone(regime, combined)
-handle_query_actions(combined)
-default_page = get_query_value("page", "Home")
-selected_ticker = get_query_value("stock", "")
-
-render_topbar()
-st.markdown("<h3 style='margin-bottom:0.2rem;'>Market Structure Radar</h3>", unsafe_allow_html=True)
-view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
 show_pro_quick_read = view_mode == "Pro"
-render_mode_badge(view_mode)
-st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
-render_hero_strip(current_market_tone, stage_counts["Stage 2"], top_industry_text(industry))
-selected_page = render_floating_nav(default_page)
-if st.session_state.get("watchlist_message"):
-    st.success(st.session_state.pop("watchlist_message"))
+st.caption("Free preview shows teaser insights. Premium preview shows the full quick-read layer. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
+tabs = st.tabs(["Home","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
 
-if selected_page == "Home":
+with tabs[0]:
+    current_market_tone = market_tone(regime, combined)
+    if not is_premium:
+        render_upgrade_banner("Free preview active", "You are showing teaser-level quick reads and basic tracking only. Unlock full stock-level analysis, larger portfolios, and live alerting in Pro.")
     st.markdown("### Today’s Summary")
+    st.markdown("""<div class="upgrade-banner"><div class="upgrade-title">Today’s urgency layer</div><div class="upgrade-copy">Use this strip to highlight fresh Stage 2 entries, rank jumps, or breakout clusters. It gives users a reason to return daily and a reason to pay for faster access.</div></div>""", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
         render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
@@ -849,6 +743,8 @@ if selected_page == "Home":
     with c3:
         render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currenlty")
 
+   
+    # st.divider()
     left, right = st.columns([1.25, 1])
     with left:
         st.markdown("#### Top names that changed")
@@ -857,32 +753,29 @@ if selected_page == "Home":
         else:
             for _, r in top_changed_df.iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
+                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank, is_premium=is_premium)
     with right:
         st.markdown("#### Top stocks today")
         for _, r in top_stocks_today.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
 
     st.divider()
     st.markdown("#### Guided workflow")
     workflow_cols = st.columns(len(guided_workflow_steps(current_market_tone)))
     for col, step_text in zip(workflow_cols, guided_workflow_steps(current_market_tone)):
         with col:
-            st.markdown(f"""<div class='assist-box'><div class='assist-text'>{step_text}</div></div>""", unsafe_allow_html=True)
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{step_text}</div></div>""", unsafe_allow_html=True)
 
     render_disclosure()
 
-elif selected_page == "Stocks":
-    st.markdown("### Stock Analysis")
+with tabs[1]:
+    if not is_premium:
+        render_upgrade_banner("Stock deep dives are partially locked", "The free view can still browse stocks, but the quick-read layer is shortened. Premium is where this page becomes truly sticky for users.")
     ranked = combined.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
     names = ranked["Company Name"].dropna().astype(str).tolist()
     if "selected_stock_index" not in st.session_state:
         st.session_state["selected_stock_index"] = 0
-    if selected_ticker and "ticker" in ranked.columns:
-        match = ranked.index[ranked["ticker"].astype(str).str.replace(".NS", "", regex=False) == selected_ticker].tolist()
-        if match:
-            st.session_state["selected_stock_index"] = int(match[0])
     st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
     current_index = st.session_state["selected_stock_index"]
 
@@ -890,18 +783,13 @@ elif selected_page == "Stocks":
     selected_index = names.index(selected_name)
     if selected_index != current_index:
         st.session_state["selected_stock_index"] = selected_index
-        try:
-            st.query_params.update({"page": "Stocks", "stock": str(ranked.iloc[selected_index]["ticker"]).replace(".NS", "")})
-        except Exception:
-            pass
         st.rerun()
 
     row = ranked.iloc[st.session_state["selected_stock_index"]]
     ticker_short = str(row["ticker"]).replace(".NS", "")
     st.markdown("#### Selected stock")
     stock_rank = get_stock_rank(row["ticker"])
-    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
-    st.divider()
+    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
 
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
@@ -928,28 +816,21 @@ elif selected_page == "Stocks":
         next2 = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key=f"stocks_next_bottom_{st.session_state['selected_stock_index']}")
     if prev2 and st.session_state["selected_stock_index"] > 0:
         st.session_state["selected_stock_index"] -= 1
-        try:
-            st.query_params.update({"page": "Stocks", "stock": str(ranked.iloc[st.session_state['selected_stock_index']]["ticker"]).replace(".NS", "")})
-        except Exception:
-            pass
         st.rerun()
     if next2 and st.session_state["selected_stock_index"] < len(names) - 1:
         st.session_state["selected_stock_index"] += 1
-        try:
-            st.query_params.update({"page": "Stocks", "stock": str(ranked.iloc[st.session_state['selected_stock_index']]["ticker"]).replace(".NS", "")})
-        except Exception:
-            pass
         st.rerun()
 
     st.divider()
     st.markdown("### Browse more stocks")
     for _, r in ranked.head(20).iterrows():
         stock_rank = get_stock_rank(r["ticker"])
-        card(r, use_stage_color=True, stock_rank=stock_rank)
+        card(r, use_stage_color=True, stock_rank=stock_rank, is_premium=is_premium)
     render_disclosure()
 
-elif selected_page == "Movers":
+with tabs[2]:
     st.markdown("### Movers")
+    # st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
     if moves.empty:
         st.info("Price move data not found yet.")
     else:
@@ -964,15 +845,15 @@ elif selected_page == "Movers":
             st.markdown(f"#### Biggest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
         with c2:
             st.markdown(f"#### Major downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
     render_disclosure()
 
-elif selected_page == "Market":
+with tabs[3]:
     st.markdown("### Market")
     c1, c2, c3, c4 = st.columns(4)
     with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
@@ -1012,30 +893,31 @@ elif selected_page == "Market":
                 st.dataframe(renamed, use_container_width=True, hide_index=True, height=520)
     render_disclosure()
 
-elif selected_page == "How to Use":
+with tabs[4]:
+    current_market_tone = market_tone(regime, combined)
     left, right = st.columns([1.05, 0.95])
     with left:
-        st.markdown(f"""<div class='learn-card'>
-  <div class='stock-title'>How to read this dashboard</div>
-  <ul class='list-tight'>
+        st.markdown(f"""<div class="learn-card">
+  <div class="stock-title">How to read this dashboard</div>
+  <ul class="list-tight">
     <li>Start with <b>Market tone</b>. Today it reads <b>{current_market_tone}</b>.</li>
     <li>Then scan <b>Strong</b> Stage 2 names first, and use Stage 1 names mainly as watchlist bases.</li>
     <li>Read the <b>Quick read</b> before opening charts.</li>
     <li>Use daily and weekly charts together. When both agree, the setup is cleaner.</li>
   </ul>
 </div>
-<div class='learn-card'>
-  <div class='stock-title'>How the stage model should be read</div>
-  <ul class='list-tight'>
+<div class="learn-card">
+  <div class="stock-title">How the stage model should be read</div>
+  <ul class="list-tight">
     <li><b>Stage 1</b>: base / repair zone. Not a confirmed uptrend yet.</li>
     <li><b>Stage 2</b>: advancing trend. This is the main leadership phase.</li>
     <li><b>Stage 3</b>: topping or transition. Failed rallies and distribution risk matter more here.</li>
     <li><b>Stage 4</b>: declining trend. Weak structure remains dominant.</li>
   </ul>
 </div>
-<div class='learn-card'>
-  <div class='stock-title'>SEBI-safe language built into the app</div>
-  <ul class='list-tight'>
+<div class="learn-card">
+  <div class="stock-title">SEBI-safe language built into the app</div>
+  <ul class="list-tight">
     <li>The app describes structure, trend, rank and improvement.</li>
     <li>It avoids direct buy, sell, target, stop-loss or allocation advice.</li>
     <li>Use terms like <b>advancing trend</b>, <b>tightening base</b>, <b>transition structure</b>, or <b>weak structure</b>.</li>
@@ -1050,36 +932,51 @@ elif selected_page == "How to Use":
             st.info("Stage image not found.")
     render_disclosure()
 
-elif selected_page == "Portfolio":
-    ensure_watchlist_state()
-    portfolio_options = ["Watchlist", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
+with tabs[5]:
+    if not is_premium:
+        render_upgrade_banner("Portfolio is your best upsell surface", "Keep the free portfolio intentionally tight. Premium can unlock up to 25 tracked stocks, richer summaries, and persistent alerts.")
+    if "portfolio_names" not in st.session_state:
+        st.session_state["portfolio_names"] = []
+    if "custom_portfolio_names" not in st.session_state:
+        st.session_state["custom_portfolio_names"] = []
+    if "portfolio_chart_index" not in st.session_state:
+        st.session_state["portfolio_chart_index"] = 0
+    if "portfolio_selection" not in st.session_state:
+        st.session_state["portfolio_selection"] = "Custom"
+    if "portfolio_selection_prev" not in st.session_state:
+        st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
+
+    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
-    previous_portfolio = st.session_state.get("portfolio_selection_prev", "Watchlist")
+    previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
     if selected_portfolio != previous_portfolio:
-        if previous_portfolio == "Watchlist":
-            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
-        if selected_portfolio == "Watchlist":
-            st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("custom_portfolio_names", []), limit=MAX_PORTFOLIO_STOCKS)
+        if previous_portfolio == "Custom":
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+        if selected_portfolio == "Custom":
+            st.session_state["portfolio_names"] = dedupe_names(st.session_state.get("custom_portfolio_names", []), limit=current_max_portfolio_stocks)
         else:
             st.session_state["portfolio_names"] = get_prebuilt_portfolio(selected_portfolio, combined, changes)
         st.session_state["portfolio_chart_index"] = 0
         st.session_state["portfolio_selection_prev"] = selected_portfolio
 
-    st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
-    if selected_portfolio == "Watchlist":
-        st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+    st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
+    if selected_portfolio == "Custom":
+        st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
 
     names = sorted(company_map.keys())
     available = [n for n in names if n not in st.session_state["portfolio_names"]]
-    portfolio_full = len(st.session_state["portfolio_names"]) >= MAX_PORTFOLIO_STOCKS
+    portfolio_full = len(st.session_state["portfolio_names"]) >= current_max_portfolio_stocks
     selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name", disabled=portfolio_full)
     if portfolio_full:
-        st.warning(f"Watchlist is limited to {MAX_PORTFOLIO_STOCKS} stocks.")
-    if st.button("Add to watchlist", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
-        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=MAX_PORTFOLIO_STOCKS)
-        if selected_portfolio == "Watchlist":
-            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+        if is_premium:
+            st.warning(f"Portfolio is limited to {current_max_portfolio_stocks} stocks.")
+        else:
+            st.warning(f"Free preview is limited to {current_max_portfolio_stocks} stocks. Upgrade Pro to unlock {PREMIUM_PORTFOLIO_STOCKS} tracked names plus alert delivery.")
+    if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
+        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=current_max_portfolio_stocks)
+        if selected_portfolio == "Custom":
+            st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
         if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
             st.session_state["portfolio_chart_index"] = max(0, len(st.session_state["portfolio_names"]) - 1)
         st.rerun()
@@ -1087,7 +984,7 @@ elif selected_page == "Portfolio":
     if not st.session_state["portfolio_names"]:
         st.info("No stocks added yet.")
     else:
-        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(MAX_PORTFOLIO_STOCKS).copy()
+        current = combined[combined["Company Name"].isin(st.session_state["portfolio_names"])].copy().sort_values("final_combined_score", ascending=False).head(current_max_portfolio_stocks).copy()
         p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
@@ -1098,27 +995,23 @@ elif selected_page == "Portfolio":
 
         st.markdown("### Portfolio assistant")
         for msg in portfolio_assistant(current):
-            st.markdown(f"""<div class='assist-box'><div class='assist-text'>{msg}</div></div>""", unsafe_allow_html=True)
+            st.markdown(f"""<div class="assist-box"><div class="assist-text">{msg}</div></div>""", unsafe_allow_html=True)
 
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read, is_premium=is_premium)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
-        if st.button("Remove from watchlist", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
+        if st.button("Remove from portfolio", use_container_width=True, key="portfolio_remove_btn") and selected_remove:
             st.session_state["portfolio_names"] = [x for x in st.session_state["portfolio_names"] if x != selected_remove]
-            if selected_portfolio == "Watchlist":
-                st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
+            if selected_portfolio == "Custom":
+                st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=current_max_portfolio_stocks)
             st.session_state["portfolio_chart_index"] = min(st.session_state["portfolio_chart_index"], max(0, len(st.session_state["portfolio_names"]) - 1))
             st.rerun()
 
         portfolio_ordered = current.sort_values("final_combined_score", ascending=False).reset_index(drop=True)
-        if selected_ticker and "ticker" in portfolio_ordered.columns:
-            match = portfolio_ordered.index[portfolio_ordered["ticker"].astype(str).str.replace(".NS", "", regex=False) == selected_ticker].tolist()
-            if match:
-                st.session_state["portfolio_chart_index"] = int(match[0])
         if not portfolio_ordered.empty:
             st.divider()
             st.markdown("### Portfolio charts")
@@ -1151,40 +1044,28 @@ elif selected_page == "Portfolio":
                 pnext = st.button("Next", use_container_width=True, disabled=(st.session_state["portfolio_chart_index"] >= len(portfolio_ordered) - 1), key="portfolio_next")
             if pprev and st.session_state["portfolio_chart_index"] > 0:
                 st.session_state["portfolio_chart_index"] -= 1
-                try:
-                    st.query_params.update({"page": "Portfolio", "stock": str(portfolio_ordered.iloc[st.session_state['portfolio_chart_index']]["ticker"]).replace(".NS", "")})
-                except Exception:
-                    pass
                 st.rerun()
             if pnext and st.session_state["portfolio_chart_index"] < len(portfolio_ordered) - 1:
                 st.session_state["portfolio_chart_index"] += 1
-                try:
-                    st.query_params.update({"page": "Portfolio", "stock": str(portfolio_ordered.iloc[st.session_state['portfolio_chart_index']]["ticker"]).replace(".NS", "")})
-                except Exception:
-                    pass
                 st.rerun()
 
     render_disclosure()
 
-elif selected_page == "Alerts":
+with tabs[6]:
     st.markdown("### Alerts")
-    if selected_ticker:
-        st.info(f"Focused from card click: {selected_ticker}")
+    if not is_premium:
+        render_upgrade_banner("Free users can see examples, not distribution", "Keep alerts visible as proof of value, but reserve real delivery by email, Telegram, WhatsApp, or push for the paid tier.")
     st.markdown("#### Triggered alert candidates from the latest scan")
     if alert_candidates.empty:
         st.info("No alert candidates found in the latest data.")
     else:
-        alert_view = alert_candidates.copy()
-        if selected_ticker and "ticker" in alert_view.columns:
-            prioritized = alert_view[alert_view["ticker"].astype(str).str.replace(".NS", "", regex=False) == selected_ticker]
-            if not prioritized.empty:
-                alert_view = pd.concat([prioritized, alert_view[alert_view.index.difference(prioritized.index)]], ignore_index=True)
-        for _, r in alert_view.iterrows():
+        for _, r in alert_candidates.iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
+            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank, is_premium=is_premium)
 
     st.divider()
     st.markdown("#### How to add alerts for users")
+    st.markdown(f"<div class='limit-note'>Current preview mode: <b>{'Premium' if is_premium else 'Free'}</b>. Free can showcase alert candidates; Premium should handle saved rules and outbound delivery.</div>", unsafe_allow_html=True)
     a1, a2, a3 = st.columns(3)
     with a1:
         st.markdown('<div class="assist-box"><div class="assist-title">1. Store user rules</div><div class="assist-text">Save watchlists and alert rules in a database: entered Stage 2, breakout, rank improvement, or weak structure.</div></div>', unsafe_allow_html=True)
@@ -1192,9 +1073,27 @@ elif selected_page == "Alerts":
         st.markdown('<div class="assist-box"><div class="assist-title">2. Run after each scan</div><div class="assist-text">After CSV generation, compare the latest snapshot vs previous snapshot and create alert events only for new changes.</div></div>', unsafe_allow_html=True)
     with a3:
         st.markdown('<div class="assist-box"><div class="assist-title">3. Send neutral notifications</div><div class="assist-text">Use email, Telegram, WhatsApp or push notifications with neutral wording like “entered Stage 2” or “rank improved”.</div></div>', unsafe_allow_html=True)
+
+    st.markdown("#### Suggested MVP alert schema")
+#     st.code(
+# '''alerts_rule
+# - user_id
+# - ticker
+# - rule_type  # entered_stage_2 / daily_breakout / weekly_breakout / rank_improved / turned_weak
+# - threshold  # optional, e.g. 5 ranks
+# - channel    # email / telegram / whatsapp / in_app
+# - is_active
+
+# alerts_event
+# - user_id
+# - ticker
+# - rule_type
+# - triggered_at
+# - message
+# - dedupe_key''', language="text")
     render_disclosure()
 
-elif selected_page == "Advanced":
+with tabs[7]:
     def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
         wanted = [c for c in ["Company Name","ticker","label","classification","stage","Industry"] if c in df.columns]
         out = df[wanted].copy() if wanted else df.copy()
@@ -1221,7 +1120,7 @@ elif selected_page == "Advanced":
         st.dataframe(industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}), use_container_width=True, hide_index=True, height=320)
     render_disclosure()
 
-else:
+with tabs[8]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, while Stage 2 is the main advancing phase. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
     render_disclosure()
