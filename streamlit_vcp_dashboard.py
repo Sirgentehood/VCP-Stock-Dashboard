@@ -559,8 +559,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         button_lines.append(f"Quick read: {explanation}")
     if show_change_text:
         button_lines.append(show_change_text)
-    open_label = "
-".join(button_lines)
+    open_label = "\n".join(button_lines)
 
     st.markdown(f"<div class='stock-shell {stage_cls}'>", unsafe_allow_html=True)
     top_left, top_right = st.columns([4.5, 1.4])
