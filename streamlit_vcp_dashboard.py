@@ -971,6 +971,102 @@ if view_mode == "Beginner":
     tab_names = ["Decision Board", "Charts", "Movers", "Portfolio", "How to Use", "Disclaimer"]
 else:
     tab_names = ["Decision Board", "Charts", "Movers", "Market", "Portfolio", "Alerts", "Advanced", "How to Use", "Disclaimer"]
+def render_stock_detail(row):
+    """Render a readable stock detail panel below the selected stock card."""
+    try:
+        stock_name = escape(str(row.get("Company Name", row.get("stock_name", "")) or ""))
+        ticker = escape(str(row.get("ticker", "") or ""))
+        stage = escape(str(row.get("stage", "") or ""))
+        decision = escape(decision_state(row) if "decision_state" in globals() else "")
+        qualifier = escape(stage_condition_text(row) if "stage_condition_text" in globals() else "")
+        try:
+            dscore = int(round(decision_score(row))) if "decision_score" in globals() else None
+        except Exception:
+            dscore = None
+
+        rank_val = None
+        for key in ["current_rank", "rank", "final_rank"]:
+            if key in row and str(row.get(key)).strip() not in ("", "nan", "None"):
+                rank_val = row.get(key)
+                break
+
+        why_parts = []
+        if "rank_change" in row and str(row.get("rank_change")).strip() not in ("", "nan", "None"):
+            try:
+                rc = int(float(row.get("rank_change", 0)))
+                if rc > 0:
+                    why_parts.append(f"Rank improved by {rc}")
+                elif rc < 0:
+                    why_parts.append(f"Rank slipped by {abs(rc)}")
+            except Exception:
+                pass
+        if "industry_rank" in row and str(row.get("industry_rank")).strip() not in ("", "nan", "None"):
+            why_parts.append(f"Industry rank {row.get('industry_rank')}")
+        if stage == "Stage 2":
+            why_parts.append("Uptrend structure remains in focus")
+        elif stage == "Stage 1":
+            why_parts.append("Base is still forming")
+        elif stage == "Stage 3":
+            why_parts.append("Trend is under pressure")
+        elif stage == "Stage 4":
+            why_parts.append("Structure remains weak")
+        why_now = escape(" • ".join(why_parts[:3]) if why_parts else "Review current structure and relative position.")
+
+        improved_parts = []
+        for key, label in [("breakout", "Breakout present"), ("weekly_breakout", "Weekly breakout"), ("daily_breakout", "Daily breakout")]:
+            if key in row:
+                val = str(row.get(key)).lower()
+                if val in ("1", "true", "yes", "y"):
+                    improved_parts.append(label)
+        for key, label in [("rs_3m_pct", "3M RS"), ("rs_6m_pct", "6M RS")]:
+            if key in row:
+                try:
+                    if float(row.get(key, 0)) > 0:
+                        improved_parts.append(f"{label} positive")
+                except Exception:
+                    pass
+        what_improved = escape(" • ".join(improved_parts[:3]) if improved_parts else "No major fresh improvement signal detected.")
+
+        if stage == "Stage 2":
+            monitor = "Watch for rank stability, follow-through, and support holding."
+        elif stage == "Stage 1":
+            monitor = "Watch for tighter structure and stronger confirmation."
+        elif stage == "Stage 3":
+            monitor = "Watch whether strength stabilizes or breakdown risk increases."
+        else:
+            monitor = "Watch for any improvement in structure before prioritizing."
+        monitor = escape(monitor)
+
+        score_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Decision Score: <b>{dscore}</b></div>" if dscore is not None else ""
+        rank_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Rank: <b>{escape(str(rank_val))}</b></div>" if rank_val is not None else ""
+        qualifier_html = f" • {qualifier}" if qualifier else ""
+
+        html = f"""
+        <div style="margin-top:0.7rem;padding:0.9rem;border-radius:16px;background:#0b1220;border:1px solid rgba(148,163,184,0.25);">
+            <div style="font-size:1.05rem;font-weight:700;color:#f8fafc;">{stock_name} ({ticker})</div>
+            <div style="font-size:0.95rem;color:#93c5fd;margin-top:0.2rem;">{decision}</div>
+            <div style="font-size:0.92rem;color:#e2e8f0;margin-top:0.15rem;">{stage}{qualifier_html}</div>
+            {score_html}
+            {rank_html}
+            <div style="margin-top:0.75rem;padding:0.8rem;border-radius:12px;background:#111827;">
+                <div style="font-size:0.84rem;font-weight:700;color:#93c5fd;">Why it matters now</div>
+                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{why_now}</div>
+            </div>
+            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#0f172a;">
+                <div style="font-size:0.84rem;font-weight:700;color:#86efac;">What improved</div>
+                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{what_improved}</div>
+            </div>
+            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#1f2937;">
+                <div style="font-size:0.84rem;font-weight:700;color:#fcd34d;">What to monitor next</div>
+                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{monitor}</div>
+            </div>
+        </div>
+        """
+        st.markdown(html, unsafe_allow_html=True)
+    except Exception as e:
+        st.info(f"Unable to render stock detail: {e}")
+
+
 tabs = st.tabs(tab_names)
 
 # Decision Board
@@ -1068,103 +1164,6 @@ with tabs[1]:
         stock_rank = get_stock_rank(r["ticker"])
         card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
-
-
-
-def render_stock_detail(row):
-    """Render a readable stock detail panel below the selected stock card."""
-    try:
-        stock_name = escape(str(row.get("Company Name", row.get("stock_name", "")) or ""))
-        ticker = escape(str(row.get("ticker", "") or ""))
-        stage = escape(str(row.get("stage", "") or ""))
-        decision = escape(decision_state(row) if "decision_state" in globals() else "")
-        qualifier = escape(stage_condition_text(row) if "stage_condition_text" in globals() else "")
-        try:
-            dscore = int(round(decision_score(row))) if "decision_score" in globals() else None
-        except Exception:
-            dscore = None
-
-        rank_val = None
-        for key in ["current_rank", "rank", "final_rank"]:
-            if key in row and str(row.get(key)).strip() not in ("", "nan", "None"):
-                rank_val = row.get(key)
-                break
-
-        why_parts = []
-        if "rank_change" in row and str(row.get("rank_change")).strip() not in ("", "nan", "None"):
-            try:
-                rc = int(float(row.get("rank_change", 0)))
-                if rc > 0:
-                    why_parts.append(f"Rank improved by {rc}")
-                elif rc < 0:
-                    why_parts.append(f"Rank slipped by {abs(rc)}")
-            except Exception:
-                pass
-        if "industry_rank" in row and str(row.get("industry_rank")).strip() not in ("", "nan", "None"):
-            why_parts.append(f"Industry rank {row.get('industry_rank')}")
-        if stage == "Stage 2":
-            why_parts.append("Uptrend structure remains in focus")
-        elif stage == "Stage 1":
-            why_parts.append("Base is still forming")
-        elif stage == "Stage 3":
-            why_parts.append("Trend is under pressure")
-        elif stage == "Stage 4":
-            why_parts.append("Structure remains weak")
-        why_now = escape(" • ".join(why_parts[:3]) if why_parts else "Review current structure and relative position.")
-
-        improved_parts = []
-        for key, label in [("breakout", "Breakout present"), ("weekly_breakout", "Weekly breakout"), ("daily_breakout", "Daily breakout")]:
-            if key in row:
-                val = str(row.get(key)).lower()
-                if val in ("1", "true", "yes", "y"):
-                    improved_parts.append(label)
-        for key, label in [("rs_3m_pct", "3M RS"), ("rs_6m_pct", "6M RS")]:
-            if key in row:
-                try:
-                    if float(row.get(key, 0)) > 0:
-                        improved_parts.append(f"{label} positive")
-                except Exception:
-                    pass
-        what_improved = escape(" • ".join(improved_parts[:3]) if improved_parts else "No major fresh improvement signal detected.")
-
-        if stage == "Stage 2":
-            monitor = "Watch for rank stability, follow-through, and support holding."
-        elif stage == "Stage 1":
-            monitor = "Watch for tighter structure and stronger confirmation."
-        elif stage == "Stage 3":
-            monitor = "Watch whether strength stabilizes or breakdown risk increases."
-        else:
-            monitor = "Watch for any improvement in structure before prioritizing."
-        monitor = escape(monitor)
-
-        score_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Decision Score: <b>{dscore}</b></div>" if dscore is not None else ""
-        rank_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Rank: <b>{escape(str(rank_val))}</b></div>" if rank_val is not None else ""
-        qualifier_html = f" • {qualifier}" if qualifier else ""
-
-        html = f"""
-        <div style="margin-top:0.7rem;padding:0.9rem;border-radius:16px;background:#0b1220;border:1px solid rgba(148,163,184,0.25);">
-            <div style="font-size:1.05rem;font-weight:700;color:#f8fafc;">{stock_name} ({ticker})</div>
-            <div style="font-size:0.95rem;color:#93c5fd;margin-top:0.2rem;">{decision}</div>
-            <div style="font-size:0.92rem;color:#e2e8f0;margin-top:0.15rem;">{stage}{qualifier_html}</div>
-            {score_html}
-            {rank_html}
-            <div style="margin-top:0.75rem;padding:0.8rem;border-radius:12px;background:#111827;">
-                <div style="font-size:0.84rem;font-weight:700;color:#93c5fd;">Why it matters now</div>
-                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{why_now}</div>
-            </div>
-            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#0f172a;">
-                <div style="font-size:0.84rem;font-weight:700;color:#86efac;">What improved</div>
-                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{what_improved}</div>
-            </div>
-            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#1f2937;">
-                <div style="font-size:0.84rem;font-weight:700;color:#fcd34d;">What to monitor next</div>
-                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{monitor}</div>
-            </div>
-        </div>
-        """
-        st.markdown(html, unsafe_allow_html=True)
-    except Exception as e:
-        st.info(f"Unable to render stock detail: {e}")
 
 
 # Movers
