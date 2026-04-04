@@ -166,6 +166,135 @@ def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+
+def _decision_css(decision: str) -> str:
+    return {
+        "Ready": "decision-ready",
+        "Near Ready": "decision-near-ready",
+        "Needs Confirmation": "decision-needs-confirmation",
+        "Too Early": "decision-too-early",
+        "Avoid": "decision-avoid",
+    }.get(decision, "decision-too-early")
+
+
+def decision_score(row: pd.Series) -> int:
+    stage = str(row.get("stage", ""))
+    label = str(row.get("label", row.get("classification", "Developing")))
+    score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
+    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
+    rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
+
+    value = 0.0
+    value += {"Stage 1": 18, "Stage 2": 42, "Stage 3": 10, "Stage 4": -12}.get(stage, 12)
+    value += {"Strong": 24, "Developing": 14, "Cautious": -6, "Weak": -18}.get(label, 10)
+    if pd.notna(score):
+        value += min(24, max(0, score * 0.28))
+    if pd.notna(rank):
+        value += max(0, 18 - min(rank, 18))
+    if pd.notna(rank_change) and rank_change > 0:
+        value += min(10, rank_change * 1.4)
+    if bool(row.get("entered_stage_2", False)):
+        value += 12
+    if bool(row.get("new_weekly_breakout", False)):
+        value += 10
+    if bool(row.get("new_daily_breakout", False)):
+        value += 8
+    if pd.notna(rs3) and rs3 > 0:
+        value += 4
+    if pd.notna(rs6) and rs6 > 0:
+        value += 4
+    if stage == "Stage 3":
+        value -= 8
+    if stage == "Stage 4":
+        value -= 15
+    return int(max(0, min(100, round(value))))
+
+
+def decision_state(row: pd.Series) -> str:
+    stage = str(row.get("stage", ""))
+    label = str(row.get("label", row.get("classification", "Developing")))
+    score = decision_score(row)
+    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
+    breakout = bool(row.get("new_daily_breakout", False) or row.get("new_weekly_breakout", False))
+
+    if stage == "Stage 4" or label == "Weak":
+        return "Avoid"
+    if stage == "Stage 2" and label == "Strong" and score >= 72 and (pd.isna(rank) or rank <= 20 or breakout):
+        return "Ready"
+    if stage == "Stage 2" and score >= 58:
+        return "Near Ready"
+    if stage == "Stage 1" and score >= 48:
+        return "Needs Confirmation"
+    if stage == "Stage 3" or label == "Cautious":
+        return "Avoid" if score < 32 else "Too Early"
+    return "Too Early"
+
+
+def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> dict:
+    empty = {"all": pd.DataFrame(), "top": pd.DataFrame()}
+    if combined_df.empty:
+        return {
+            "Top Names that Changed": empty,
+            "Ready Now": empty,
+            "Improving Fast": empty,
+            "Watchlist": empty,
+        }
+
+    work = combined_df.copy()
+    top_changed, _ = build_today_changes(changes_df.copy(), pd.DataFrame()) if 'build_today_changes' in globals() else (pd.DataFrame(), {})
+
+    if not changes_df.empty and "ticker" in changes_df.columns:
+        enrich_cols = [c for c in ["ticker", "entered_stage_2", "new_daily_breakout", "new_weekly_breakout", "rank_change", "combined_score_change"] if c in changes_df.columns]
+        if enrich_cols:
+            work = work.merge(changes_df[enrich_cols], on="ticker", how="left", suffixes=("", "_chg"))
+            for src in ["entered_stage_2", "new_daily_breakout", "new_weekly_breakout", "rank_change", "combined_score_change"]:
+                chg = f"{src}_chg"
+                if chg in work.columns:
+                    if src in work.columns:
+                        work[src] = work[src].where(work[src].notna(), work[chg])
+                    else:
+                        work[src] = work[chg]
+
+    work["decision_score"] = work.apply(decision_score, axis=1)
+    work["decision_state"] = work.apply(decision_state, axis=1)
+
+    used = set()
+
+    def unique_top(df: pd.DataFrame, limit: int = 3):
+        nonlocal used
+        if df.empty:
+            return pd.DataFrame()
+        temp = df.copy()
+        temp = temp[~temp["ticker"].astype(str).isin(used)]
+        top = temp.head(limit).copy()
+        if not top.empty:
+            used.update(top["ticker"].astype(str).tolist())
+        return top
+
+    changed_all = top_changed.copy() if not top_changed.empty else pd.DataFrame(columns=work.columns)
+
+    ready_all = work[work["decision_state"] == "Ready"].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).copy()
+
+    rank_change_series = pd.to_numeric(work.get("rank_change"), errors="coerce").fillna(0)
+    improving_mask = rank_change_series.gt(0) | work["decision_state"].isin(["Ready", "Near Ready"])
+    if "new_daily_breakout" in work.columns:
+        improving_mask = improving_mask | work["new_daily_breakout"].fillna(False)
+    if "new_weekly_breakout" in work.columns:
+        improving_mask = improving_mask | work["new_weekly_breakout"].fillna(False)
+    improving_all = work[improving_mask].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).copy()
+
+    watchlist_all = work[work["decision_state"].isin(["Near Ready", "Needs Confirmation", "Too Early"])].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).copy()
+
+    sections = {
+        "Top Names that Changed": {"all": changed_all, "top": unique_top(changed_all, 3)},
+        "Ready Now": {"all": ready_all, "top": unique_top(ready_all, 3)},
+        "Improving Fast": {"all": improving_all, "top": unique_top(improving_all, 3)},
+        "Watchlist": {"all": watchlist_all, "top": unique_top(watchlist_all, 3)},
+    }
+    return sections
+
 def resolve_chart_path(charts_dir: str, ticker: str, suffix: str):
     chart_dir = Path(charts_dir)
     if not chart_dir.exists():
