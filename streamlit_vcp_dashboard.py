@@ -50,7 +50,7 @@ st.markdown("""
 .action-avoid {background: rgba(255,107,107,0.12); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
 .assist-box {border:1px solid var(--card-border); border-radius:16px; padding:0.85rem 0.95rem; background:rgba(255,255,255,0.03); margin-bottom:0.55rem;}
 .assist-title {font-size:1rem; font-weight:800; margin-bottom:0.28rem;}
-.assist-text {font-size:0.92rem; color: var(--muted); line-height:1.35;}
+.assist-text {font-size:0.98rem; color: #f3f6fb; line-height:1.55;}
 .stock-title {font-size: 1.02rem; font-weight: 700; margin-bottom: 0.06rem; line-height: 1.2;}
 .meta-line {font-size: 0.93rem; font-weight: 600; line-height: 1.18; margin-top: 0.06rem; margin-bottom: 0.02rem;}
 .stock-subtitle {font-size: 0.92rem; color: var(--muted); margin-top: 0.04rem; line-height: 1.1;}
@@ -62,16 +62,6 @@ st.markdown("""
 .change-badge-up {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--up);}
 .change-badge-down {font-size: 1.12rem; font-weight: 900; margin-top: 0.1rem; color: var(--down);}
 .rank-text {font-size: 0.84rem; font-weight: 700; color: var(--muted); margin-top: 0.18rem;}
-.decision-pill {display:inline-block; font-size:0.74rem; font-weight:800; padding:0.2rem 0.56rem; border-radius:999px; white-space:nowrap; margin-top:0.28rem;}
-.decision-ready {background: rgba(30,201,119,0.14); color: var(--strong); border:1px solid rgba(30,201,119,0.35);}
-.decision-near-ready {background: rgba(55,95,220,0.14); color:#8ab4ff; border:1px solid rgba(55,95,220,0.35);}
-.decision-needs-confirmation {background: rgba(240,180,41,0.14); color: var(--developing); border:1px solid rgba(240,180,41,0.35);}
-.decision-too-early {background: rgba(160,160,160,0.14); color:#d8d8d8; border:1px solid rgba(160,160,160,0.35);}
-.decision-avoid {background: rgba(255,107,107,0.14); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
-.signal-line {font-size: 0.84rem; margin-top: 0.26rem; color: var(--muted); line-height: 1.18;}
-.detail-box {border:1px solid var(--card-border); border-radius:14px; padding:0.75rem 0.85rem; background:rgba(255,255,255,0.03); margin-top:0.45rem;}
-.detail-grid {display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:0.6rem;}
-.board-section-title {font-size: 1rem; font-weight: 800; margin-bottom: 0.45rem;}
 .disclosure {border-left: 4px solid rgba(240,180,41,0.55); background: rgba(240,180,41,0.08); border-radius: 12px; padding: 0.7rem 0.85rem; font-size: 0.86rem; margin-bottom: 0.7rem; margin-top: 1rem;}
 .simple-list-item {border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0.55rem 0;}
 .simple-list-item:last-child {border-bottom:none;}
@@ -80,6 +70,11 @@ st.markdown("""
 @media (max-width: 768px) {
   .block-container {padding-top: 0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;}
   .stTabs [data-baseweb="tab"] {font-size: 0.93rem;}
+  .detail-grid {grid-template-columns: 1fr; gap:0.65rem;}
+  .stock-title {font-size: 0.96rem;}
+  .meta-line {font-size: 0.88rem; line-height:1.28;}
+  .assist-text, .signal-line, .change-text {font-size: 0.95rem; line-height:1.45;}
+  .detail-box b {display:block; margin-bottom:0.14rem; color:#cfe0ff;}
 }
 </style>
 """, unsafe_allow_html=True)
@@ -170,10 +165,37 @@ def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
         out["label"] = out["classification"]
     return out
 
+
 def resolve_chart_path(charts_dir: str, ticker: str, suffix: str):
-    filename = ticker.replace(".", "_") + suffix
-    path = Path(charts_dir) / filename
-    return path if path.exists() else None
+    chart_dir = Path(charts_dir)
+    if not chart_dir.exists():
+        return None
+    ticker = str(ticker).strip()
+    raw = ticker.replace(".NS", "")
+    candidates = []
+    for candidate in {
+        ticker, raw,
+        ticker.replace(".", "_"), raw.replace(".", "_"),
+        ticker.replace("&", "_"), raw.replace("&", "_"),
+        ticker.replace("&", "AND"), raw.replace("&", "AND"),
+        ticker.replace("&", "and"), raw.replace("&", "and"),
+        re.sub(r"[^A-Za-z0-9]+", "_", ticker),
+        re.sub(r"[^A-Za-z0-9]+", "_", raw),
+        re.sub(r"[^A-Za-z0-9]+", "", ticker),
+        re.sub(r"[^A-Za-z0-9]+", "", raw),
+    }:
+        if candidate:
+            candidates.append(candidate + suffix)
+    for name in candidates:
+        path = chart_dir / name
+        if path.exists():
+            return path
+    raw_key = re.sub(r"[^A-Za-z0-9]+", "", raw).lower()
+    for path in chart_dir.glob(f"*{suffix}"):
+        stem_key = re.sub(r"[^A-Za-z0-9]+", "", path.stem).lower()
+        if raw_key and raw_key in stem_key:
+            return path
+    return None
 
 @st.cache_data(show_spinner=False)
 def load_image_bytes(path: str, mtime_ns: int) -> bytes:
@@ -202,196 +224,53 @@ def trend_text(row: pd.Series) -> str:
         return "Cautious trend"
     return "Developing trend"
 
-
-def _decision_css(decision: str) -> str:
+def stage_primary_label(stage: str) -> str:
     return {
-        "Ready": "decision-ready",
-        "Near Ready": "decision-near-ready",
-        "Needs Confirmation": "decision-needs-confirmation",
-        "Too Early": "decision-too-early",
-        "Avoid": "decision-avoid",
-    }.get(decision, "decision-too-early")
+        "Stage 1": "Preparing",
+        "Stage 2": "Advancing",
+        "Stage 3": "Under Pressure",
+        "Stage 4": "Weakening",
+    }.get(stage, stage or "Unknown")
 
 
-def decision_score(row: pd.Series) -> int:
+def stage_short_description(stage: str) -> str:
+    return {
+        "Stage 1": "Base forming, early structure",
+        "Stage 2": "Uptrend with strength",
+        "Stage 3": "Trend slowing, mixed signals",
+        "Stage 4": "Downtrend, declining structure",
+    }.get(stage, "Mixed structure")
+
+
+def stage_condition_text(row: pd.Series) -> str:
     stage = str(row.get("stage", ""))
     label = str(row.get("label", row.get("classification", "Developing")))
     score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
-    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
     rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
-    rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
-
-    value = 0.0
-    value += {"Stage 1": 18, "Stage 2": 42, "Stage 3": 10, "Stage 4": -12}.get(stage, 12)
-    value += {"Strong": 24, "Developing": 14, "Cautious": -6, "Weak": -18}.get(label, 10)
-    if pd.notna(score):
-        value += min(24, max(0, score * 0.28))
-    if pd.notna(rank):
-        value += max(0, 18 - min(rank, 18))
-    if pd.notna(rank_change) and rank_change > 0:
-        value += min(10, rank_change * 1.4)
-    if bool(row.get("entered_stage_2", False)):
-        value += 12
-    if bool(row.get("new_weekly_breakout", False)):
-        value += 10
-    if bool(row.get("new_daily_breakout", False)):
-        value += 8
-    if pd.notna(rs3) and rs3 > 0:
-        value += 4
-    if pd.notna(rs6) and rs6 > 0:
-        value += 4
+    if stage == "Stage 1":
+        return "Improving" if pd.notna(score) and score >= 65 else "Early"
+    if stage == "Stage 2":
+        if label == "Strong" and pd.notna(rank_change) and rank_change > 0:
+            return "Strong"
+        if label == "Strong":
+            return "Stable"
+        return "Slowing" if pd.notna(rank_change) and rank_change < 0 else "Developing"
     if stage == "Stage 3":
-        value -= 8
+        if label == "Cautious" and pd.notna(score) and score >= 65:
+            return "Resilient"
+        if label == "Weak":
+            return "Breaking"
+        return "Vulnerable"
     if stage == "Stage 4":
-        value -= 15
-    return int(max(0, min(100, round(value))))
+        return "Stabilizing" if pd.notna(rank_change) and rank_change > 0 else "Weak"
+    return "Mixed"
 
 
-def decision_state(row: pd.Series) -> str:
-    stage = str(row.get("stage", ""))
-    label = str(row.get("label", row.get("classification", "Developing")))
-    score = decision_score(row)
-    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    breakout = bool(row.get("new_daily_breakout", False) or row.get("new_weekly_breakout", False))
+def stock_display_label(row: pd.Series) -> str:
+    company = str(row.get("Company Name", row.get("ticker", "Stock"))).strip()
+    ticker = str(row.get("ticker", "")).replace(".NS", "").strip()
+    return f"{company} ({ticker})" if ticker else company
 
-    if stage == "Stage 4" or label == "Weak":
-        return "Avoid"
-    if stage == "Stage 2" and label == "Strong" and score >= 72 and (pd.isna(rank) or rank <= 20 or breakout):
-        return "Ready"
-    if stage == "Stage 2" and score >= 58:
-        return "Near Ready"
-    if stage == "Stage 1" and score >= 48:
-        return "Needs Confirmation"
-    if stage == "Stage 3" or label == "Cautious":
-        return "Avoid" if score < 32 else "Too Early"
-    return "Too Early"
-
-
-def signal_summary(row: pd.Series) -> str:
-    parts = []
-    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    if pd.notna(rank_change):
-        if rank_change > 0:
-            parts.append(f"↑ Improving by {int(rank_change)}")
-        elif rank_change < 0:
-            parts.append(f"↓ Weakening by {abs(int(rank_change))}")
-    if bool(row.get("new_weekly_breakout", False)):
-        parts.append("⚡ Weekly breakout")
-    elif bool(row.get("new_daily_breakout", False)):
-        parts.append("⚡ Daily breakout")
-    stage = str(row.get("stage", ""))
-    if stage == "Stage 1":
-        parts.append("⏳ Base building")
-    elif stage == "Stage 2":
-        parts.append("🧭 Trend intact")
-    elif stage == "Stage 3":
-        parts.append("⚠ Transition risk")
-    elif stage == "Stage 4":
-        parts.append("⚠ Weak structure")
-    if pd.notna(rank) and rank <= 10:
-        parts.append(f"🏁 Top rank #{int(rank)}")
-    industry = str(row.get("Industry", "")).strip()
-    if industry:
-        parts.append(f"🏭 {industry}")
-    return " | ".join(parts[:3]) if parts else "Mixed signals | Monitor structure"
-
-
-def detail_lines(row: pd.Series) -> tuple[str, str, str, str]:
-    stage = str(row.get("stage", ""))
-    label = str(row.get("label", row.get("classification", "Developing")))
-    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    industry = str(row.get("Industry", "its industry")).strip() or "its industry"
-
-    why_now = one_line_explanation(row)
-    if bool(row.get("new_weekly_breakout", False)):
-        improved = "Weekly breakout appeared in the latest scan."
-    elif bool(row.get("new_daily_breakout", False)):
-        improved = "Daily breakout appeared in the latest scan."
-    elif pd.notna(rank_change) and rank_change > 0:
-        improved = f"Relative rank improved by {int(rank_change)} places."
-    else:
-        improved = "No major fresh trigger; the existing structure remains the main signal."
-
-    if stage == "Stage 1":
-        missing = "Still needs a cleaner Stage 2 transition or stronger confirmation."
-    elif stage == "Stage 2" and label != "Strong":
-        missing = "Trend is positive, but it still trails the strongest Stage 2 leaders."
-    elif stage == "Stage 3":
-        missing = "Transition risk remains elevated, so leadership quality is weaker here."
-    elif stage == "Stage 4":
-        missing = "Structure remains weak; recovery evidence is still missing."
-    elif pd.notna(rank) and rank > 20:
-        missing = "Rank still needs improvement versus stronger peers."
-    else:
-        missing = "Nothing major is missing, but continued rank stability still matters."
-
-    next_step = f"Monitor rank stability, stage behavior, and how it performs versus {industry}."
-    return why_now, improved, missing, next_step
-
-
-def render_stock_detail(row: pd.Series):
-    why_now, improved, missing, next_step = detail_lines(row)
-    st.markdown(
-        f"""
-<div class="detail-box">
-  <div class="detail-grid">
-    <div><b>Why it matters now</b><br>{why_now}</div>
-    <div><b>What improved</b><br>{improved}</div>
-    <div><b>What is missing</b><br>{missing}</div>
-    <div><b>What to monitor next</b><br>{next_step}</div>
-  </div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-def portfolio_health_summary(current: pd.DataFrame) -> tuple[str, str]:
-    if current.empty:
-        return "No holdings yet", "Add stocks to review portfolio structure."
-    states = current.apply(decision_state, axis=1)
-    total = len(current)
-    ready = int((states == "Ready").sum())
-    avoid = int((states == "Avoid").sum())
-    near = int((states == "Near Ready").sum())
-    if ready >= max(3, math.ceil(total * 0.35)) and avoid <= max(1, math.ceil(total * 0.2)):
-        return "Strong", f"{ready}/{total} holdings are Ready and only {avoid} are in Avoid."
-    if avoid >= max(2, math.ceil(total * 0.3)):
-        return "Needs review", f"{avoid}/{total} holdings are in Avoid and only {ready} are Ready."
-    return "Mixed", f"{ready} Ready, {near} Near Ready and {avoid} Avoid names inside {total} holdings."
-
-
-def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> dict:
-    if combined_df.empty:
-        return {"Ready Now": pd.DataFrame(), "Improving Fast": pd.DataFrame(), "Watchlist": pd.DataFrame(), "Weakening": pd.DataFrame()}
-    work = combined_df.copy()
-    if not changes_df.empty and "ticker" in changes_df.columns:
-        enrich_cols = [c for c in ["ticker", "entered_stage_2", "new_daily_breakout", "new_weekly_breakout", "rank_change"] if c in changes_df.columns]
-        if enrich_cols:
-            work = work.merge(changes_df[enrich_cols], on="ticker", how="left", suffixes=("", "_chg"))
-            for src in ["entered_stage_2", "new_daily_breakout", "new_weekly_breakout", "rank_change"]:
-                chg = f"{src}_chg"
-                if chg in work.columns:
-                    if src in work.columns:
-                        work[src] = work[src].where(work[src].notna(), work[chg])
-                    else:
-                        work[src] = work[chg]
-    work["decision_score"] = work.apply(decision_score, axis=1)
-    work["decision_state"] = work.apply(decision_state, axis=1)
-    rank_change_series = pd.to_numeric(work.get("rank_change"), errors="coerce").fillna(0)
-    ready = work[work["decision_state"] == "Ready"].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).head(8)
-    improving_mask = rank_change_series.gt(0)
-    if "new_daily_breakout" in work.columns:
-        improving_mask = improving_mask | work["new_daily_breakout"].fillna(False)
-    if "new_weekly_breakout" in work.columns:
-        improving_mask = improving_mask | work["new_weekly_breakout"].fillna(False)
-    improving = work[improving_mask].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).head(8)
-    watchlist = work[work["decision_state"].isin(["Near Ready", "Needs Confirmation"])].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).head(8)
-    weakening = work[work["decision_state"].isin(["Avoid", "Too Early"])].sort_values(["decision_score", "final_combined_score"], ascending=[True, False]).head(8)
-    return {"Ready Now": ready, "Improving Fast": improving, "Watchlist": watchlist, "Weakening": weakening}
 
 def one_line_explanation(row: pd.Series) -> str:
     label = str(row.get("label", row.get("classification", "Developing")))
@@ -492,6 +371,7 @@ def top_industry_text(industry_df: pd.DataFrame, n: int = 3) -> str:
         return "Not available"
     return ", ".join(industry_df.head(n)["Industry"].astype(str).tolist())
 
+
 def company_choices(df: pd.DataFrame):
     if df.empty:
         return {}
@@ -500,6 +380,17 @@ def company_choices(df: pd.DataFrame):
     tmp = tmp.sort_values(["final_combined_score", "Company Name"], ascending=[False, True])
     tmp = tmp.drop_duplicates(subset=["Company Name"], keep="first")
     return dict(zip(tmp["Company Name"], tmp["ticker"]))
+
+
+def chart_dropdown_options(df: pd.DataFrame):
+    if df.empty:
+        return {}
+    tmp = df.dropna(subset=["Company Name", "ticker"]).copy()
+    tmp["display_label"] = tmp.apply(stock_display_label, axis=1)
+    tmp = tmp.sort_values(["final_combined_score", "display_label"], ascending=[False, True])
+    tmp = tmp.drop_duplicates(subset=["ticker"], keep="first")
+    return dict(zip(tmp["display_label"], tmp["ticker"]))
+
 
 def render_disclosure():
     st.markdown("""
@@ -581,15 +472,15 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
     return auto_rank(match, preferred_cols)
 
 
+
 def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
-    company = row.get("Company Name", row.get("ticker", "Stock"))
-    ticker = str(row.get("ticker", "")).replace(".NS", "")
     stage_raw = str(row.get("stage", "Unknown"))
-    trend = trend_text(row)
-    phase = stage_display(stage_raw)
-    explanation = one_line_explanation(row)
+    stage_label = stage_primary_label(stage_raw)
+    stage_desc = stage_short_description(stage_raw)
+    stage_condition = stage_condition_text(row)
+    display_name = stock_display_label(row)
     decision = decision_state(row)
     dscore = decision_score(row)
     signals = signal_summary(row)
@@ -603,17 +494,17 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
         change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
-    quick_read_html = f"<div class='change-text'><b>Quick read:</b> {explanation}</div>" if show_quick_read else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     decision_html = f"<div class='decision-pill {_decision_css(decision)}'>Decision: {decision} · Score {dscore}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
-        f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;'>"
+        f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.55rem;'>"
         f"<div style='min-width:0;'>"
-        f"<div class='stock-title'>{company} ({ticker})</div>"
-        f"<div class='meta-line'>{stage_raw} * {trend} * {phase}</div>"
+        f"<div class='stock-title'>{display_name}</div>"
+        f"<div class='meta-line'>{stage_raw} • {stage_label} • {stage_condition}</div>"
+        f"<div class='stock-subtitle'>{stage_desc}</div>"
         f"{decision_html}"
         f"<div class='signal-line'>{signals}</div>"
         f"</div>"
@@ -621,7 +512,6 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"{status_html}{rank_html}{change_html}"
         f"</div>"
         f"</div>"
-        f"{quick_read_html}"
         f"{extra_change}"
         f"</div>"
     )
@@ -714,9 +604,10 @@ if combined.empty:
 daily_dir = f"{outdir}/charts/daily"
 weekly_dir = f"{outdir}/charts/weekly"
 company_map = company_choices(combined)
+chart_choice_map = chart_dropdown_options(combined)
 top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
 changed_tickers = set(top_changed_df["ticker"].dropna().tolist()) if not top_changed_df.empty and "ticker" in top_changed_df.columns else set()
-top_stocks_today = combined[~combined["ticker"].isin(changed_tickers)].sort_values("final_combined_score", ascending=False).head(5).copy()
+board_sections = build_decision_board_sections(combined, changes)
 def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> pd.DataFrame:
     if combined_df.empty:
         return pd.DataFrame()
@@ -818,8 +709,10 @@ def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.Da
 
 INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=21)
 
+
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame) -> list:
-    ranked = combined.sort_values("final_combined_score", ascending=False)
+    ranked = combined.sort_values("final_combined_score", ascending=False).copy()
+    ranked["decision_state"] = ranked.apply(decision_state, axis=1)
     names = []
     if name == "Top 15":
         names = ranked.head(15)["Company Name"].dropna().tolist()
@@ -836,6 +729,19 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         if "label" not in tmp.columns:
             tmp["label"] = tmp.apply(classify_stock, axis=1)
         names = tmp.loc[tmp["label"] == "Strong", "Company Name"].dropna().tolist()
+    elif name == "Ready Now":
+        names = ranked.loc[ranked["decision_state"] == "Ready", "Company Name"].dropna().tolist()
+    elif name == "Improving Fast":
+        improving_mask = pd.to_numeric(ranked.get("rank_change"), errors="coerce").fillna(0).gt(0)
+        if "new_daily_breakout" in ranked.columns:
+            improving_mask = improving_mask | ranked["new_daily_breakout"].fillna(False)
+        if "new_weekly_breakout" in ranked.columns:
+            improving_mask = improving_mask | ranked["new_weekly_breakout"].fillna(False)
+        names = ranked.loc[improving_mask, "Company Name"].dropna().tolist()
+    elif name == "Watchlist":
+        names = ranked.loc[ranked["decision_state"].isin(["Near Ready", "Needs Confirmation", "Too Early"]), "Company Name"].dropna().tolist()
+    elif name == "Avoid":
+        names = ranked.loc[ranked["decision_state"] == "Avoid", "Company Name"].dropna().tolist()
     elif name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
         names = combined.loc[combined["stage"] == name, "Company Name"].dropna().tolist()
     elif name == "Cautious":
@@ -848,127 +754,83 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
 
+
 st.title("Market Structure Radar")
 view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
-show_pro_quick_read = view_mode == "Pro"
-st.caption("Pro mode adds a quick-read summary on stock cards. Stage 1 is treated as a base/watchlist phase, while Stage 2 is treated as the main leadership phase.")
-tabs = st.tabs(["Home","Decision Board","Stocks","Movers","Market","How to Use","Portfolio","Alerts","Advanced","Disclaimer"])
+show_pro_quick_read = False
+if view_mode == "Beginner":
+    tab_names = ["Decision Board", "Charts", "Movers", "Portfolio", "How to Use", "Disclaimer"]
+else:
+    tab_names = ["Decision Board", "Charts", "Movers", "Market", "Portfolio", "Alerts", "Advanced", "How to Use", "Disclaimer"]
+tabs = st.tabs(tab_names)
 
+# Decision Board
 with tabs[0]:
     current_market_tone = market_tone(regime, combined)
-    st.markdown("### Today’s Summary")
+    st.markdown("### Decision Board")
     c1, c2, c3 = st.columns(3)
     with c1:
         render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
     with c2:
         render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stage 2 leaders improving materially")
     with c3:
-        render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currenlty")
-
-   
-    # st.divider()
-    left, right = st.columns([1.25, 1])
-    with left:
-        st.markdown("#### Top names that changed")
-        if top_changed_df.empty:
-            st.info("No major stock changes found in the latest run.")
+        render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currently")
+    for title in ["Top Names that Changed", "Ready Now", "Improving Fast", "Watchlist"]:
+        section = board_sections.get(title, {"all": pd.DataFrame(), "top": pd.DataFrame()})
+        total_ct = len(section["all"])
+        st.markdown(f"#### {title} (Top 3 out of {total_ct})")
+        if total_ct == 0:
+            st.info(f"No stocks in {title.lower()} right now.")
         else:
-            for _, r in top_changed_df.iterrows():
-                stock_rank = get_stock_rank(r["ticker"])
-                card(r, use_stage_color=True, show_change_text=f"What changed: {r['what_changed']}", stock_rank=stock_rank)
-    with right:
-        st.markdown("#### Top stocks today")
-        for _, r in top_stocks_today.iterrows():
-            stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
-
+            cols = st.columns(3)
+            for col, (_, r) in zip(cols, section["top"].iterrows()):
+                with col:
+                    stock_rank = get_stock_rank(r["ticker"])
+                    extra = ""
+                    if title == "Top Names that Changed":
+                        what_changed = str(r.get("what_changed", "")).strip()
+                        if what_changed:
+                            extra = f"What changed: {what_changed}"
+                    card(r, use_stage_color=True, show_change_text=extra, stock_rank=stock_rank)
     st.divider()
     st.markdown("#### Guided workflow")
     workflow_cols = st.columns(len(guided_workflow_steps(current_market_tone)))
     for col, step_text in zip(workflow_cols, guided_workflow_steps(current_market_tone)):
         with col:
-            st.markdown(f"""<div class="assist-box"><div class="assist-text">{step_text}</div></div>""", unsafe_allow_html=True)
-
+            st.markdown(f'''<div class="assist-box"><div class="assist-text">{step_text}</div></div>''', unsafe_allow_html=True)
     render_disclosure()
 
+# Charts
 with tabs[1]:
-    st.markdown("### Decision Board")
-    board_sections = build_decision_board_sections(combined, changes)
-    bh1, bh2 = st.columns([1.2, 1])
-    with bh1:
-        st.markdown("#### What deserves attention now")
-        for title, df_section in board_sections.items():
-            st.markdown(f'<div class="board-section-title">{title}</div>', unsafe_allow_html=True)
-            if df_section.empty:
-                st.info(f"No stocks in {title.lower()} right now.")
-            else:
-                for _, r in df_section.iterrows():
-                    stock_rank = get_stock_rank(r["ticker"])
-                    card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
-    with bh2:
-        st.markdown("#### Daily decision summary")
-        all_states = combined.apply(decision_state, axis=1)
-        ready_ct = int((all_states == "Ready").sum())
-        near_ct = int((all_states == "Near Ready").sum())
-        avoid_ct = int((all_states == "Avoid").sum())
-        render_summary_card("Ready now", str(ready_ct), "Highest-priority names in the latest scan")
-        render_summary_card("Near ready", str(near_ct), "Positive structures that still need confirmation")
-        render_summary_card("Avoid", str(avoid_ct), "Weak or deteriorating structures")
-        st.markdown("### How to use this board")
-        st.markdown('<div class="assist-box"><div class="assist-text">Use this tab first. It compresses the full scan into four buckets: ready now, improving fast, watchlist, and weakening.</div></div>', unsafe_allow_html=True)
-        health_title, health_text = portfolio_health_summary(combined.head(20))
-        st.markdown(f'<div class="assist-box"><div class="assist-title">Market basket: {health_title}</div><div class="assist-text">{health_text}</div></div>', unsafe_allow_html=True)
-    render_disclosure()
-
-with tabs[2]:
     ranked = combined.sort_values("final_combined_score", ascending=False).reset_index(drop=True).copy()
-    ranked["decision_state"] = ranked.apply(decision_state, axis=1)
-    ranked["decision_score"] = ranked.apply(decision_score, axis=1)
-    f1, f2 = st.columns(2)
-    with f1:
-        decision_filter = st.selectbox("Decision filter", ["All", "Ready", "Near Ready", "Needs Confirmation", "Too Early", "Avoid"], index=0)
-    with f2:
-        stage_filter = st.selectbox("Stage filter", ["All", "Stage 1", "Stage 2", "Stage 3", "Stage 4"], index=0)
-    filtered_ranked = ranked.copy()
-    if decision_filter != "All":
-        filtered_ranked = filtered_ranked[filtered_ranked["decision_state"] == decision_filter]
-    if stage_filter != "All":
-        filtered_ranked = filtered_ranked[filtered_ranked["stage"] == stage_filter]
-    if filtered_ranked.empty:
-        st.info("No stocks match the current filters. Showing the full ranked list instead.")
-        filtered_ranked = ranked.copy()
-    names = filtered_ranked["Company Name"].dropna().astype(str).tolist()
+    ticker_list = ranked["ticker"].dropna().astype(str).tolist()
     if "selected_stock_index" not in st.session_state:
         st.session_state["selected_stock_index"] = 0
-    st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(names)-1))
-    current_index = st.session_state["selected_stock_index"]
+    st.session_state["selected_stock_index"] = max(0, min(st.session_state["selected_stock_index"], len(ticker_list) - 1))
+    current_ticker = ticker_list[st.session_state["selected_stock_index"]] if ticker_list else None
+    selected_display = st.selectbox("Select stock", options=[None] + list(chart_choice_map.keys()), index=0, placeholder="Type stock name or ticker")
+    if selected_display:
+        selected_ticker = chart_choice_map[selected_display]
+        selected_index = ticker_list.index(selected_ticker)
+        if selected_index != st.session_state["selected_stock_index"]:
+            st.session_state["selected_stock_index"] = selected_index
+            st.rerun()
 
-    selected_name = st.selectbox("Select stock", names, index=current_index, key=f"stocks_select_name_ordered_{current_index}")
-    selected_index = names.index(selected_name)
-    if selected_index != current_index:
-        st.session_state["selected_stock_index"] = selected_index
-        st.rerun()
-
-    row = filtered_ranked.iloc[st.session_state["selected_stock_index"]]
+    row = ranked.iloc[st.session_state["selected_stock_index"]]
     ticker_short = str(row["ticker"]).replace(".NS", "")
-    st.markdown("#### Selected stock")
-    stock_rank = get_stock_rank(row["ticker"])
-    card(row, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
-    render_stock_detail(row)
-
     dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
     wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
     a, b = st.columns(2)
     with a:
         daily_rank = get_display_stock_rank(row["ticker"])
-        st.markdown(f"#### {ticker_short} * {row.get('stage', '')} * Daily Rank {daily_rank}")
+        st.markdown(f"#### Daily * {ticker_short} * {row.get('stage', '')} * Daily Rank {daily_rank}")
         if dpath:
             st.image(safe_image_bytes(dpath), use_container_width=True)
         else:
             st.info("Daily chart not available.")
     with b:
         weekly_rank = get_display_stock_rank(row["ticker"])
-        st.markdown(f"#### {ticker_short} * {row.get('stage', '')} * Weekly Rank {weekly_rank}")
+        st.markdown(f"#### Weekly * {ticker_short} * {row.get('stage', '')} * Weekly Rank {weekly_rank}")
         if wpath:
             st.image(safe_image_bytes(wpath), use_container_width=True)
         else:
@@ -976,26 +838,31 @@ with tabs[2]:
 
     nav1, nav2 = st.columns(2)
     with nav1:
-        prev2 = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key=f"stocks_prev_bottom_{st.session_state['selected_stock_index']}")
+        prev2 = st.button("Previous", use_container_width=True, disabled=(st.session_state["selected_stock_index"] == 0), key=f"charts_prev_{st.session_state['selected_stock_index']}")
     with nav2:
-        next2 = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(names) - 1), key=f"stocks_next_bottom_{st.session_state['selected_stock_index']}")
+        next2 = st.button("Next", use_container_width=True, disabled=(st.session_state["selected_stock_index"] >= len(ticker_list) - 1), key=f"charts_next_{st.session_state['selected_stock_index']}")
     if prev2 and st.session_state["selected_stock_index"] > 0:
         st.session_state["selected_stock_index"] -= 1
         st.rerun()
-    if next2 and st.session_state["selected_stock_index"] < len(names) - 1:
+    if next2 and st.session_state["selected_stock_index"] < len(ticker_list) - 1:
         st.session_state["selected_stock_index"] += 1
         st.rerun()
 
+    st.markdown("#### Selected stock")
+    stock_rank = get_stock_rank(row["ticker"])
+    card(row, use_stage_color=True, stock_rank=stock_rank)
+    render_stock_detail(row)
+
     st.divider()
     st.markdown("### Browse more stocks")
-    for _, r in filtered_ranked.head(20).iterrows():
+    for _, r in ranked.head(20).iterrows():
         stock_rank = get_stock_rank(r["ticker"])
         card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
-with tabs[3]:
+# Movers
+with tabs[2]:
     st.markdown("### Movers")
-    # st.caption("Rename pivot to Reference line in your chart generator and anchor it near a recent close level where possible.")
     if moves.empty:
         st.info("Price move data not found yet.")
     else:
@@ -1010,94 +877,59 @@ with tabs[3]:
             st.markdown(f"#### Biggest upward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[False, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
         with c2:
             st.markdown(f"#### Major downward moves • {selected}")
             for _, r in mv.sort_values([col, "final_combined_score"], ascending=[True, False]).head(10).iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
-with tabs[4]:
-    st.markdown("### Market")
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
-    with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Advancing trend")
-    with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Topping / transition")
-    with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Declining trend")
+# Market only in Pro
+if view_mode == "Pro":
+    with tabs[3]:
+        st.markdown("### Market")
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
+        with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Advancing trend")
+        with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Under pressure")
+        with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Weakening trend")
 
-    if industry.empty:
-        st.info("Industry data not available.")
-    else:
-        view = industry.copy()
-        stage2 = stage2_count_by_industry(combined)
-        if "Industry" in view.columns:
-            view = view.merge(stage2, on="Industry", how="left")
-        sort_col = None
-        for candidate in ["avg_combined_score","current_rank","rs_rank"]:
-            if candidate in view.columns:
-                sort_col = candidate
-                break
-        if sort_col is not None:
-            view[sort_col] = pd.to_numeric(view[sort_col], errors="coerce")
-            view = view.sort_values(sort_col, ascending=(sort_col!="avg_combined_score"), na_position="last").reset_index(drop=True)
-            view["Rank"] = range(1, len(view)+1)
-        if "Stage 2 Stocks" in view.columns:
-            view["Stage 2 Stocks"] = view["Stage 2 Stocks"].fillna(0).astype(int)
-        left, right = st.columns(2)
-        with left:
-            st.markdown("#### Industry strength")
-            st.dataframe(view[[c for c in ["Industry","Rank","Stage 2 Stocks"] if c in view.columns]], use_container_width=True, hide_index=True, height=520)
-        with right:
-            st.markdown("#### Industry changes")
-            if industry_changes.empty:
-                st.info("Industry changes data not available.")
-            else:
-                cols = [c for c in ["Industry","current_rank","prev_rank","rank_change"] if c in industry_changes.columns]
-                renamed = industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"})
-                st.dataframe(renamed, use_container_width=True, hide_index=True, height=520)
-    render_disclosure()
-
-with tabs[5]:
-    current_market_tone = market_tone(regime, combined)
-    left, right = st.columns([1.05, 0.95])
-    with left:
-        st.markdown(f"""<div class="learn-card">
-  <div class="stock-title">How to read this dashboard</div>
-  <ul class="list-tight">
-    <li>Start with <b>Market tone</b>. Today it reads <b>{current_market_tone}</b>.</li>
-    <li>Then scan <b>Strong</b> Stage 2 names first, and use Stage 1 names mainly as watchlist bases.</li>
-    <li>Read the <b>Quick read</b> before opening charts.</li>
-    <li>Use daily and weekly charts together. When both agree, the setup is cleaner.</li>
-  </ul>
-</div>
-<div class="learn-card">
-  <div class="stock-title">How the stage model should be read</div>
-  <ul class="list-tight">
-    <li><b>Stage 1</b>: base / repair zone. Not a confirmed uptrend yet.</li>
-    <li><b>Stage 2</b>: advancing trend. This is the main leadership phase.</li>
-    <li><b>Stage 3</b>: topping or transition. Failed rallies and distribution risk matter more here.</li>
-    <li><b>Stage 4</b>: declining trend. Weak structure remains dominant.</li>
-  </ul>
-</div>
-<div class="learn-card">
-  <div class="stock-title">SEBI-safe language built into the app</div>
-  <ul class="list-tight">
-    <li>The app describes structure, trend, rank and improvement.</li>
-    <li>It avoids direct buy, sell, target, stop-loss or allocation advice.</li>
-    <li>Use terms like <b>advancing trend</b>, <b>tightening base</b>, <b>transition structure</b>, or <b>weak structure</b>.</li>
-  </ul>
-</div>
-""", unsafe_allow_html=True)
-    with right:
-        img = Path(help_image_path)
-        if img.exists():
-            st.image(str(img), caption="Reference image for the four market phases", use_container_width=True)
+        if industry.empty:
+            st.info("Industry data not available.")
         else:
-            st.info("Stage image not found.")
-    render_disclosure()
+            view = industry.copy()
+            stage2 = stage2_count_by_industry(combined)
+            if "Industry" in view.columns:
+                view = view.merge(stage2, on="Industry", how="left")
+            sort_col = None
+            for candidate in ["avg_combined_score","current_rank","rs_rank"]:
+                if candidate in view.columns:
+                    sort_col = candidate
+                    break
+            if sort_col is not None:
+                view[sort_col] = pd.to_numeric(view[sort_col], errors="coerce")
+                view = view.sort_values(sort_col, ascending=(sort_col!="avg_combined_score"), na_position="last").reset_index(drop=True)
+                view["Rank"] = range(1, len(view)+1)
+            if "Stage 2 Stocks" in view.columns:
+                view["Stage 2 Stocks"] = view["Stage 2 Stocks"].fillna(0).astype(int)
+            left, right = st.columns(2)
+            with left:
+                st.markdown("#### Industry strength")
+                st.dataframe(view[[c for c in ["Industry","Rank","Stage 2 Stocks"] if c in view.columns]], use_container_width=True, hide_index=True, height=520)
+            with right:
+                st.markdown("#### Industry changes")
+                if industry_changes.empty:
+                    st.info("Industry changes data not available.")
+                else:
+                    cols = [c for c in ["Industry","current_rank","prev_rank","rank_change"] if c in industry_changes.columns]
+                    renamed = industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"})
+                    st.dataframe(renamed, use_container_width=True, hide_index=True, height=520)
+        render_disclosure()
 
-with tabs[6]:
+# Portfolio
+portfolio_tab_index = 3 if view_mode == "Beginner" else 4
+with tabs[portfolio_tab_index]:
     if "portfolio_names" not in st.session_state:
         st.session_state["portfolio_names"] = []
     if "custom_portfolio_names" not in st.session_state:
@@ -1109,7 +941,7 @@ with tabs[6]:
     if "portfolio_selection_prev" not in st.session_state:
         st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
 
-    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
+    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Ready Now", "Improving Fast", "Watchlist", "Avoid", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
     previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
@@ -1127,14 +959,14 @@ with tabs[6]:
     if selected_portfolio == "Custom":
         st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
 
-    names = sorted(company_map.keys())
-    available = [n for n in names if n not in st.session_state["portfolio_names"]]
+    available = [label for label in chart_choice_map.keys() if label.split(" (")[0] not in st.session_state["portfolio_names"]]
     portfolio_full = len(st.session_state["portfolio_names"]) >= MAX_PORTFOLIO_STOCKS
-    selected_to_add = st.selectbox("Add stock", [""] + available, key="portfolio_add_name", disabled=portfolio_full)
+    selected_to_add = st.selectbox("Add stock", options=[None] + list(chart_choice_map.keys()), index=0, placeholder="Type stock name or ticker", key="portfolio_add_name", disabled=portfolio_full)
     if portfolio_full:
         st.warning(f"Portfolio is limited to {MAX_PORTFOLIO_STOCKS} stocks.")
     if st.button("Add to portfolio", use_container_width=True, key="portfolio_add_btn", disabled=portfolio_full) and selected_to_add:
-        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_to_add], limit=MAX_PORTFOLIO_STOCKS)
+        selected_name = selected_to_add.rsplit(" (", 1)[0]
+        st.session_state["portfolio_names"] = dedupe_names(st.session_state["portfolio_names"] + [selected_name], limit=MAX_PORTFOLIO_STOCKS)
         if selected_portfolio == "Custom":
             st.session_state["custom_portfolio_names"] = dedupe_names(st.session_state["portfolio_names"], limit=MAX_PORTFOLIO_STOCKS)
         if st.session_state["portfolio_chart_index"] >= len(st.session_state["portfolio_names"]):
@@ -1148,21 +980,21 @@ with tabs[6]:
         p_stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1: render_summary_card("Total stocks", str(len(current)), "Stocks currently added")
-        with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Base / repair")
-        with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Advancing trend")
-        with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Topping / transition")
-        with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Declining trend")
+        with c2: render_summary_card("Stage 1", str(int(p_stage_counts.get("Stage 1", 0))), "Preparing")
+        with c3: render_summary_card("Stage 2", str(int(p_stage_counts.get("Stage 2", 0))), "Advancing")
+        with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Under pressure")
+        with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Weakening")
 
         st.markdown("### Portfolio assistant")
         health_title, health_text = portfolio_health_summary(current)
         st.markdown(f'<div class="assist-box"><div class="assist-title">Portfolio health: {health_title}</div><div class="assist-text">{health_text}</div></div>', unsafe_allow_html=True)
         for msg in portfolio_assistant(current):
-            st.markdown(f"""<div class="assist-box"><div class="assist-text">{msg}</div></div>""", unsafe_allow_html=True)
+            st.markdown(f'''<div class="assist-box"><div class="assist-text">{msg}</div></div>''', unsafe_allow_html=True)
 
         st.divider()
         for _, r in current.sort_values("final_combined_score", ascending=False).iterrows():
             stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, stock_rank=stock_rank, show_quick_read=show_pro_quick_read)
+            card(r, use_stage_color=True, stock_rank=stock_rank)
 
         removable = [""] + sorted(st.session_state["portfolio_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="portfolio_remove_name")
@@ -1180,7 +1012,6 @@ with tabs[6]:
             st.session_state["portfolio_chart_index"] = max(0, min(st.session_state["portfolio_chart_index"], len(portfolio_ordered) - 1))
             prow = portfolio_ordered.iloc[st.session_state["portfolio_chart_index"]]
             pticker_short = str(prow["ticker"]).replace(".NS", "")
-            render_stock_detail(prow)
 
             pc1, pc2 = st.columns(2)
             with pc1:
@@ -1212,75 +1043,87 @@ with tabs[6]:
                 st.session_state["portfolio_chart_index"] += 1
                 st.rerun()
 
+            stock_rank = get_stock_rank(prow["ticker"])
+            card(prow, use_stage_color=True, stock_rank=stock_rank)
+            render_stock_detail(prow)
+
     render_disclosure()
 
-with tabs[7]:
-    st.markdown("### Alerts")
-    st.markdown("#### Triggered alert candidates from the latest scan")
-    if alert_candidates.empty:
-        st.info("No alert candidates found in the latest data.")
-    else:
-        for _, r in alert_candidates.iterrows():
-            stock_rank = get_stock_rank(r["ticker"])
-            card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
-
-    st.divider()
-    st.markdown("#### How to add alerts for users")
-    a1, a2, a3 = st.columns(3)
-    with a1:
-        st.markdown('<div class="assist-box"><div class="assist-title">1. Store user rules</div><div class="assist-text">Save watchlists and alert rules in a database: entered Stage 2, breakout, rank improvement, or weak structure.</div></div>', unsafe_allow_html=True)
-    with a2:
-        st.markdown('<div class="assist-box"><div class="assist-title">2. Run after each scan</div><div class="assist-text">After CSV generation, compare the latest snapshot vs previous snapshot and create alert events only for new changes.</div></div>', unsafe_allow_html=True)
-    with a3:
-        st.markdown('<div class="assist-box"><div class="assist-title">3. Send neutral notifications</div><div class="assist-text">Use email, Telegram, WhatsApp or push notifications with neutral wording like “entered Stage 2” or “rank improved”.</div></div>', unsafe_allow_html=True)
-
-    st.markdown("#### Suggested MVP alert schema")
-#     st.code(
-# '''alerts_rule
-# - user_id
-# - ticker
-# - rule_type  # entered_stage_2 / daily_breakout / weekly_breakout / rank_improved / turned_weak
-# - threshold  # optional, e.g. 5 ranks
-# - channel    # email / telegram / whatsapp / in_app
-# - is_active
-
-# alerts_event
-# - user_id
-# - ticker
-# - rule_type
-# - triggered_at
-# - message
-# - dedupe_key''', language="text")
-    render_disclosure()
-
-with tabs[8]:
-    def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
-        wanted = [c for c in ["Company Name","ticker","label","classification","stage","Industry"] if c in df.columns]
-        out = df[wanted].copy() if wanted else df.copy()
-        if "classification" in out.columns and "label" not in out.columns:
-            out["label"] = out["classification"]
-            out = out.drop(columns=["classification"])
-        if "ticker" in out.columns:
-            out = out.rename(columns={"ticker":"Ticker","label":"Classification"})
-            out["Ticker"] = out["Ticker"].astype(str).str.replace(".NS","", regex=False)
+# Alerts and Advanced only in Pro
+if view_mode == "Pro":
+    with tabs[5]:
+        st.markdown("### Alerts")
+        st.markdown("#### Triggered alert candidates from the latest scan")
+        if alert_candidates.empty:
+            st.info("No alert candidates found in the latest data.")
         else:
-            out = out.rename(columns={"label":"Classification"})
-        return out
-    st.markdown("### Advanced")
-    with st.expander("Overall ranked", expanded=True):
-        st.dataframe(keep_simple(combined), use_container_width=True, hide_index=True, height=360)
-    with st.expander("Daily ranked", expanded=False):
-        st.dataframe(keep_simple(daily_df), use_container_width=True, hide_index=True, height=320)
-    with st.expander("Weekly ranked", expanded=False):
-        st.dataframe(keep_simple(weekly_df), use_container_width=True, hide_index=True, height=320)
-    with st.expander("Stock changes", expanded=False):
-        st.dataframe(keep_simple(changes), use_container_width=True, hide_index=True, height=320)
-    with st.expander("Industry changes", expanded=False):
-        cols = [c for c in ["Industry","current_rank","prev_rank","rank_change"] if c in industry_changes.columns]
-        st.dataframe(industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}), use_container_width=True, hide_index=True, height=320)
+            for _, r in alert_candidates.iterrows():
+                stock_rank = get_stock_rank(r["ticker"])
+                card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
+        render_disclosure()
+
+    with tabs[6]:
+        def keep_simple(df: pd.DataFrame) -> pd.DataFrame:
+            wanted = [c for c in ["Company Name","ticker","label","classification","stage","Industry"] if c in df.columns]
+            out = df[wanted].copy() if wanted else df.copy()
+            if "classification" in out.columns and "label" not in out.columns:
+                out["label"] = out["classification"]
+                out = out.drop(columns=["classification"])
+            if "ticker" in out.columns:
+                out = out.rename(columns={"ticker":"Ticker","label":"Classification"})
+                out["Ticker"] = out["Ticker"].astype(str).str.replace(".NS","", regex=False)
+            else:
+                out = out.rename(columns={"label":"Classification"})
+            return out
+        st.markdown("### Advanced")
+        with st.expander("Overall ranked", expanded=True):
+            st.dataframe(keep_simple(combined), use_container_width=True, hide_index=True, height=360)
+        with st.expander("Daily ranked", expanded=False):
+            st.dataframe(keep_simple(daily_df), use_container_width=True, hide_index=True, height=320)
+        with st.expander("Weekly ranked", expanded=False):
+            st.dataframe(keep_simple(weekly_df), use_container_width=True, hide_index=True, height=320)
+        with st.expander("Stock changes", expanded=False):
+            st.dataframe(keep_simple(changes), use_container_width=True, hide_index=True, height=320)
+        with st.expander("Industry changes", expanded=False):
+            cols = [c for c in ["Industry","current_rank","prev_rank","rank_change"] if c in industry_changes.columns]
+            st.dataframe(industry_changes[cols].rename(columns={"current_rank":"Current Rank","prev_rank":"Previous Rank","rank_change":"Rank Change"}), use_container_width=True, hide_index=True, height=320)
+        render_disclosure()
+
+# How to Use
+how_tab_index = 4 if view_mode == "Beginner" else 7
+with tabs[how_tab_index]:
+    current_market_tone = market_tone(regime, combined)
+    left, right = st.columns([1.05, 0.95])
+    with left:
+        st.markdown(f'''<div class="learn-card">
+  <div class="stock-title">How to read this dashboard</div>
+  <ul class="list-tight">
+    <li>Start with <b>Decision Board</b>. Today the model reads <b>{current_market_tone}</b>.</li>
+    <li>Then scan <b>Ready Now</b> and <b>Improving Fast</b> first, and treat watchlist names as earlier-stage ideas.</li>
+    <li>Use <b>Charts</b> for daily and weekly confirmation.</li>
+    <li>Use <b>Portfolio</b> to review baskets like Ready Now, Improving Fast, Watchlist and Avoid.</li>
+  </ul>
+</div>
+<div class="learn-card">
+  <div class="stock-title">How the stage model should be read</div>
+  <ul class="list-tight">
+    <li><b>Stage 1 • Preparing</b>: base forming, early structure.</li>
+    <li><b>Stage 2 • Advancing</b>: uptrend with strength.</li>
+    <li><b>Stage 3 • Under Pressure</b>: trend slowing, mixed signals.</li>
+    <li><b>Stage 4 • Weakening</b>: downtrend, declining structure.</li>
+  </ul>
+</div>''', unsafe_allow_html=True)
+    with right:
+        img = Path(help_image_path)
+        if img.exists():
+            st.image(str(img), caption="Reference image for the four market phases", use_container_width=True)
+        else:
+            st.info("Stage image not found.")
     render_disclosure()
 
-with tabs[9]:
+# Disclaimer
+disclaimer_tab_index = 5 if view_mode == "Beginner" else 8
+with tabs[disclaimer_tab_index]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, while Stage 2 is the main advancing phase. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
     render_disclosure()
