@@ -971,14 +971,15 @@ if view_mode == "Beginner":
     tab_names = ["Decision Board", "Charts", "Movers", "Portfolio", "How to Use", "Disclaimer"]
 else:
     tab_names = ["Decision Board", "Charts", "Movers", "Market", "Portfolio", "Alerts", "Advanced", "How to Use", "Disclaimer"]
+
 def render_stock_detail(row):
-    """Render a readable stock detail panel below the selected stock card."""
     try:
-        stock_name = escape(str(row.get("Company Name", row.get("stock_name", "")) or ""))
-        ticker = escape(str(row.get("ticker", "") or ""))
-        stage = escape(str(row.get("stage", "") or ""))
-        decision = escape(decision_state(row) if "decision_state" in globals() else "")
-        qualifier = escape(stage_condition_text(row) if "stage_condition_text" in globals() else "")
+        stock_name = str(row.get("Company Name", row.get("stock_name", "")) or "")
+        ticker = str(row.get("ticker", "") or "")
+        stage = str(row.get("stage", "") or "")
+        decision = decision_state(row) if "decision_state" in globals() else ""
+        qualifier = stage_condition_text(row) if "stage_condition_text" in globals() else ""
+
         try:
             dscore = int(round(decision_score(row))) if "decision_score" in globals() else None
         except Exception:
@@ -1000,8 +1001,10 @@ def render_stock_detail(row):
                     why_parts.append(f"Rank slipped by {abs(rc)}")
             except Exception:
                 pass
+
         if "industry_rank" in row and str(row.get("industry_rank")).strip() not in ("", "nan", "None"):
             why_parts.append(f"Industry rank {row.get('industry_rank')}")
+
         if stage == "Stage 2":
             why_parts.append("Uptrend structure remains in focus")
         elif stage == "Stage 1":
@@ -1010,14 +1013,20 @@ def render_stock_detail(row):
             why_parts.append("Trend is under pressure")
         elif stage == "Stage 4":
             why_parts.append("Structure remains weak")
-        why_now = escape(" • ".join(why_parts[:3]) if why_parts else "Review current structure and relative position.")
+
+        why_now = " • ".join(why_parts[:3]) if why_parts else "Review current structure and relative position."
 
         improved_parts = []
-        for key, label in [("breakout", "Breakout present"), ("weekly_breakout", "Weekly breakout"), ("daily_breakout", "Daily breakout")]:
+        for key, label in [
+            ("breakout", "Breakout present"),
+            ("weekly_breakout", "Weekly breakout"),
+            ("daily_breakout", "Daily breakout"),
+        ]:
             if key in row:
                 val = str(row.get(key)).lower()
                 if val in ("1", "true", "yes", "y"):
                     improved_parts.append(label)
+
         for key, label in [("rs_3m_pct", "3M RS"), ("rs_6m_pct", "6M RS")]:
             if key in row:
                 try:
@@ -1025,7 +1034,8 @@ def render_stock_detail(row):
                         improved_parts.append(f"{label} positive")
                 except Exception:
                     pass
-        what_improved = escape(" • ".join(improved_parts[:3]) if improved_parts else "No major fresh improvement signal detected.")
+
+        what_improved = " • ".join(improved_parts[:3]) if improved_parts else "No major fresh improvement signal detected."
 
         if stage == "Stage 2":
             monitor = "Watch for rank stability, follow-through, and support holding."
@@ -1035,36 +1045,81 @@ def render_stock_detail(row):
             monitor = "Watch whether strength stabilizes or breakdown risk increases."
         else:
             monitor = "Watch for any improvement in structure before prioritizing."
-        monitor = escape(monitor)
 
-        score_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Decision Score: <b>{dscore}</b></div>" if dscore is not None else ""
-        rank_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Rank: <b>{escape(str(rank_val))}</b></div>" if rank_val is not None else ""
-        qualifier_html = f" • {qualifier}" if qualifier else ""
+        st.markdown("#### Stock detail")
+        st.markdown(f"**{stock_name} ({ticker})**")
+        if decision:
+            st.caption(decision)
 
-        html = f"""
-        <div style="margin-top:0.7rem;padding:0.9rem;border-radius:16px;background:#0b1220;border:1px solid rgba(148,163,184,0.25);">
-            <div style="font-size:1.05rem;font-weight:700;color:#f8fafc;">{stock_name} ({ticker})</div>
-            <div style="font-size:0.95rem;color:#93c5fd;margin-top:0.2rem;">{decision}</div>
-            <div style="font-size:0.92rem;color:#e2e8f0;margin-top:0.15rem;">{stage}{qualifier_html}</div>
-            {score_html}
-            {rank_html}
-            <div style="margin-top:0.75rem;padding:0.8rem;border-radius:12px;background:#111827;">
-                <div style="font-size:0.84rem;font-weight:700;color:#93c5fd;">Why it matters now</div>
-                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{why_now}</div>
-            </div>
-            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#0f172a;">
-                <div style="font-size:0.84rem;font-weight:700;color:#86efac;">What improved</div>
-                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{what_improved}</div>
-            </div>
-            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#1f2937;">
-                <div style="font-size:0.84rem;font-weight:700;color:#fcd34d;">What to monitor next</div>
-                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{monitor}</div>
-            </div>
-        </div>
-        """
-        st.markdown(html, unsafe_allow_html=True)
+        meta = []
+        if stage:
+            meta.append(stage)
+        if qualifier:
+            meta.append(qualifier)
+        if dscore is not None:
+            meta.append(f"Decision Score: {dscore}")
+        if rank_val is not None:
+            meta.append(f"Rank: {rank_val}")
+        if meta:
+            st.write(" • ".join(meta))
+
+        with st.container(border=True):
+            st.markdown("**Why it matters now**")
+            st.write(why_now)
+
+        with st.container(border=True):
+            st.markdown("**What improved**")
+            st.write(what_improved)
+
+        with st.container(border=True):
+            st.markdown("**What to monitor next**")
+            st.write(monitor)
+
     except Exception as e:
         st.info(f"Unable to render stock detail: {e}")
+
+
+
+
+def portfolio_health_summary(current: pd.DataFrame):
+    if current is None or current.empty:
+        return "Empty", "No stocks are currently in this portfolio basket."
+
+    stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
+    total = len(current)
+    stage2 = int(stage_counts.get("Stage 2", 0))
+    stage1 = int(stage_counts.get("Stage 1", 0))
+    stage3 = int(stage_counts.get("Stage 3", 0))
+    stage4 = int(stage_counts.get("Stage 4", 0))
+
+    ready = 0
+    near_ready = 0
+    avoid = 0
+    if "decision_state" in current.columns:
+        ready = int((current["decision_state"] == "Ready").sum())
+        near_ready = int((current["decision_state"] == "Near Ready").sum())
+        avoid = int((current["decision_state"] == "Avoid").sum())
+    else:
+        states = current.apply(decision_state, axis=1)
+        ready = int((states == "Ready").sum())
+        near_ready = int((states == "Near Ready").sum())
+        avoid = int((states == "Avoid").sum())
+
+    if stage2 >= max(3, round(total * 0.45)) and avoid <= max(1, round(total * 0.15)):
+        title = "Strong"
+    elif stage2 + stage1 >= max(3, round(total * 0.50)) and avoid <= max(2, round(total * 0.25)):
+        title = "Constructive"
+    elif stage4 >= max(2, round(total * 0.30)) or avoid >= max(2, round(total * 0.25)):
+        title = "Weakening"
+    else:
+        title = "Mixed"
+
+    text = (
+        f"{stage2}/{total} are in Stage 2, {stage1} are in Stage 1, "
+        f"{stage3} are under pressure, and {stage4} are weakening. "
+        f"Decision mix: {ready} Ready, {near_ready} Near Ready, {avoid} Avoid."
+    )
+    return title, text
 
 
 tabs = st.tabs(tab_names)
