@@ -4,6 +4,7 @@ from pathlib import Path
 import math
 import re
 from html import escape
+import html
 
 st.set_page_config(page_title="Market Structure Radar", layout="wide", initial_sidebar_state="collapsed")
 
