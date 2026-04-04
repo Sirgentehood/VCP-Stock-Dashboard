@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import math
 import re
+from html import escape
 
 st.set_page_config(page_title="Market Structure Radar", layout="wide", initial_sidebar_state="collapsed")
 
@@ -639,6 +640,35 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
 
 
 
+
+def build_simple_rank_map(df: pd.DataFrame) -> dict:
+    if df.empty:
+        return {}
+    ticker_col = None
+    for cand in ["ticker", "Ticker", "symbol", "Symbol"]:
+        if cand in df.columns:
+            ticker_col = cand
+            break
+    if ticker_col is None:
+        return {}
+    rank_col = None
+    for cand in ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+        if cand in df.columns:
+            rank_col = cand
+            break
+    if rank_col is None:
+        return {}
+    temp = df[[ticker_col, rank_col]].copy()
+    temp[ticker_col] = temp[ticker_col].astype(str).str.strip()
+    temp[rank_col] = pd.to_numeric(temp[rank_col], errors="coerce")
+    temp = temp.dropna(subset=[ticker_col, rank_col]).drop_duplicates(subset=[ticker_col], keep="first")
+    out = {}
+    for _, r in temp.iterrows():
+        t = str(r[ticker_col]).strip()
+        out[t] = str(int(r[rank_col]))
+        out[t.replace(".NS", "")] = str(int(r[rank_col]))
+    return out
+
 def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", show_quick_read: bool = False):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
@@ -767,6 +797,15 @@ if combined.empty:
     st.info("Create an outputs folder beside this file and keep the generated CSV files there.")
     st.stop()
 
+for df_name in ["combined", "daily_df", "weekly_df", "changes", "moves", "top_movers"]:
+    _df = locals().get(df_name)
+    if _df is not None and not _df.empty:
+        if "decision_score" not in _df.columns:
+            _df["decision_score"] = _df.apply(decision_score, axis=1)
+        if "decision_state" not in _df.columns:
+            _df["decision_state"] = _df.apply(decision_state, axis=1)
+
+
 daily_dir = f"{outdir}/charts/daily"
 weekly_dir = f"{outdir}/charts/weekly"
 company_map = company_choices(combined)
@@ -819,6 +858,7 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
 
 alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
+TOP_MOVER_RANK_MAP = build_simple_rank_map(top_movers)
 
 def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     out = []
@@ -836,7 +876,8 @@ def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     return out
 
 def get_stock_rank(ticker: str) -> str:
-    return rank_lookup(top_movers, ticker, ["current_rank"])
+    t = str(ticker).strip()
+    return TOP_MOVER_RANK_MAP.get(t) or TOP_MOVER_RANK_MAP.get(t.replace(".NS","")) or rank_lookup(top_movers, ticker, ["current_rank"])
 
 def get_display_stock_rank(ticker: str) -> str:
     return get_stock_rank(ticker)
@@ -878,7 +919,8 @@ INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=2
 
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame) -> list:
     ranked = combined.sort_values("final_combined_score", ascending=False).copy()
-    ranked["decision_state"] = ranked.apply(decision_state, axis=1)
+    if "decision_state" not in ranked.columns:
+        ranked["decision_state"] = ranked.apply(decision_state, axis=1)
     names = []
     if name == "Top 15":
         names = ranked.head(15)["Company Name"].dropna().tolist()
@@ -1027,14 +1069,15 @@ with tabs[1]:
     render_disclosure()
 
 
+
 def render_stock_detail(row):
     """Render a readable stock detail panel below the selected stock card."""
     try:
-        stock_name = str(row.get("stock_name", "") or "")
-        ticker = str(row.get("ticker", "") or "")
-        stage = str(row.get("stage", "") or "")
-        decision = decision_state(row) if "decision_state" in globals() else ""
-        qualifier = stage_condition_text(row) if "stage_condition_text" in globals() else ""
+        stock_name = escape(str(row.get("Company Name", row.get("stock_name", "")) or ""))
+        ticker = escape(str(row.get("ticker", "") or ""))
+        stage = escape(str(row.get("stage", "") or ""))
+        decision = escape(decision_state(row) if "decision_state" in globals() else "")
+        qualifier = escape(stage_condition_text(row) if "stage_condition_text" in globals() else "")
         try:
             dscore = int(round(decision_score(row))) if "decision_score" in globals() else None
         except Exception:
@@ -1066,7 +1109,7 @@ def render_stock_detail(row):
             why_parts.append("Trend is under pressure")
         elif stage == "Stage 4":
             why_parts.append("Structure remains weak")
-        why_now = " • ".join(why_parts[:3]) if why_parts else "Review current structure and relative position."
+        why_now = escape(" • ".join(why_parts[:3]) if why_parts else "Review current structure and relative position.")
 
         improved_parts = []
         for key, label in [("breakout", "Breakout present"), ("weekly_breakout", "Weekly breakout"), ("daily_breakout", "Daily breakout")]:
@@ -1081,7 +1124,7 @@ def render_stock_detail(row):
                         improved_parts.append(f"{label} positive")
                 except Exception:
                     pass
-        what_improved = " • ".join(improved_parts[:3]) if improved_parts else "No major fresh improvement signal detected."
+        what_improved = escape(" • ".join(improved_parts[:3]) if improved_parts else "No major fresh improvement signal detected.")
 
         if stage == "Stage 2":
             monitor = "Watch for rank stability, follow-through, and support holding."
@@ -1091,37 +1134,39 @@ def render_stock_detail(row):
             monitor = "Watch whether strength stabilizes or breakdown risk increases."
         else:
             monitor = "Watch for any improvement in structure before prioritizing."
+        monitor = escape(monitor)
 
         score_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Decision Score: <b>{dscore}</b></div>" if dscore is not None else ""
-        rank_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Rank: <b>{rank_val}</b></div>" if rank_val is not None else ""
+        rank_html = f"<div style='font-size:0.92rem;color:#cbd5e1;margin-top:0.2rem;'>Rank: <b>{escape(str(rank_val))}</b></div>" if rank_val is not None else ""
+        qualifier_html = f" • {qualifier}" if qualifier else ""
 
-        st.markdown(
-            f"""
-            <div style="margin-top:0.7rem;padding:0.9rem;border-radius:16px;background:#0b1220;border:1px solid rgba(148,163,184,0.25);">
-                <div style="font-size:1.05rem;font-weight:700;color:#f8fafc;">{stock_name} ({ticker})</div>
-                <div style="font-size:0.95rem;color:#93c5fd;margin-top:0.2rem;">{decision}</div>
-                <div style="font-size:0.92rem;color:#e2e8f0;margin-top:0.15rem;">{stage}" + (f" • {qualifier}" if qualifier else "") + """</div>
-                """ + score_html + rank_html + """
-                <div style="margin-top:0.75rem;padding:0.8rem;border-radius:12px;background:#111827;">
-                    <div style="font-size:0.84rem;font-weight:700;color:#93c5fd;">Why it matters now</div>
-                    <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">""" + why_now + """</div>
-                </div>
-                <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#0f172a;">
-                    <div style="font-size:0.84rem;font-weight:700;color:#86efac;">What improved</div>
-                    <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">""" + what_improved + """</div>
-                </div>
-                <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#1f2937;">
-                    <div style="font-size:0.84rem;font-weight:700;color:#fcd34d;">What to monitor next</div>
-                    <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">""" + monitor + """</div>
-                </div>
+        html = f"""
+        <div style="margin-top:0.7rem;padding:0.9rem;border-radius:16px;background:#0b1220;border:1px solid rgba(148,163,184,0.25);">
+            <div style="font-size:1.05rem;font-weight:700;color:#f8fafc;">{stock_name} ({ticker})</div>
+            <div style="font-size:0.95rem;color:#93c5fd;margin-top:0.2rem;">{decision}</div>
+            <div style="font-size:0.92rem;color:#e2e8f0;margin-top:0.15rem;">{stage}{qualifier_html}</div>
+            {score_html}
+            {rank_html}
+            <div style="margin-top:0.75rem;padding:0.8rem;border-radius:12px;background:#111827;">
+                <div style="font-size:0.84rem;font-weight:700;color:#93c5fd;">Why it matters now</div>
+                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{why_now}</div>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#0f172a;">
+                <div style="font-size:0.84rem;font-weight:700;color:#86efac;">What improved</div>
+                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{what_improved}</div>
+            </div>
+            <div style="margin-top:0.55rem;padding:0.8rem;border-radius:12px;background:#1f2937;">
+                <div style="font-size:0.84rem;font-weight:700;color:#fcd34d;">What to monitor next</div>
+                <div style="font-size:0.98rem;line-height:1.5;color:#f8fafc;margin-top:0.25rem;">{monitor}</div>
+            </div>
+        </div>
+        """
+        st.markdown(html, unsafe_allow_html=True)
     except Exception as e:
         st.info(f"Unable to render stock detail: {e}")
 
 
+# Movers
 # Movers
 with tabs[2]:
     st.markdown("### Movers")
