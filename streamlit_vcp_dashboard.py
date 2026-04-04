@@ -401,6 +401,42 @@ def stock_display_label(row: pd.Series) -> str:
     return f"{company} ({ticker})" if ticker else company
 
 
+def signal_summary(row: pd.Series) -> str:
+    parts = []
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
+
+    if pd.notna(rank_change):
+        if rank_change > 0:
+            parts.append(f"↑ Improving by {int(rank_change)}")
+        elif rank_change < 0:
+            parts.append(f"↓ Weakening by {abs(int(rank_change))}")
+
+    if bool(row.get("new_weekly_breakout", False)):
+        parts.append("⚡ Weekly breakout")
+    elif bool(row.get("new_daily_breakout", False)):
+        parts.append("⚡ Daily breakout")
+
+    stage = str(row.get("stage", ""))
+    if stage == "Stage 1":
+        parts.append("⏳ Base forming")
+    elif stage == "Stage 2":
+        parts.append("🧭 Trend intact")
+    elif stage == "Stage 3":
+        parts.append("⚠ Under pressure")
+    elif stage == "Stage 4":
+        parts.append("⚠ Weak structure")
+
+    if pd.notna(rank) and rank <= 10:
+        parts.append(f"🏁 Top rank #{int(rank)}")
+
+    industry = str(row.get("Industry", "")).strip()
+    if industry:
+        parts.append(f"🏭 {industry}")
+
+    return " | ".join(parts[:3]) if parts else "Mixed signals | Monitor structure"
+
+
 def one_line_explanation(row: pd.Series) -> str:
     label = str(row.get("label", row.get("classification", "Developing")))
     stage = str(row.get("stage", ""))
