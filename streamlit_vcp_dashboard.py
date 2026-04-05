@@ -51,7 +51,6 @@ st.markdown("""
 .action-watch {background: rgba(55,95,220,0.12); color: #8ab4ff; border:1px solid rgba(55,95,220,0.35);}
 .action-caution {background: rgba(255,159,67,0.12); color: var(--cautious); border:1px solid rgba(255,159,67,0.35);}
 .action-avoid {background: rgba(255,107,107,0.12); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
-.structure-pill {display:inline-block; font-size:0.74rem; font-weight:800; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; margin-top:0.22rem; background: rgba(255,255,255,0.08); color:#eef3ff; border:1px solid rgba(255,255,255,0.18);}
 .assist-box {border:1px solid var(--card-border); border-radius:16px; padding:0.85rem 0.95rem; background:rgba(255,255,255,0.03); margin-bottom:0.55rem;}
 .assist-title {font-size:1rem; font-weight:800; margin-bottom:0.28rem;}
 .assist-text {font-size:0.98rem; color: #f3f6fb; line-height:1.55;}
@@ -172,20 +171,27 @@ def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _decision_css(decision: str) -> str:
-    return 'structure-pill'
+    return {
+        "Ready": "decision-ready",
+        "Near Ready": "decision-near-ready",
+        "Needs Confirmation": "decision-needs-confirmation",
+        "Too Early": "decision-too-early",
+        "Avoid": "decision-avoid",
+    }.get(decision, "decision-too-early")
+
 
 def structure_score(row: pd.Series) -> int:
     stage = str(row.get("stage", ""))
     label = str(row.get("label", row.get("classification", "Developing")))
-    base_score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
+    score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
     rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
     rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
 
     value = 0.0
     value += {"Stage 1": 24, "Stage 2": 48, "Stage 3": 26, "Stage 4": 10}.get(stage, 20)
     value += {"Strong": 20, "Developing": 12, "Cautious": 6, "Weak": 0}.get(label, 8)
-    if pd.notna(base_score):
-        value += min(26, max(0, base_score * 0.28))
+    if pd.notna(score):
+        value += min(26, max(0, score * 0.28))
     if pd.notna(rank):
         value += max(0, 14 - min(rank, 14))
     if pd.notna(rank_change) and rank_change > 0:
@@ -231,10 +237,10 @@ def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.Data
     empty = {"all": pd.DataFrame(), "top": pd.DataFrame()}
     if combined_df.empty:
         return {
-            "Top Names that Changed": empty,
-            "Strong Structures": empty,
-            "Improving Structures": empty,
-            "Emerging Structures": empty,
+            "Recent Changes": empty,
+            "Stage 2 Snapshot": empty,
+            "Stage 1 Snapshot": empty,
+            "Stage 3-4 Snapshot": empty,
         }
 
     work = combined_df.copy()
@@ -255,38 +261,26 @@ def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.Data
     work["decision_score"] = work.apply(decision_score, axis=1)
     work["decision_state"] = work.apply(decision_state, axis=1)
 
-    used = set()
-
-    def unique_top(df: pd.DataFrame, limit: int = 3):
-        nonlocal used
+    def sample_view(df: pd.DataFrame, limit: int = 3, sort_cols=None, ascending=None):
         if df.empty:
             return pd.DataFrame()
         temp = df.copy()
-        temp = temp[~temp["ticker"].astype(str).isin(used)]
-        top = temp.head(limit).copy()
-        if not top.empty:
-            used.update(top["ticker"].astype(str).tolist())
-        return top
+        if sort_cols:
+            temp = temp.sort_values(sort_cols, ascending=ascending if ascending is not None else True, na_position="last")
+        else:
+            temp = temp.sort_values(["Company Name", "ticker"], ascending=[True, True], na_position="last")
+        return temp.head(limit).copy()
 
     changed_all = top_changed.copy() if not top_changed.empty else pd.DataFrame(columns=work.columns)
-
-    ready_all = work[work["decision_state"] == "Ready"].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).copy()
-
-    rank_change_series = pd.to_numeric(work.get("rank_change"), errors="coerce").fillna(0)
-    improving_mask = rank_change_series.gt(0) | work["decision_state"].isin(["Ready", "Near Ready"])
-    if "new_daily_breakout" in work.columns:
-        improving_mask = improving_mask | work["new_daily_breakout"].fillna(False)
-    if "new_weekly_breakout" in work.columns:
-        improving_mask = improving_mask | work["new_weekly_breakout"].fillna(False)
-    improving_all = work[improving_mask].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).copy()
-
-    watchlist_all = work[work["decision_state"].isin(["Near Ready", "Needs Confirmation", "Too Early"])].sort_values(["decision_score", "final_combined_score"], ascending=[False, False]).copy()
+    stage2_all = work[work["stage"] == "Stage 2"].copy()
+    stage1_all = work[work["stage"] == "Stage 1"].copy()
+    stage34_all = work[work["stage"].isin(["Stage 3", "Stage 4"])].copy()
 
     sections = {
-        "Top Names that Changed": {"all": changed_all, "top": unique_top(changed_all, 3)},
-        "Strong Structures": {"all": ready_all, "top": unique_top(ready_all, 3)},
-        "Improving Structures": {"all": improving_all, "top": unique_top(improving_all, 3)},
-        "Emerging Structures": {"all": watchlist_all, "top": unique_top(watchlist_all, 3)},
+        "Recent Changes": {"all": changed_all, "top": sample_view(changed_all, 3, ["Company Name"], True)},
+        "Stage 2 Snapshot": {"all": stage2_all, "top": sample_view(stage2_all, 3, ["Company Name"], True)},
+        "Stage 1 Snapshot": {"all": stage1_all, "top": sample_view(stage1_all, 3, ["Company Name"], True)},
+        "Stage 3-4 Snapshot": {"all": stage34_all, "top": sample_view(stage34_all, 3, ["Company Name"], True)},
     }
     return sections
 
@@ -433,65 +427,38 @@ def signal_summary(row: pd.Series) -> str:
 
 
 def one_line_explanation(row: pd.Series) -> str:
-    label = str(row.get("label", row.get("classification", "Developing")))
     stage = str(row.get("stage", ""))
+    label = str(row.get("label", row.get("classification", "Developing")))
     industry = str(row.get("Industry", "its industry")).strip() or "its industry"
     rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    prev_rank = pd.to_numeric(row.get("prev_rank"), errors="coerce")
     rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
     rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
     rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
-    score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
 
-    if stage == "Stage 2" and label == "Strong":
-        if pd.notna(rank_change) and rank_change > 0:
-            return f"Advancing trend is intact and relative position improved by {int(rank_change)} places."
-        if pd.notna(rank) and rank <= 10:
-            return "This is a top-ranked Stage 2 leader in the current scan."
-        if pd.notna(rs3) and rs3 > 0 and pd.notna(rs6) and rs6 > 0:
-            return "Trend and medium-term relative strength are aligned on the upside."
-        return "Structure is acting like a leadership candidate rather than a repair candidate."
-
-    if stage == "Stage 1":
-        if pd.notna(score) and score >= 65:
-            return "Base is tightening, but this is still a watchlist setup until a cleaner Stage 2 transition appears."
-        if pd.notna(rs3) and rs3 < 0:
-            return "The stock is still repairing after weakness, so the base needs more time."
-        return "This looks like a base or repair zone, not a confirmed advancing trend yet."
-
-    if label == "Developing" and stage == "Stage 2":
-        return "Trend is positive, but conviction is still lower than the strongest Stage 2 leaders."
-
-    if stage == "Stage 3" or label == "Cautious":
-        if pd.notna(prev_rank) and pd.notna(rank) and rank > prev_rank:
-            return "Structure is losing momentum and rank is slipping versus peers."
-        return "This is a transition or distribution-type structure, so failed rallies are a risk here."
-
-    if stage == "Stage 4":
-        return "Declining structure remains dominant, so this is better treated as avoid-for-now."
-
-    if pd.notna(rs3) and pd.notna(rs6) and rs3 < 0 and rs6 < 0:
-        return f"Relative strength is weak across timeframes and lagging {industry} peers."
-
-    if pd.notna(score) and score >= 50:
-        return "Mixed signals are present, so keep it on a watchlist rather than treating it like leadership."
-
-    return "Current structure is weak or incomplete, so it is not a priority candidate right now."
+    parts = [f"The model currently classifies this stock as {label} in {stage or 'the current'} structure."]
+    if pd.notna(rank):
+        parts.append(f"Current rank in the dataset is {int(rank)}.")
+    if pd.notna(rank_change) and rank_change != 0:
+        direction = "improved" if rank_change > 0 else "declined"
+        parts.append(f"Relative rank has {direction} by {abs(int(rank_change))} places.")
+    if pd.notna(rs3) and pd.notna(rs6):
+        parts.append(f"Relative strength inputs are {rs3:.1f}% over 3 months and {rs6:.1f}% over 6 months.")
+    parts.append(f"Industry tag: {industry}.")
+    return " ".join(parts[:4])
 
 
 def guided_workflow_steps(market_label: str) -> list:
     first_step = {
-        "Risk On": "This backdrop usually shows broader participation across stronger structures.",
+        "Risk On": "This backdrop usually shows broader participation across advancing structures.",
         "Mixed": "This backdrop usually reflects selective participation and mixed follow-through.",
         "Risk Off": "This backdrop usually shows fewer advancing structures and more repair activity.",
-    }.get(market_label, "Use the board as a descriptive map of current market structure.")
+    }.get(market_label, "Use the board as a descriptive map of the current dataset.")
     return [
         f"Step 1: Read market tone first. Today the model reads: {market_label}. {first_step}",
         "Step 2: In this framework, Stage 1 reflects base formation or repair, while Stage 2 reflects an advancing structure.",
-        "Step 3: Relative rank, industry alignment, and daily-weekly confirmation help describe how a stock is positioned versus peers.",
-        "Step 4: Use Portfolio and Structure Changes tabs to monitor transitions over time without treating the tool as advice.",
+        "Step 3: Relative rank, industry alignment, and daily-weekly confirmation describe how a stock is positioned versus peers in the dataset.",
+        "Step 4: Use Portfolio and Structure Changes tabs to monitor transitions over time. The platform does not recommend, prioritize, or suggest securities for investment purposes.",
     ]
-
 
 def portfolio_assistant(current: pd.DataFrame) -> list:
     if current.empty:
@@ -509,7 +476,6 @@ def portfolio_assistant(current: pd.DataFrame) -> list:
     if top_industries:
         msgs.append(f"Most names in this basket are from {', '.join(top_industries)}.")
     return msgs
-
 
 def market_tone(regime_df: pd.DataFrame, combined_df: pd.DataFrame) -> str:
     if not regime_df.empty and "regime_label" in regime_df.columns:
@@ -551,7 +517,7 @@ def chart_dropdown_options(df: pd.DataFrame):
 def render_disclosure():
     st.markdown("""
 <div class="disclosure">
-This platform provides rule-based market structure analytics and visualization only. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. No output on this dashboard should be treated as a personalized recommendation, model portfolio, suitability assessment, or allocation advice. Users remain solely responsible for any investment decisions.
+This platform provides rule-based market structure analytics and visualization only. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. It does not rank, recommend, prioritize, or suggest any securities for investment purposes. No output on this dashboard should be treated as a personalized recommendation, model portfolio, suitability assessment, or allocation advice. Users remain solely responsible for any investment decisions.
 </div>
 """, unsafe_allow_html=True)
 
@@ -907,46 +873,18 @@ INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=2
 
 
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame) -> list:
-    ranked = combined.sort_values("final_combined_score", ascending=False).copy()
-    if "decision_state" not in ranked.columns:
-        ranked["decision_state"] = ranked.apply(decision_state, axis=1)
+    ranked = combined.sort_values(["Company Name", "ticker"], ascending=[True, True], na_position="last").copy()
     names = []
-    if name == "Top 15":
-        names = ranked.head(15)["Company Name"].dropna().tolist()
-    elif name == "New Breakouts":
-        tmp = changes.copy()
-        mask = pd.Series(False, index=tmp.index)
-        if "new_daily_breakout" in tmp.columns:
-            mask = mask | tmp["new_daily_breakout"].fillna(False)
-        if "new_weekly_breakout" in tmp.columns:
-            mask = mask | tmp["new_weekly_breakout"].fillna(False)
-        names = tmp.loc[mask, "Company Name"].dropna().tolist()
-    elif name == "New Strong":
-        tmp = changes.copy()
-        if "label" not in tmp.columns:
-            tmp["label"] = tmp.apply(classify_stock, axis=1)
-        names = tmp.loc[tmp["label"] == "Strong", "Company Name"].dropna().tolist()
-    elif name == "Strong Structures":
-        names = ranked.loc[ranked["decision_state"] == "Ready", "Company Name"].dropna().tolist()
-    elif name == "Improving Structures":
-        improving_mask = pd.to_numeric(ranked.get("rank_change"), errors="coerce").fillna(0).gt(0)
-        if "new_daily_breakout" in ranked.columns:
-            improving_mask = improving_mask | ranked["new_daily_breakout"].fillna(False)
-        if "new_weekly_breakout" in ranked.columns:
-            improving_mask = improving_mask | ranked["new_weekly_breakout"].fillna(False)
-        names = ranked.loc[improving_mask, "Company Name"].dropna().tolist()
-    elif name == "Emerging Structures":
-        names = ranked.loc[ranked["decision_state"].isin(["Near Ready", "Needs Confirmation", "Too Early"]), "Company Name"].dropna().tolist()
-    elif name == "Weak Structures":
-        names = ranked.loc[ranked["decision_state"] == "Weak Structures", "Company Name"].dropna().tolist()
-    elif name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
-        names = combined.loc[combined["stage"] == name, "Company Name"].dropna().tolist()
-    elif name == "Cautious":
-        names = combined.loc[combined["label"] == "Cautious", "Company Name"].dropna().tolist()
-    elif name == "Weak":
-        names = combined.loc[combined["label"] == "Weak", "Company Name"].dropna().tolist()
+    if name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
+        names = ranked.loc[ranked["stage"] == name, "Company Name"].dropna().tolist()
     elif name == "Strong":
-        names = combined.loc[combined["label"] == "Strong", "Company Name"].dropna().tolist()
+        names = ranked.loc[ranked["label"] == "Strong", "Company Name"].dropna().tolist()
+    elif name == "Developing":
+        names = ranked.loc[ranked["label"] == "Developing", "Company Name"].dropna().tolist()
+    elif name == "Cautious":
+        names = ranked.loc[ranked["label"] == "Cautious", "Company Name"].dropna().tolist()
+    elif name == "Weak":
+        names = ranked.loc[ranked["label"] == "Weak", "Company Name"].dropna().tolist()
     elif name in INDUSTRY_PORTFOLIOS:
         names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
     return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
@@ -1053,15 +991,15 @@ def render_stock_detail(row):
             st.write(" • ".join(meta))
 
         with st.container(border=True):
-            st.markdown("**Why it matters now**")
+            st.markdown("**Current model description**")
             st.write(why_now)
 
         with st.container(border=True):
-            st.markdown("**What improved**")
+            st.markdown("**Recent model changes**")
             st.write(what_improved)
 
         with st.container(border=True):
-            st.markdown("**What to monitor next**")
+            st.markdown("**Additional context**")
             st.write(monitor)
 
     except Exception as e:
@@ -1102,10 +1040,9 @@ def portfolio_health_summary(current: pd.DataFrame):
     )
     return title, text
 
-
 tabs = st.tabs(tab_names)
 
-# Decision Board
+# Structure Board
 with tabs[0]:
     current_market_tone = market_tone(regime, combined)
     st.markdown("### Market Structure Board")
@@ -1113,22 +1050,22 @@ with tabs[0]:
     with c1:
         render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
     with c2:
-        render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stage 2 leaders improving materially")
+        render_summary_card("New Strong labels", str(changes_summary["New Strong"]), "Count of rows newly tagged Strong in the latest change file")
     with c3:
-        render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currently")
-    for title in ["Top Names that Changed", "Strong Structures", "Improving Structures", "Emerging Structures"]:
+        render_summary_card("Industries in sample view", top_industry_text(industry), "Industries appearing at the top of the current industry table")
+    for title in ["Recent Changes", "Stage 2 Snapshot", "Stage 1 Snapshot", "Stage 3-4 Snapshot"]:
         section = board_sections.get(title, {"all": pd.DataFrame(), "top": pd.DataFrame()})
         total_ct = len(section["all"])
-        st.markdown(f"#### {title} (Top 3 out of {total_ct})")
+        st.markdown(f"#### {title} (Sample view: {min(3, total_ct)} of {total_ct})")
         if total_ct == 0:
-            st.info(f"No stocks in {title.lower()} right now.")
+            st.info(f"No rows available for {title.lower()} right now.")
         else:
             cols = st.columns(3)
             for col, (_, r) in zip(cols, section["top"].iterrows()):
                 with col:
                     stock_rank = get_stock_rank(r["ticker"])
                     extra = ""
-                    if title == "Top Names that Changed":
+                    if title == "Recent Changes":
                         what_changed = str(r.get("what_changed", "")).strip()
                         if what_changed:
                             extra = f"What changed: {what_changed}"
@@ -1195,8 +1132,8 @@ with tabs[1]:
     render_stock_detail(row)
 
     st.divider()
-    st.markdown("### Browse more stocks")
-    for _, r in ranked.head(20).iterrows():
+    st.markdown("### Sample stock list from the current dataset")
+    for _, r in ranked.sort_values(["Company Name", "ticker"], ascending=[True, True], na_position="last").head(20).iterrows():
         stock_rank = get_stock_rank(r["ticker"])
         card(r, use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
@@ -1284,7 +1221,7 @@ with tabs[portfolio_tab_index]:
     if "portfolio_selection_prev" not in st.session_state:
         st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
 
-    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong Structures", "Improving Structures", "Emerging Structures", "Weak Structures", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
+    portfolio_options = ["Custom", "Strong", "Developing", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
     previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
@@ -1392,7 +1329,7 @@ with tabs[portfolio_tab_index]:
 
     render_disclosure()
 
-# Alerts and Advanced only in Pro
+# Structure Changes and Advanced only in Pro
 if view_mode == "Pro":
     with tabs[5]:
         st.markdown("### Structure Changes")
@@ -1402,7 +1339,7 @@ if view_mode == "Pro":
         else:
             for _, r in alert_candidates.iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, use_stage_color=True, show_change_text=f"Structure change: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
+                card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
         render_disclosure()
 
     with tabs[6]:
@@ -1442,9 +1379,9 @@ with tabs[how_tab_index]:
   <div class="stock-title">How to read this dashboard</div>
   <ul class="list-tight">
     <li>Start with <b>Structure Board</b>. Today the model reads <b>{current_market_tone}</b>.</li>
-    <li>Then scan <b>Strong Structures</b> and <b>Improving Structures</b> first, and treat <b>Emerging Structures</b> as earlier-stage ideas in this framework.</li>
-    <li>Use <b>Charts</b> for daily and weekly confirmation.</li>
-    <li>Use <b>Portfolio</b> to review baskets like Ready Now, Improving Fast, Watchlist and Avoid.</li>
+    <li>The board shows sample views of recent changes and stage-based snapshots from the dataset.</li>
+    <li>Use <b>Charts</b> for daily and weekly context, and use <b>Portfolio</b> to inspect custom or descriptive stage/industry baskets.</li>
+    <li>The platform does not rank, recommend, prioritize, or suggest securities for investment purposes.</li>
   </ul>
 </div>
 <div class="learn-card">
@@ -1468,6 +1405,5 @@ with tabs[how_tab_index]:
 disclaimer_tab_index = 5 if view_mode == "Beginner" else 8
 with tabs[disclaimer_tab_index]:
     st.markdown("### Disclaimer")
-    st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities, and it does not provide model portfolios, suitability analysis, or allocation recommendations.")
+    st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. It does not rank, recommend, prioritize, or suggest any securities for investment purposes, and it does not provide model portfolios, suitability analysis, or allocation recommendations.")
     render_disclosure()
-tabs = st.tabs
