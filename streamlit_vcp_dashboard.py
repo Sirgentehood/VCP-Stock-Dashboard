@@ -51,6 +51,7 @@ st.markdown("""
 .action-watch {background: rgba(55,95,220,0.12); color: #8ab4ff; border:1px solid rgba(55,95,220,0.35);}
 .action-caution {background: rgba(255,159,67,0.12); color: var(--cautious); border:1px solid rgba(255,159,67,0.35);}
 .action-avoid {background: rgba(255,107,107,0.12); color: var(--weak); border:1px solid rgba(255,107,107,0.35);}
+.structure-pill {display:inline-block; font-size:0.74rem; font-weight:800; padding:0.18rem 0.5rem; border-radius:999px; white-space:nowrap; margin-top:0.22rem; background: rgba(255,255,255,0.08); color:#eef3ff; border:1px solid rgba(255,255,255,0.18);}
 .assist-box {border:1px solid var(--card-border); border-radius:16px; padding:0.85rem 0.95rem; background:rgba(255,255,255,0.03); margin-bottom:0.55rem;}
 .assist-title {font-size:1rem; font-weight:800; margin-bottom:0.28rem;}
 .assist-text {font-size:0.98rem; color: #f3f6fb; line-height:1.55;}
@@ -171,68 +172,59 @@ def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _decision_css(decision: str) -> str:
-    return {
-        "Ready": "decision-ready",
-        "Near Ready": "decision-near-ready",
-        "Needs Confirmation": "decision-needs-confirmation",
-        "Too Early": "decision-too-early",
-        "Avoid": "decision-avoid",
-    }.get(decision, "decision-too-early")
+    return 'structure-pill'
 
-
-def decision_score(row: pd.Series) -> int:
+def structure_score(row: pd.Series) -> int:
     stage = str(row.get("stage", ""))
     label = str(row.get("label", row.get("classification", "Developing")))
-    score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
+    base_score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
     rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
     rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
-    rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
 
     value = 0.0
-    value += {"Stage 1": 18, "Stage 2": 42, "Stage 3": 10, "Stage 4": -12}.get(stage, 12)
-    value += {"Strong": 24, "Developing": 14, "Cautious": -6, "Weak": -18}.get(label, 10)
-    if pd.notna(score):
-        value += min(24, max(0, score * 0.28))
+    value += {"Stage 1": 24, "Stage 2": 48, "Stage 3": 26, "Stage 4": 10}.get(stage, 20)
+    value += {"Strong": 20, "Developing": 12, "Cautious": 6, "Weak": 0}.get(label, 8)
+    if pd.notna(base_score):
+        value += min(26, max(0, base_score * 0.28))
     if pd.notna(rank):
-        value += max(0, 18 - min(rank, 18))
+        value += max(0, 14 - min(rank, 14))
     if pd.notna(rank_change) and rank_change > 0:
-        value += min(10, rank_change * 1.4)
+        value += min(8, rank_change * 1.1)
     if bool(row.get("entered_stage_2", False)):
-        value += 12
+        value += 6
     if bool(row.get("new_weekly_breakout", False)):
-        value += 10
+        value += 5
     if bool(row.get("new_daily_breakout", False)):
-        value += 8
-    if pd.notna(rs3) and rs3 > 0:
         value += 4
-    if pd.notna(rs6) and rs6 > 0:
-        value += 4
-    if stage == "Stage 3":
-        value -= 8
-    if stage == "Stage 4":
-        value -= 15
     return int(max(0, min(100, round(value))))
 
 
-def decision_state(row: pd.Series) -> str:
+def decision_score(row: pd.Series) -> int:
+    return structure_score(row)
+
+
+def structure_category(row: pd.Series) -> str:
     stage = str(row.get("stage", ""))
     label = str(row.get("label", row.get("classification", "Developing")))
-    score = decision_score(row)
-    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    breakout = bool(row.get("new_daily_breakout", False) or row.get("new_weekly_breakout", False))
+    score = structure_score(row)
 
+    if stage == "Stage 2" and label == "Strong":
+        return "Strong Structure"
+    if stage == "Stage 2" and score >= 55:
+        return "Developing Structure"
+    if stage == "Stage 1":
+        return "Emerging Structure"
+    if stage == "Stage 3":
+        return "Transitioning Structure"
     if stage == "Stage 4" or label == "Weak":
-        return "Avoid"
-    if stage == "Stage 2" and label == "Strong" and score >= 72 and (pd.isna(rank) or rank <= 20 or breakout):
-        return "Ready"
-    if stage == "Stage 2" and score >= 58:
-        return "Near Ready"
-    if stage == "Stage 1" and score >= 48:
-        return "Needs Confirmation"
-    if stage == "Stage 3" or label == "Cautious":
-        return "Avoid" if score < 32 else "Too Early"
-    return "Too Early"
+        return "Weak Structure"
+    if label == "Cautious":
+        return "Cautious Structure"
+    return "Mixed Structure"
+
+
+def decision_state(row: pd.Series) -> str:
+    return structure_category(row)
 
 
 def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> dict:
@@ -240,9 +232,9 @@ def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.Data
     if combined_df.empty:
         return {
             "Top Names that Changed": empty,
-            "Ready Now": empty,
-            "Improving Fast": empty,
-            "Watchlist": empty,
+            "Strong Structures": empty,
+            "Improving Structures": empty,
+            "Emerging Structures": empty,
         }
 
     work = combined_df.copy()
@@ -292,9 +284,9 @@ def build_decision_board_sections(combined_df: pd.DataFrame, changes_df: pd.Data
 
     sections = {
         "Top Names that Changed": {"all": changed_all, "top": unique_top(changed_all, 3)},
-        "Ready Now": {"all": ready_all, "top": unique_top(ready_all, 3)},
-        "Improving Fast": {"all": improving_all, "top": unique_top(improving_all, 3)},
-        "Watchlist": {"all": watchlist_all, "top": unique_top(watchlist_all, 3)},
+        "Strong Structures": {"all": ready_all, "top": unique_top(ready_all, 3)},
+        "Improving Structures": {"all": improving_all, "top": unique_top(improving_all, 3)},
+        "Emerging Structures": {"all": watchlist_all, "top": unique_top(watchlist_all, 3)},
     }
     return sections
 
@@ -489,16 +481,17 @@ def one_line_explanation(row: pd.Series) -> str:
 
 def guided_workflow_steps(market_label: str) -> list:
     first_step = {
-        "Risk On": "Start with Stage 2 names and the strongest industries.",
-        "Mixed": "Be selective and focus on top-ranked Stage 2 names or the tightest Stage 1 bases.",
-        "Risk Off": "Use the dashboard mainly to track improving bases and avoid forcing Stage 2 labels.",
-    }.get(market_label, "Start with the highest-ranked names and confirm on both timeframes.")
+        "Risk On": "This backdrop usually shows broader participation across stronger structures.",
+        "Mixed": "This backdrop usually reflects selective participation and mixed follow-through.",
+        "Risk Off": "This backdrop usually shows fewer advancing structures and more repair activity.",
+    }.get(market_label, "Use the board as a descriptive map of current market structure.")
     return [
         f"Step 1: Read market tone first. Today the model reads: {market_label}. {first_step}",
-        "Step 2: Treat Stage 1 as a base or repair zone, and treat Stage 2 as the primary leadership phase.",
-        "Step 3: Prefer improving ranks, stronger industries, and daily-weekly alignment over isolated laggards.",
-        "Step 4: Use Portfolio and Alerts tabs to monitor stage transitions over time.",
+        "Step 2: In this framework, Stage 1 reflects base formation or repair, while Stage 2 reflects an advancing structure.",
+        "Step 3: Relative rank, industry alignment, and daily-weekly confirmation help describe how a stock is positioned versus peers.",
+        "Step 4: Use Portfolio and Structure Changes tabs to monitor transitions over time without treating the tool as advice.",
     ]
+
 
 def portfolio_assistant(current: pd.DataFrame) -> list:
     if current.empty:
@@ -507,21 +500,16 @@ def portfolio_assistant(current: pd.DataFrame) -> list:
     stage2 = int((current["stage"] == "Stage 2").sum()) if "stage" in current.columns else 0
     weak = int((current["label"].isin(["Weak", "Cautious"])).sum()) if "label" in current.columns else 0
     stage4 = int((current["stage"] == "Stage 4").sum()) if "stage" in current.columns else 0
-    msgs = []
-    if stage2 >= max(3, math.ceil(total * 0.45)):
-        msgs.append(f"{stage2} of {total} stocks are in Stage 2, so the basket has decent trend participation.")
-    else:
-        msgs.append(f"Only {stage2} of {total} stocks are in Stage 2, so leadership inside the basket is limited.")
-    if weak >= max(2, math.ceil(total * 0.4)):
-        msgs.append(f"{weak} names are in Weak or Cautious territory, so risk is concentrated in lagging names.")
-    else:
-        msgs.append("Weak and Cautious names are contained, so the basket is not heavily tilted to laggards.")
-    if stage4 > 0:
-        msgs.append(f"{stage4} names are already in Stage 4, so these deserve extra review first.")
+    msgs = [
+        f"{stage2} of {total} stocks are currently classified as Stage 2 within this rule-based framework.",
+        f"{weak} of {total} stocks are currently tagged as Weak or Cautious by the model.",
+        f"{stage4} of {total} stocks are currently in Stage 4."
+    ]
     top_industries = current["Industry"].dropna().astype(str).value_counts().head(2).index.tolist() if "Industry" in current.columns else []
     if top_industries:
-        msgs.append(f"The basket is most exposed to {', '.join(top_industries)}.")
+        msgs.append(f"Most names in this basket are from {', '.join(top_industries)}.")
     return msgs
+
 
 def market_tone(regime_df: pd.DataFrame, combined_df: pd.DataFrame) -> str:
     if not regime_df.empty and "regime_label" in regime_df.columns:
@@ -563,7 +551,7 @@ def chart_dropdown_options(df: pd.DataFrame):
 def render_disclosure():
     st.markdown("""
 <div class="disclosure">
-This dashboard is an informational analytics tool. It shows rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, not an actionable uptrend by itself. Stage 2 is the primary leadership phase. The tool does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.
+This platform provides rule-based market structure analytics and visualization only. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. No output on this dashboard should be treated as a personalized recommendation, model portfolio, suitability assessment, or allocation advice. Users remain solely responsible for any investment decisions.
 </div>
 """, unsafe_allow_html=True)
 
@@ -678,8 +666,8 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     stage_desc = stage_short_description(stage_raw)
     stage_condition = stage_condition_text(row)
     display_name = stock_display_label(row)
-    decision = decision_state(row)
-    dscore = decision_score(row)
+    decision = structure_category(row)
+    dscore = structure_score(row)
     signals = signal_summary(row)
     classes = []
     if use_stage_color:
@@ -693,7 +681,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
-    decision_html = f"<div class='decision-pill {_decision_css(decision)}'>Decision: {decision} · Score {dscore}</div>"
+    decision_html = f"<div class='structure-pill'>Structure: {decision} · Score {dscore}</div>"
     rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
@@ -829,19 +817,19 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
         alert_type = ""
         reason = ""
         if cr is not None and bool(cr.get("entered_stage_2", False)):
-            alert_type = "Entered Stage 2"
-            reason = "Trend moved into the uptrend phase."
+            alert_type = "Stage transition event"
+            reason = "The stock moved into Stage 2 in this framework."
         elif cr is not None and bool(cr.get("new_weekly_breakout", False)):
-            alert_type = "Weekly breakout"
-            reason = "Weekly structure triggered a fresh breakout event."
+            alert_type = "Weekly structure breakout event"
+            reason = "A fresh weekly breakout flag was detected by the model."
         elif cr is not None and bool(cr.get("new_daily_breakout", False)):
-            alert_type = "Daily breakout"
-            reason = "Daily structure triggered a fresh breakout event."
+            alert_type = "Daily structure breakout event"
+            reason = "A fresh daily breakout flag was detected by the model."
         else:
             rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
             if pd.notna(rank_change) and rank_change >= 5:
-                alert_type = "Rank improvement"
-                reason = f"Rank improved by {int(rank_change)} places."
+                alert_type = "Relative position change"
+                reason = f"Relative rank improved by {int(rank_change)} places."
 
         if alert_type:
             item = row.copy()
@@ -938,19 +926,19 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
         if "label" not in tmp.columns:
             tmp["label"] = tmp.apply(classify_stock, axis=1)
         names = tmp.loc[tmp["label"] == "Strong", "Company Name"].dropna().tolist()
-    elif name == "Ready Now":
+    elif name == "Strong Structures":
         names = ranked.loc[ranked["decision_state"] == "Ready", "Company Name"].dropna().tolist()
-    elif name == "Improving Fast":
+    elif name == "Improving Structures":
         improving_mask = pd.to_numeric(ranked.get("rank_change"), errors="coerce").fillna(0).gt(0)
         if "new_daily_breakout" in ranked.columns:
             improving_mask = improving_mask | ranked["new_daily_breakout"].fillna(False)
         if "new_weekly_breakout" in ranked.columns:
             improving_mask = improving_mask | ranked["new_weekly_breakout"].fillna(False)
         names = ranked.loc[improving_mask, "Company Name"].dropna().tolist()
-    elif name == "Watchlist":
+    elif name == "Emerging Structures":
         names = ranked.loc[ranked["decision_state"].isin(["Near Ready", "Needs Confirmation", "Too Early"]), "Company Name"].dropna().tolist()
-    elif name == "Avoid":
-        names = ranked.loc[ranked["decision_state"] == "Avoid", "Company Name"].dropna().tolist()
+    elif name == "Weak Structures":
+        names = ranked.loc[ranked["decision_state"] == "Weak Structures", "Company Name"].dropna().tolist()
     elif name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
         names = combined.loc[combined["stage"] == name, "Company Name"].dropna().tolist()
     elif name == "Cautious":
@@ -965,19 +953,20 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
 
 
 st.title("Market Structure Radar")
+st.caption("Rule-based market structure analytics and visualization")
 view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
 show_pro_quick_read = False
 if view_mode == "Beginner":
-    tab_names = ["Decision Board", "Charts", "Movers", "Portfolio", "How to Use", "Disclaimer"]
+    tab_names = ["Structure Board", "Charts", "Movers", "Portfolio", "How to Use", "Disclaimer"]
 else:
-    tab_names = ["Decision Board", "Charts", "Movers", "Market", "Portfolio", "Alerts", "Advanced", "How to Use", "Disclaimer"]
+    tab_names = ["Structure Board", "Charts", "Movers", "Market", "Portfolio", "Structure Changes", "Advanced", "How to Use", "Disclaimer"]
 
 def render_stock_detail(row):
     try:
         stock_name = str(row.get("Company Name", row.get("stock_name", "")) or "")
         ticker = str(row.get("ticker", "") or "")
         stage = str(row.get("stage", "") or "")
-        decision = decision_state(row) if "decision_state" in globals() else ""
+        decision = structure_category(row) if "decision_state" in globals() else ""
         qualifier = stage_condition_text(row) if "stage_condition_text" in globals() else ""
 
         try:
@@ -1049,7 +1038,7 @@ def render_stock_detail(row):
         st.markdown("#### Stock detail")
         st.markdown(f"**{stock_name} ({ticker})**")
         if decision:
-            st.caption(decision)
+            st.caption(f"Structure category: {decision}")
 
         meta = []
         if stage:
@@ -1057,7 +1046,7 @@ def render_stock_detail(row):
         if qualifier:
             meta.append(qualifier)
         if dscore is not None:
-            meta.append(f"Decision Score: {dscore}")
+            meta.append(f"Structure Score: {dscore}")
         if rank_val is not None:
             meta.append(f"Rank: {rank_val}")
         if meta:
@@ -1092,32 +1081,24 @@ def portfolio_health_summary(current: pd.DataFrame):
     stage3 = int(stage_counts.get("Stage 3", 0))
     stage4 = int(stage_counts.get("Stage 4", 0))
 
-    ready = 0
-    near_ready = 0
-    avoid = 0
-    if "decision_state" in current.columns:
-        ready = int((current["decision_state"] == "Ready").sum())
-        near_ready = int((current["decision_state"] == "Near Ready").sum())
-        avoid = int((current["decision_state"] == "Avoid").sum())
-    else:
-        states = current.apply(decision_state, axis=1)
-        ready = int((states == "Ready").sum())
-        near_ready = int((states == "Near Ready").sum())
-        avoid = int((states == "Avoid").sum())
+    state_series = current["decision_state"] if "decision_state" in current.columns else current.apply(structure_category, axis=1)
+    strong_ct = int((state_series == "Strong Structure").sum())
+    developing_ct = int((state_series == "Developing Structure").sum())
+    weak_ct = int((state_series == "Weak Structure").sum())
 
-    if stage2 >= max(3, round(total * 0.45)) and avoid <= max(1, round(total * 0.15)):
-        title = "Strong"
-    elif stage2 + stage1 >= max(3, round(total * 0.50)) and avoid <= max(2, round(total * 0.25)):
-        title = "Constructive"
-    elif stage4 >= max(2, round(total * 0.30)) or avoid >= max(2, round(total * 0.25)):
-        title = "Weakening"
+    if stage2 >= max(3, round(total * 0.45)) and weak_ct <= max(1, round(total * 0.15)):
+        title = "Stage 2 heavy"
+    elif stage2 + stage1 >= max(3, round(total * 0.50)):
+        title = "Early-to-advancing mix"
+    elif stage4 >= max(2, round(total * 0.30)):
+        title = "Transition or decline heavy"
     else:
-        title = "Mixed"
+        title = "Mixed composition"
 
     text = (
-        f"{stage2}/{total} are in Stage 2, {stage1} are in Stage 1, "
-        f"{stage3} are under pressure, and {stage4} are weakening. "
-        f"Decision mix: {ready} Ready, {near_ready} Near Ready, {avoid} Avoid."
+        f"Out of {total} stocks, {stage2} are in Stage 2, {stage1} are in Stage 1, "
+        f"{stage3} are in Stage 3, and {stage4} are in Stage 4. "
+        f"Structure categories: {strong_ct} Strong Structure, {developing_ct} Developing Structure, {weak_ct} Weak Structure."
     )
     return title, text
 
@@ -1127,7 +1108,7 @@ tabs = st.tabs(tab_names)
 # Decision Board
 with tabs[0]:
     current_market_tone = market_tone(regime, combined)
-    st.markdown("### Decision Board")
+    st.markdown("### Market Structure Board")
     c1, c2, c3 = st.columns(3)
     with c1:
         render_summary_card("Market tone", current_market_tone, "Use this before reviewing any stock")
@@ -1135,7 +1116,7 @@ with tabs[0]:
         render_summary_card("New Strong", str(changes_summary["New Strong"]), "Stage 2 leaders improving materially")
     with c3:
         render_summary_card("Top industries", top_industry_text(industry), "Industries that are leading currently")
-    for title in ["Top Names that Changed", "Ready Now", "Improving Fast", "Watchlist"]:
+    for title in ["Top Names that Changed", "Strong Structures", "Improving Structures", "Emerging Structures"]:
         section = board_sections.get(title, {"all": pd.DataFrame(), "top": pd.DataFrame()})
         total_ct = len(section["all"])
         st.markdown(f"#### {title} (Top 3 out of {total_ct})")
@@ -1303,7 +1284,7 @@ with tabs[portfolio_tab_index]:
     if "portfolio_selection_prev" not in st.session_state:
         st.session_state["portfolio_selection_prev"] = st.session_state["portfolio_selection"]
 
-    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Ready Now", "Improving Fast", "Watchlist", "Avoid", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
+    portfolio_options = ["Custom", "Top 15", "New Breakouts", "New Strong", "Strong Structures", "Improving Structures", "Emerging Structures", "Weak Structures", "Strong", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_portfolio = st.selectbox("Portfolio selection", portfolio_options, key="portfolio_selection")
 
     previous_portfolio = st.session_state.get("portfolio_selection_prev", "Custom")
@@ -1347,9 +1328,9 @@ with tabs[portfolio_tab_index]:
         with c4: render_summary_card("Stage 3", str(int(p_stage_counts.get("Stage 3", 0))), "Under pressure")
         with c5: render_summary_card("Stage 4", str(int(p_stage_counts.get("Stage 4", 0))), "Weakening")
 
-        st.markdown("### Portfolio assistant")
+        st.markdown("### Portfolio composition")
         health_title, health_text = portfolio_health_summary(current)
-        st.markdown(f'<div class="assist-box"><div class="assist-title">Portfolio health: {health_title}</div><div class="assist-text">{health_text}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="assist-box"><div class="assist-title">Portfolio composition: {health_title}</div><div class="assist-text">{health_text}</div></div>', unsafe_allow_html=True)
         for msg in portfolio_assistant(current):
             st.markdown(f'''<div class="assist-box"><div class="assist-text">{msg}</div></div>''', unsafe_allow_html=True)
 
@@ -1414,14 +1395,14 @@ with tabs[portfolio_tab_index]:
 # Alerts and Advanced only in Pro
 if view_mode == "Pro":
     with tabs[5]:
-        st.markdown("### Alerts")
-        st.markdown("#### Triggered alert candidates from the latest scan")
+        st.markdown("### Structure Changes")
+        st.markdown("#### Recent structure change events from the latest scan")
         if alert_candidates.empty:
             st.info("No alert candidates found in the latest data.")
         else:
             for _, r in alert_candidates.iterrows():
                 stock_rank = get_stock_rank(r["ticker"])
-                card(r, use_stage_color=True, show_change_text=f"Alert: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
+                card(r, use_stage_color=True, show_change_text=f"Structure change: {r['alert_type']} — {r['alert_reason']}", stock_rank=stock_rank)
         render_disclosure()
 
     with tabs[6]:
@@ -1460,8 +1441,8 @@ with tabs[how_tab_index]:
         st.markdown(f'''<div class="learn-card">
   <div class="stock-title">How to read this dashboard</div>
   <ul class="list-tight">
-    <li>Start with <b>Decision Board</b>. Today the model reads <b>{current_market_tone}</b>.</li>
-    <li>Then scan <b>Ready Now</b> and <b>Improving Fast</b> first, and treat watchlist names as earlier-stage ideas.</li>
+    <li>Start with <b>Structure Board</b>. Today the model reads <b>{current_market_tone}</b>.</li>
+    <li>Then scan <b>Strong Structures</b> and <b>Improving Structures</b> first, and treat <b>Emerging Structures</b> as earlier-stage ideas in this framework.</li>
     <li>Use <b>Charts</b> for daily and weekly confirmation.</li>
     <li>Use <b>Portfolio</b> to review baskets like Ready Now, Improving Fast, Watchlist and Avoid.</li>
   </ul>
@@ -1487,5 +1468,6 @@ with tabs[how_tab_index]:
 disclaimer_tab_index = 5 if view_mode == "Beginner" else 8
 with tabs[disclaimer_tab_index]:
     st.markdown("### Disclaimer")
-    st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. In this model, Stage 1 means a base or repair zone, while Stage 2 is the main advancing phase. It does not provide personalized investment advice, suitability analysis, buy calls, sell calls, or allocation recommendations.")
+    st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities, and it does not provide model portfolios, suitability analysis, or allocation recommendations.")
     render_disclosure()
+tabs = st.tabs
