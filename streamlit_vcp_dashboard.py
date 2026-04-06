@@ -668,6 +668,61 @@ def render_stock_detail(row):
     with col3:
         st.markdown('<div class="info-card"><b>Industry</b><br>' + str(row.get("Industry", "Not available")) + '</div>', unsafe_allow_html=True)
 
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a"):
+    label = row.get("label", row.get("classification", "Developing"))
+    style = LABELS.get(label, LABELS["Developing"])
+    stage_raw = str(row.get("stage", "Unknown"))
+    stage_label = stage_primary_label(stage_raw)
+    stage_desc = stage_short_description(stage_raw)
+    stage_condition = stage_condition_text(row)
+    display_name = stock_display_label(row)
+    structure = structure_category(row)
+    score = structure_score(row)
+    interpret = interpretation_line(row)
+    signals = signal_summary(row)
+    signals_html = f"<div class='small-note' style='margin-top:0.15rem;'>{signals}</div>" if signals and signals != "No major new structure-change flag in the latest update." else ""
+    industry_name = str(row.get("Industry", "")).strip()
+    industry_with_icon = f"{industry_icon(industry_name)} {industry_name}" if industry_name else "Not available"
+
+    classes = []
+    if use_stage_color:
+        stage_cls = _stage_card_class(stage_raw)
+        if stage_cls:
+            classes.append(stage_cls)
+
+    change_html = ""
+    if pct is not None:
+        cls = "change-badge-up" if pct > 0 else "change-badge-down"
+        change_html = f"<div class='{cls}'>{pct:+.2f}%</div>"
+
+    extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
+    class_attr = " ".join(classes)
+    status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
+    structure_html = f"<div class='structure-pill'>{structure} · Model Score {score}/100</div>"
+    rank_html = f"<div class='rank-text'>Dataset Rank {stock_rank}</div>"
+
+    html = (
+        f"<div class='stock-card {class_attr}'>"
+        f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.55rem;'>"
+        f"<div style='min-width:0;'>"
+        f"<div class='stock-title'>{display_name}</div>"
+        f"<div class='meta-line'>{stage_raw} • {stage_label} • {stage_condition}</div>"
+        f"<div class='stock-subtitle'>{interpret}</div>"
+        f"{structure_html}"
+        f"<div class='small-note'>Higher model score means stronger structure inside this model. It is not a recommendation.</div>"
+        f"<div class='small-note' style='margin-top:0.15rem;'>{stage_desc}</div>"
+        f"<div class='small-note' style='margin-top:0.2rem;'>{industry_with_icon}</div>"
+        f"{signals_html}"
+        f"</div>"
+        f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
+        f"{status_html}{rank_html}{change_html}"
+        f"</div>"
+        f"</div>"
+        f"{extra_change}"
+        f"</div>"
+    )
+    st.markdown(html, unsafe_allow_html=True)
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
