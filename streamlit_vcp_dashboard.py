@@ -440,6 +440,49 @@ def build_today_changes(changes_df: pd.DataFrame, industry_changes_df: pd.DataFr
     top_changed = df.sort_values(sort_cols, ascending=ascending, na_position="last").head(12).copy()
     return top_changed, summary
 
+def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) -> pd.DataFrame:
+    if combined_df.empty:
+        return pd.DataFrame()
+    alerts = []
+    changes_lookup = changes_df.copy() if not changes_df.empty else pd.DataFrame()
+    if not changes_lookup.empty and "ticker" in changes_lookup.columns:
+        changes_lookup["ticker"] = changes_lookup["ticker"].astype(str).str.strip()
+        changes_lookup = changes_lookup.set_index("ticker", drop=False)
+
+    for _, row in combined_df.iterrows():
+        ticker = str(row.get("ticker", "")).strip()
+        cr = changes_lookup.loc[ticker] if (not changes_lookup.empty and ticker in changes_lookup.index) else None
+        alert_type = ""
+        reason = ""
+        if cr is not None and bool(cr.get("entered_stage_2", False)):
+            alert_type = "Stage transition event"
+            reason = "The stock moved into Stage 2 in this framework."
+        elif cr is not None and bool(cr.get("new_weekly_breakout", False)):
+            alert_type = "Weekly structure breakout event"
+            reason = "A fresh weekly breakout flag was detected."
+        elif cr is not None and bool(cr.get("new_daily_breakout", False)):
+            alert_type = "Daily structure breakout event"
+            reason = "A fresh daily breakout flag was detected."
+        else:
+            rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+            if pd.notna(rank_change) and abs(rank_change) >= 5:
+                alert_type = "Relative position change"
+                direction = "improved" if rank_change > 0 else "declined"
+                reason = f"Dataset rank {direction} by {abs(int(rank_change))} places."
+        if alert_type:
+            item = row.copy()
+            item["alert_type"] = alert_type
+            item["alert_reason"] = reason
+            alerts.append(item)
+
+    if not alerts:
+        return pd.DataFrame()
+    out = pd.DataFrame(alerts)
+    if "Company Name" in out.columns:
+        out = out.sort_values(["Company Name"], ascending=[True])
+    return out.head(20)
+
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
