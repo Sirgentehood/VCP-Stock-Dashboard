@@ -548,6 +548,126 @@ def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.Da
     return []
 
 
+def market_tone(regime_df: pd.DataFrame, combined_df: pd.DataFrame) -> str:
+    if not regime_df.empty and "regime_label" in regime_df.columns:
+        label = str(regime_df.iloc[0]["regime_label"])
+        return {"risk_on": "Risk On", "mixed": "Mixed", "risk_off": "Risk Off"}.get(label, "Mixed")
+    strong_count = int((combined_df["label"] == "Strong").sum()) if not combined_df.empty and "label" in combined_df.columns else 0
+    if strong_count >= 15:
+        return "Risk On"
+    if strong_count >= 6:
+        return "Mixed"
+    return "Risk Off"
+
+
+def market_tone_text(label: str) -> str:
+    return {
+        "Risk On": "More names are participating in advancing structures.",
+        "Mixed": "Participation is selective. Some names are strong while others are weak.",
+        "Risk Off": "Fewer names are in advancing structures and more are in repair or decline phases.",
+    }.get(label, "This is a neutral descriptive view of the current dataset.")
+
+
+def top_industry_text(industry_df: pd.DataFrame, n: int = 3) -> str:
+    if industry_df.empty or "Industry" not in industry_df.columns:
+        return "Not available"
+    return ", ".join(industry_df.head(n)["Industry"].astype(str).tolist())
+
+
+def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
+    out, seen = [], set()
+    for name in names:
+        if pd.isna(name):
+            continue
+        name = str(name).strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        out.append(name)
+        if len(out) >= limit:
+            break
+    return out
+
+
+def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame, industries: list) -> list:
+    ranked = combined.sort_values(["Company Name", "ticker"], ascending=[True, True], na_position="last").copy()
+    names = []
+    if name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
+        names = ranked.loc[ranked["stage"] == name, "Company Name"].dropna().tolist()
+    elif name in {"Strong", "Developing", "Cautious", "Weak"}:
+        names = ranked.loc[ranked["label"] == name, "Company Name"].dropna().tolist()
+    elif name in industries:
+        names = ranked.loc[ranked["Industry"].astype(str).str.strip() == name, "Company Name"].dropna().tolist()
+    return dedupe_names(names, limit=MAX_PORTFOLIO_STOCKS)
+
+
+def render_distribution(stage_counts: dict):
+    total = max(1, sum(stage_counts.values()))
+    colors = {
+        "Stage 1": "#4f7dff",
+        "Stage 2": "#16c5c5",
+        "Stage 3": "#d4a017",
+        "Stage 4": "#aa50b4",
+    }
+    st.markdown('<div class="info-card">', unsafe_allow_html=True)
+    st.markdown("**Market distribution**")
+    for key in ["Stage 1", "Stage 2", "Stage 3", "Stage 4"]:
+        value = int(stage_counts.get(key, 0))
+        pct = round((value / total) * 100)
+        st.markdown(
+            f"""
+            <div class="dist-row">
+              <div class="dist-label">{key}</div>
+              <div class="dist-bar-wrap"><div class="dist-bar" style="width:{pct}%; background:{colors[key]};"></div></div>
+              <div class="dist-value">{value}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def portfolio_health_summary(current: pd.DataFrame):
+    if current is None or current.empty:
+        return "Empty", "No stocks are currently in this watchlist."
+    stage_counts = current["stage"].value_counts() if "stage" in current.columns else pd.Series(dtype=int)
+    total = len(current)
+    stage2 = int(stage_counts.get("Stage 2", 0))
+    stage1 = int(stage_counts.get("Stage 1", 0))
+    stage3 = int(stage_counts.get("Stage 3", 0))
+    stage4 = int(stage_counts.get("Stage 4", 0))
+    title = "Mixed composition"
+    if stage2 >= max(3, round(total * 0.45)):
+        title = "Advancing-heavy mix"
+    elif stage4 >= max(2, round(total * 0.30)):
+        title = "Transition or decline-heavy mix"
+    elif stage1 >= max(2, round(total * 0.30)):
+        title = "Base-heavy mix"
+    text = f"Out of {total} stocks, {stage1} are in Stage 1, {stage2} are in Stage 2, {stage3} are in Stage 3, and {stage4} are in Stage 4."
+    return title, text
+
+
+def render_stock_detail(row):
+    stock_name = str(row.get("Company Name", row.get("stock_name", "")) or "")
+    ticker = str(row.get("ticker", "") or "")
+    stage = str(row.get("stage", "") or "")
+    st.markdown("#### Stock detail")
+    st.markdown(f"**{stock_name} ({ticker})**")
+    st.caption(f"{stage_primary_label(stage)} · {structure_category(row)}")
+    meta = []
+    rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
+    if pd.notna(rank_val):
+        meta.append(f"Dataset Rank: {int(rank_val)}")
+    meta.append(f"Model Score: {structure_score(row)}")
+    st.write(" • ".join(meta))
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown('<div class="info-card"><b>Current model description</b><br>' + interpretation_line(row) + '</div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown('<div class="info-card"><b>Recent structure-change flags</b><br>' + signal_summary(row) + '</div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown('<div class="info-card"><b>Industry</b><br>' + str(row.get("Industry", "Not available")) + '</div>', unsafe_allow_html=True)
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
