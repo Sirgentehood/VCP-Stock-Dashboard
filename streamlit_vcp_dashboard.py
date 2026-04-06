@@ -510,20 +510,13 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
     return "n/a"
 
 def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
+    if "Industry" in combined_df.columns:
+        industries = sorted(set(combined_df["Industry"].dropna().astype(str).str.strip().tolist()))
+        return industries[:limit]
     if not industry_df.empty and "Industry" in industry_df.columns:
-        industries = industry_df["Industry"].dropna().astype(str).str.strip().tolist()
-        seen = set()
-        out = []
-        for ind in industries:
-            if ind and ind not in seen:
-                seen.add(ind)
-                out.append(ind)
-                if len(out) >= limit:
-                    return out
-    if "Industry" not in combined_df.columns:
-        return []
-    grouped = combined_df.dropna(subset=["Industry"]).groupby("Industry", as_index=False)["Company Name"].count().sort_values("Industry")
-    return grouped["Industry"].astype(str).head(limit).tolist()
+        industries = sorted(set(industry_df["Industry"].dropna().astype(str).str.strip().tolist()))
+        return industries[:limit]
+    return []
 
 def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     out, seen = [], set()
@@ -586,6 +579,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     interpret = interpretation_line(row)
     score_note = score_explanation_line(row)
     signals = signal_summary(row)
+    signals_html = f"<div class='small-note' style='margin-top:0.15rem;'>{signals}</div>" if signals and signals != "No major new structure-change flag in the latest update." else ""
     industry_name = str(row.get("Industry", "")).strip()
     industry_with_icon = f"{industry_icon(industry_name)} {industry_name}" if industry_name else "🏷️ Not available"
     classes = []
@@ -607,12 +601,12 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.55rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{display_name}</div>"
-        f"<div class='meta-line'>{stage_label} • {stage_condition}</div>"
+        f"<div class='meta-line'>{stage_raw} • {stage_label} • {stage_condition}</div>"
         f"<div class='stock-subtitle'>{interpret}</div>"
         f"{structure_html}"
         f"<div class='small-note'>{stage_desc}</div>"
         f"<div class='small-note' style='margin-top:0.15rem;'>{industry_with_icon}</div>"
-        f"<div class='small-note' style='margin-top:0.15rem;'>{signals}</div>"
+        f"{signals_html}"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
@@ -738,7 +732,7 @@ if "chart_selected_ticker" not in st.session_state:
 st.title("Market Structure Radar")
 st.caption("Rule-based market structure analytics and visualization")
 view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
-tab_names = ["Today", "Explore", "Watchlist", "Charts", "Learn", "Disclaimer"] if view_mode == "Beginner" else ["Today", "Explore", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
+tab_names = ["Today", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer"] if view_mode == "Beginner" else ["Today", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
 tabs = st.tabs(tab_names)
 
 with tabs[0]:
@@ -747,7 +741,7 @@ with tabs[0]:
     with c1:
         render_summary_card("Market mode", current_market_tone, market_tone_text(current_market_tone))
     with c2:
-        render_summary_card("Recent Stage 2 moves", str(changes_summary["Entered Stage 2"]), "Rows that moved into Stage 2 in the latest change file")
+        render_summary_card("Stage 2 count", str(stage_counts["Stage 2"]), "Stocks currently in advancing phase")
     with c3:
         render_summary_card("Top industries in view", top_industry_text(industry), "Industries at the top of the current industry table")
     st.markdown("### What changed today")
@@ -804,6 +798,30 @@ with tabs[1]:
     render_disclosure()
 
 with tabs[2]:
+    st.markdown("### Movers")
+    if moves.empty:
+        st.info("Price move data not found yet.")
+    else:
+        window_map = {"1 Day":"change_1d_pct","1 Week":"change_1w_pct","1 Month":"change_1m_pct","YTD":"change_ytd_pct"}
+        selected = st.radio("Move window", list(window_map.keys()), horizontal=True, index=0, key="movers_window")
+        col = window_map[selected]
+        mv = moves.copy()
+        mv[col] = pd.to_numeric(mv[col], errors="coerce")
+        mv = mv.dropna(subset=[col])
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown(f"#### Biggest upward moves • {selected}")
+            for _, r in mv.sort_values([col, "Company Name"], ascending=[False, True]).head(10).iterrows():
+                stock_rank = get_stock_rank(r["ticker"])
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
+        with c2:
+            st.markdown(f"#### Major downward moves • {selected}")
+            for _, r in mv.sort_values([col, "Company Name"], ascending=[True, True]).head(10).iterrows():
+                stock_rank = get_stock_rank(r["ticker"])
+                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
+    render_disclosure()
+
+with tabs[3]:
     st.markdown("### Watchlist")
     portfolio_options = ["Custom", "Strong", "Developing", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_watchlist = st.selectbox("Watchlist view", portfolio_options, key="watchlist_view")
@@ -827,13 +845,8 @@ with tabs[2]:
         st.info("No stocks added yet.")
     else:
         current = combined[combined["Company Name"].isin(st.session_state["watchlist_names"])].copy().sort_values(["Company Name", "ticker"])
-        c1, c2 = st.columns([0.9, 1.1])
-        with c1:
-            title, text = portfolio_health_summary(current)
-            st.markdown(f'<div class="info-card"><b>Your watchlist summary: {title}</b><br>{text}</div>', unsafe_allow_html=True)
-        with c2:
-            watch_counts = stage_count_summary(current)
-            render_distribution(watch_counts)
+        watch_counts = stage_count_summary(current)
+        render_distribution(watch_counts)
         st.markdown("#### Watchlist cards")
         for _, r in current.iterrows():
             card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
@@ -885,7 +898,7 @@ with tabs[2]:
             st.rerun()
     render_disclosure()
 
-with tabs[3]:
+with tabs[4]:
     st.markdown("### Charts")
     ranked_alpha = combined.sort_values(["Company Name", "ticker"], ascending=[True, True]).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
@@ -986,9 +999,9 @@ with tabs[3]:
         card(row, use_stage_color=True, stock_rank=get_stock_rank(row["ticker"]))
         render_stock_detail(row)
     render_disclosure()
-tab_offset = 4
+tab_offset = 5
 if view_mode == "Pro":
-    with tabs[4]:
+    with tabs[5]:
         st.markdown("### Market")
         c1, c2, c3, c4 = st.columns(4)
         with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
@@ -1011,7 +1024,7 @@ if view_mode == "Pro":
                 cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in industry_changes.columns]
                 st.dataframe(industry_changes[cols], use_container_width=True, hide_index=True, height=520)
         render_disclosure()
-    with tabs[5]:
+    with tabs[6]:
         st.markdown("### Structure Changes")
         if alert_candidates.empty:
             st.info("No structure-change rows were found in the latest data.")
@@ -1019,7 +1032,7 @@ if view_mode == "Pro":
             for _, r in alert_candidates.iterrows():
                 card(r, use_stage_color=True, show_change_text=f"{r['alert_type']} • {r['alert_reason']}", stock_rank=get_stock_rank(r["ticker"]))
         render_disclosure()
-    tab_offset = 6
+    tab_offset = 7
 
 with tabs[tab_offset]:
     left, right = st.columns([1.05, 0.95])
