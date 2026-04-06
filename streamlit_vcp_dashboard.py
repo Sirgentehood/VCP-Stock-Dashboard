@@ -256,13 +256,19 @@ def industry_icon(industry: str) -> str:
             return icon
     return "🏷️"
 
+def score_explanation_line(row: pd.Series) -> str:
+    score = structure_score(row)
+    stage = str(row.get("stage", ""))
+    label = str(row.get("label", row.get("classification", "Developing")))
+    return f"Model Score: {score}/100 • Higher means stronger structure inside this model. It does not mean higher returns and it is not a recommendation. Current classification: {label} in {stage or 'Unknown Stage'}."
+
 def interpretation_line(row: pd.Series) -> str:
     stage = str(row.get("stage", ""))
     mapping = {
-        "Stage 1": "This indicates base formation in the current rule-based model.",
-        "Stage 2": "This indicates an advancing phase in the current rule-based model.",
-        "Stage 3": "This indicates a slowing or transition phase in the current rule-based model.",
-        "Stage 4": "This indicates a declining phase in the current rule-based model.",
+        "Stage 1": "This stock is currently in a base-formation phase in the model.",
+        "Stage 2": "This stock is currently in an advancing phase in the model.",
+        "Stage 3": "This stock is currently in a transition phase in the model.",
+        "Stage 4": "This stock is currently in a declining phase in the model.",
     }
     return mapping.get(stage, "This reflects the current model classification.")
 
@@ -271,17 +277,14 @@ def signal_summary(row: pd.Series) -> str:
     rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
     if pd.notna(rank_change):
         if rank_change > 0:
-            parts.append(f"Rank improved by {int(rank_change)}")
+            parts.append(f"Dataset rank improved by {int(rank_change)}")
         elif rank_change < 0:
-            parts.append(f"Rank declined by {abs(int(rank_change))}")
+            parts.append(f"Dataset rank declined by {abs(int(rank_change))}")
     if bool(row.get("new_weekly_breakout", False)):
         parts.append("Weekly breakout flag")
     elif bool(row.get("new_daily_breakout", False)):
         parts.append("Daily breakout flag")
-    industry = str(row.get("Industry", "")).strip()
-    if industry:
-        parts.append(industry)
-    return " • ".join(parts[:3]) if parts else "No notable fresh change flag."
+    return " • ".join(parts[:2]) if parts else "No major new structure-change flag in the latest update."
 
 def render_disclosure():
     st.markdown("""
@@ -402,10 +405,10 @@ def build_today_changes(changes_df: pd.DataFrame, industry_changes_df: pd.DataFr
             parts.append("Daily breakout flag")
         rc = pd.to_numeric(row.get("rank_change"), errors="coerce")
         if pd.notna(rc) and rc > 0:
-            parts.append(f"Rank improved by {int(rc)}")
+            parts.append(f"Dataset rank improved by {int(rc)}")
         elif pd.notna(rc) and rc < 0:
-            parts.append(f"Rank declined by {abs(int(rc))}")
-        return " • ".join(parts[:3]) if parts else "Model inputs changed"
+            parts.append(f"Dataset rank declined by {abs(int(rc))}")
+        return " • ".join(parts[:3]) if parts else "No major new structure-change flag in the latest update."
 
     df["what_changed"] = df.apply(what_changed, axis=1)
     sort_cols = ["Company Name"] if "Company Name" in df.columns else df.columns[:1].tolist()
@@ -581,6 +584,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     structure = structure_category(row)
     dscore = structure_score(row)
     interpret = interpretation_line(row)
+    score_note = score_explanation_line(row)
     signals = signal_summary(row)
     industry_name = str(row.get("Industry", "")).strip()
     industry_with_icon = f"{industry_icon(industry_name)} {industry_name}" if industry_name else "🏷️ Not available"
@@ -596,7 +600,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
-    structure_html = f"<div class='structure-pill'>{structure} · Structure Index {dscore}</div>"
+    structure_html = f"<div class='structure-pill'>{structure} · Model Score {dscore}</div>"
     rank_html = f"<div class='rank-text'>Dataset Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
@@ -669,13 +673,13 @@ def render_stock_detail(row):
     rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
     if pd.notna(rank_val):
         meta.append(f"Dataset Rank: {int(rank_val)}")
-    meta.append(f"Structure Index: {structure_score(row)}")
+    meta.append(f"Model Score: {structure_score(row)}")
     st.write(" • ".join(meta))
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown('<div class="info-card"><b>What this means</b><br>' + interpretation_line(row) + '</div>', unsafe_allow_html=True)
+        st.markdown('<div class="info-card"><b>Current model description</b><br>' + interpretation_line(row) + '</div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="info-card"><b>Recent model change</b><br>' + signal_summary(row) + '</div>', unsafe_allow_html=True)
+        st.markdown('<div class="info-card"><b>Recent structure-change flags</b><br>' + signal_summary(row) + '</div>', unsafe_allow_html=True)
     with col3:
         st.markdown('<div class="info-card"><b>Industry</b><br>' + f"{industry_icon(row.get('Industry', ''))} {str(row.get('Industry', 'Not available'))}" + '</div>', unsafe_allow_html=True)
 
@@ -725,6 +729,8 @@ if "custom_watchlist_names" not in st.session_state:
     st.session_state["custom_watchlist_names"] = []
 if "watchlist_selection_prev" not in st.session_state:
     st.session_state["watchlist_selection_prev"] = "Custom"
+if "watchlist_chart_index" not in st.session_state:
+    st.session_state["watchlist_chart_index"] = 0
 if "chart_selected_ticker" not in st.session_state:
     first_ticker = combined["ticker"].dropna().astype(str).head(1).tolist()
     st.session_state["chart_selected_ticker"] = first_ticker[0] if first_ticker else None
@@ -883,50 +889,75 @@ with tabs[3]:
     st.markdown("### Charts")
     ranked_alpha = combined.sort_values(["Company Name", "ticker"], ascending=[True, True]).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
-    ticker_to_index = {t: i for i, t in enumerate(ticker_list)}
-    current_ticker = st.session_state.get("chart_selected_ticker")
-    if current_ticker not in ticker_to_index and ticker_list:
-        current_ticker = ticker_list[0]
-        st.session_state["chart_selected_ticker"] = current_ticker
-    selected_display = st.selectbox("Select stock", options=[None] + list(chart_choice_map.keys()), index=0, placeholder="Type stock name or ticker", key="charts_selectbox")
-    if selected_display:
+
+    if "chart_index" not in st.session_state:
+        st.session_state["chart_index"] = 0
+    if ticker_list:
+        st.session_state["chart_index"] = max(0, min(st.session_state["chart_index"], len(ticker_list) - 1))
+
+    options = list(chart_choice_map.keys())
+    current_ticker = ticker_list[st.session_state["chart_index"]] if ticker_list else None
+    current_display = None
+    if current_ticker:
+        for label, tick in chart_choice_map.items():
+            if tick == current_ticker:
+                current_display = label
+                break
+    default_idx = (options.index(current_display) + 1) if current_display in options else 0
+
+    selected_display = st.selectbox(
+        "Select stock",
+        options=[None] + options,
+        index=default_idx,
+        placeholder="Type stock name or ticker",
+        key="charts_selectbox_live",
+    )
+
+    if selected_display and ticker_list:
         chosen_ticker = chart_choice_map[selected_display]
-        if chosen_ticker != st.session_state.get("chart_selected_ticker"):
-            st.session_state["chart_selected_ticker"] = chosen_ticker
+        chosen_index = ticker_list.index(chosen_ticker)
+        if chosen_index != st.session_state["chart_index"]:
+            st.session_state["chart_index"] = chosen_index
             st.rerun()
+
     if not ticker_list:
         st.info("No chart rows are available.")
     else:
-        idx = ticker_to_index[st.session_state["chart_selected_ticker"]]
+        idx = st.session_state["chart_index"]
         row = ranked_alpha.iloc[idx]
-        dpath = resolve_chart_path(f"{outdir}/charts/daily", row["ticker"], "_daily.png")
-        wpath = resolve_chart_path(f"{outdir}/charts/weekly", row["ticker"], "_weekly.png")
+        dpath = resolve_chart_path(daily_dir, row["ticker"], "_daily.png")
+        wpath = resolve_chart_path(weekly_dir, row["ticker"], "_weekly.png")
+
         st.markdown(f"**Selected:** {stock_display_label(row)}")
         st.caption(interpretation_line(row))
+
         a, b = st.columns(2)
         with a:
-            st.markdown(f"#### Daily chart • Rank {get_stock_rank(row['ticker'])}")
+            st.markdown(f"#### Daily chart • Dataset Rank {get_stock_rank(row['ticker'])}")
             if dpath:
                 st.image(safe_image_bytes(dpath), use_container_width=True)
             else:
                 st.info("Daily chart not available.")
         with b:
-            st.markdown(f"#### Weekly chart • Rank {get_stock_rank(row['ticker'])}")
+            st.markdown(f"#### Weekly chart • Dataset Rank {get_stock_rank(row['ticker'])}")
             if wpath:
                 st.image(safe_image_bytes(wpath), use_container_width=True)
             else:
                 st.info("Weekly chart not available.")
+
         nav1, nav2 = st.columns(2)
         with nav1:
-            prev_clicked = st.button("Previous", use_container_width=True, disabled=(idx == 0), key=f"charts_prev_{idx}")
+            prev_clicked = st.button("Previous", use_container_width=True, disabled=(idx == 0), key="charts_prev_btn")
         with nav2:
-            next_clicked = st.button("Next", use_container_width=True, disabled=(idx >= len(ticker_list) - 1), key=f"charts_next_{idx}")
+            next_clicked = st.button("Next", use_container_width=True, disabled=(idx >= len(ticker_list) - 1), key="charts_next_btn")
+
         if prev_clicked and idx > 0:
-            st.session_state["chart_selected_ticker"] = ticker_list[idx - 1]
+            st.session_state["chart_index"] = idx - 1
             st.rerun()
         if next_clicked and idx < len(ticker_list) - 1:
-            st.session_state["chart_selected_ticker"] = ticker_list[idx + 1]
+            st.session_state["chart_index"] = idx + 1
             st.rerun()
+
         card(row, use_stage_color=True, stock_rank=get_stock_rank(row["ticker"]))
         render_stock_detail(row)
     render_disclosure()
