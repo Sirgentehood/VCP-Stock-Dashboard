@@ -889,36 +889,56 @@ with tabs[3]:
     st.markdown("### Charts")
     ranked_alpha = combined.sort_values(["Company Name", "ticker"], ascending=[True, True]).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
+    options = list(chart_choice_map.keys())
 
     if "chart_index" not in st.session_state:
         st.session_state["chart_index"] = 0
+
     if ticker_list:
         st.session_state["chart_index"] = max(0, min(st.session_state["chart_index"], len(ticker_list) - 1))
 
-    options = list(chart_choice_map.keys())
-    current_ticker = ticker_list[st.session_state["chart_index"]] if ticker_list else None
-    current_display = None
-    if current_ticker:
+    def _label_for_ticker(ticker):
+        if not ticker:
+            return None
         for label, tick in chart_choice_map.items():
-            if tick == current_ticker:
-                current_display = label
-                break
-    default_idx = (options.index(current_display) + 1) if current_display in options else 0
+            if tick == ticker:
+                return label
+        return options[0] if options else None
+
+    def _sync_chart_selectbox_from_index():
+        if ticker_list:
+            st.session_state["charts_selectbox_live"] = _label_for_ticker(ticker_list[st.session_state["chart_index"]])
+
+    def _go_prev_chart():
+        if ticker_list and st.session_state["chart_index"] > 0:
+            st.session_state["chart_index"] -= 1
+            _sync_chart_selectbox_from_index()
+
+    def _go_next_chart():
+        if ticker_list and st.session_state["chart_index"] < len(ticker_list) - 1:
+            st.session_state["chart_index"] += 1
+            _sync_chart_selectbox_from_index()
+
+    if "charts_selectbox_live" not in st.session_state:
+        _sync_chart_selectbox_from_index()
+
+    if ticker_list and st.session_state.get("charts_selectbox_live") in chart_choice_map:
+        selected_ticker = chart_choice_map[st.session_state["charts_selectbox_live"]]
+        if selected_ticker in ticker_list:
+            st.session_state["chart_index"] = ticker_list.index(selected_ticker)
 
     selected_display = st.selectbox(
         "Select stock",
-        options=[None] + options,
-        index=default_idx,
+        options=options,
+        index=(options.index(st.session_state["charts_selectbox_live"]) if options and st.session_state.get("charts_selectbox_live") in options else 0),
         placeholder="Type stock name or ticker",
         key="charts_selectbox_live",
     )
 
     if selected_display and ticker_list:
         chosen_ticker = chart_choice_map[selected_display]
-        chosen_index = ticker_list.index(chosen_ticker)
-        if chosen_index != st.session_state["chart_index"]:
-            st.session_state["chart_index"] = chosen_index
-            st.rerun()
+        if chosen_ticker in ticker_list:
+            st.session_state["chart_index"] = ticker_list.index(chosen_ticker)
 
     if not ticker_list:
         st.info("No chart rows are available.")
@@ -947,21 +967,25 @@ with tabs[3]:
 
         nav1, nav2 = st.columns(2)
         with nav1:
-            prev_clicked = st.button("Previous", use_container_width=True, disabled=(idx == 0), key="charts_prev_btn")
+            st.button(
+                "Previous",
+                use_container_width=True,
+                disabled=(idx == 0),
+                key="charts_prev_btn",
+                on_click=_go_prev_chart,
+            )
         with nav2:
-            next_clicked = st.button("Next", use_container_width=True, disabled=(idx >= len(ticker_list) - 1), key="charts_next_btn")
-
-        if prev_clicked and idx > 0:
-            st.session_state["chart_index"] = idx - 1
-            st.rerun()
-        if next_clicked and idx < len(ticker_list) - 1:
-            st.session_state["chart_index"] = idx + 1
-            st.rerun()
+            st.button(
+                "Next",
+                use_container_width=True,
+                disabled=(idx >= len(ticker_list) - 1),
+                key="charts_next_btn",
+                on_click=_go_next_chart,
+            )
 
         card(row, use_stage_color=True, stock_rank=get_stock_rank(row["ticker"]))
         render_stock_detail(row)
     render_disclosure()
-
 tab_offset = 4
 if view_mode == "Pro":
     with tabs[4]:
