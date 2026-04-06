@@ -538,6 +538,16 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
                 return str(int(val))
     return "n/a"
 
+def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
+    if "Industry" in combined_df.columns:
+        industries = sorted(set(combined_df["Industry"].dropna().astype(str).str.strip().tolist()))
+        return industries[:limit]
+    if not industry_df.empty and "Industry" in industry_df.columns:
+        industries = sorted(set(industry_df["Industry"].dropna().astype(str).str.strip().tolist()))
+        return industries[:limit]
+    return []
+
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
