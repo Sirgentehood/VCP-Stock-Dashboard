@@ -1238,9 +1238,10 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     if vol_ma.notna().sum() == len(volume):
         ax2.legend(loc="upper left")
 
-    fig.tight_layout()
+    plt.subplots_adjust(right=0.95)
+    fig.tight_layout(rect=[0, 0, 0.96, 1])
     outfile.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(outfile, dpi=240, bbox_inches="tight", pad_inches=0.08)
+    fig.savefig(outfile, dpi=240, bbox_inches="tight", pad_inches=0.25)
     plt.close(fig)
 
 def export_all_charts(final_report: pd.DataFrame, price_data: Dict[str, pd.DataFrame], outdir: Path) -> Dict[str, str]:
