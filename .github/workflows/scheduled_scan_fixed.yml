@@ -81,5 +81,10 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Auto update outputs"
-          git push origin main
+          git commit -m "Auto update outputs [skip ci]"
+
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin main && break
+            echo "Retrying push..."
+            sleep 5
+          done
