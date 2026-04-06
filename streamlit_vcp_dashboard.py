@@ -483,6 +483,61 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
     return out.head(20)
 
 
+def build_simple_rank_map(df: pd.DataFrame) -> dict:
+    if df.empty:
+        return {}
+    ticker_col = None
+    for cand in ["ticker", "Ticker", "symbol", "Symbol"]:
+        if cand in df.columns:
+            ticker_col = cand
+            break
+    if ticker_col is None:
+        return {}
+    rank_col = None
+    for cand in ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+        if cand in df.columns:
+            rank_col = cand
+            break
+    if rank_col is None:
+        return {}
+    temp = df[[ticker_col, rank_col]].copy()
+    temp[ticker_col] = temp[ticker_col].astype(str).str.strip()
+    temp[rank_col] = pd.to_numeric(temp[rank_col], errors="coerce")
+    temp = temp.dropna(subset=[ticker_col, rank_col]).drop_duplicates(subset=[ticker_col], keep="first")
+    out = {}
+    for _, r in temp.iterrows():
+        t = str(r[ticker_col]).strip()
+        out[t] = str(int(r[rank_col]))
+        out[t.replace(".NS", "")] = str(int(r[rank_col]))
+    return out
+
+
+def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
+    if df.empty:
+        return "n/a"
+    work = df.copy()
+    ticker_col = None
+    for cand in ["ticker", "Ticker", "symbol", "Symbol"]:
+        if cand in work.columns:
+            ticker_col = cand
+            break
+    if ticker_col is None:
+        return "n/a"
+    work[ticker_col] = work[ticker_col].astype(str).str.strip()
+    ticker_norm = str(ticker).strip()
+    match = work[work[ticker_col] == ticker_norm]
+    if match.empty:
+        match = work[work[ticker_col].str.replace(".NS", "", regex=False) == ticker_norm.replace(".NS", "")]
+    if match.empty:
+        return "n/a"
+    row = match.iloc[0]
+    for col in preferred_cols + ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+        if col in match.columns:
+            val = pd.to_numeric(row.get(col), errors="coerce")
+            if pd.notna(val):
+                return str(int(val))
+    return "n/a"
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
