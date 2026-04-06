@@ -235,6 +235,27 @@ def stock_display_label(row: pd.Series) -> str:
     ticker = str(row.get("ticker", "")).replace(".NS", "").strip()
     return f"{company} ({ticker})" if ticker else company
 
+
+def industry_icon(industry: str) -> str:
+    ind = str(industry or "").lower()
+    mapping = [
+        (["bank", "financial", "nbfc", "insurance"], "🏦"),
+        (["it", "software", "technology", "tech", "internet"], "💻"),
+        (["pharma", "health", "hospital"], "💊"),
+        (["auto", "automobile", "tyre"], "🚗"),
+        (["metal", "steel", "mining"], "⛏️"),
+        (["energy", "oil", "gas", "power", "utility"], "⚡"),
+        (["fmcg", "consumer", "retail", "apparel"], "🛍️"),
+        (["realty", "real estate", "construction", "cement"], "🏗️"),
+        (["telecom", "media"], "📡"),
+        (["chemical", "fertilizer"], "🧪"),
+        (["industrial", "capital goods", "engineering"], "🏭"),
+    ]
+    for keys, icon in mapping:
+        if any(k in ind for k in keys):
+            return icon
+    return "🏷️"
+
 def interpretation_line(row: pd.Series) -> str:
     stage = str(row.get("stage", ""))
     mapping = {
@@ -418,7 +439,7 @@ def build_alert_candidates(combined_df: pd.DataFrame, changes_df: pd.DataFrame) 
             if pd.notna(rank_change) and abs(rank_change) >= 5:
                 alert_type = "Relative position change"
                 direction = "improved" if rank_change > 0 else "declined"
-                reason = f"Relative rank {direction} by {abs(int(rank_change))} places."
+                reason = f"Dataset rank {direction} by {abs(int(rank_change))} places."
         if alert_type:
             item = row.copy()
             item["alert_type"] = alert_type
@@ -561,6 +582,8 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     dscore = structure_score(row)
     interpret = interpretation_line(row)
     signals = signal_summary(row)
+    industry_name = str(row.get("Industry", "")).strip()
+    industry_with_icon = f"{industry_icon(industry_name)} {industry_name}" if industry_name else "🏷️ Not available"
     classes = []
     if use_stage_color:
         stage_cls = _stage_card_class(stage_raw)
@@ -573,8 +596,8 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
-    structure_html = f"<div class='structure-pill'>{structure} · Metric {dscore}</div>"
-    rank_html = f"<div class='rank-text'>Rank {stock_rank}</div>"
+    structure_html = f"<div class='structure-pill'>{structure} · Structure Index {dscore}</div>"
+    rank_html = f"<div class='rank-text'>Dataset Rank {stock_rank}</div>"
     html = (
         f"<div class='stock-card {class_attr}'>"
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.55rem;'>"
@@ -584,7 +607,8 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div class='stock-subtitle'>{interpret}</div>"
         f"{structure_html}"
         f"<div class='small-note'>{stage_desc}</div>"
-        f"<div class='small-note' style='margin-top:0.2rem;'>{signals}</div>"
+        f"<div class='small-note' style='margin-top:0.15rem;'>{industry_with_icon}</div>"
+        f"<div class='small-note' style='margin-top:0.15rem;'>{signals}</div>"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
         f"{status_html}{rank_html}{change_html}"
@@ -644,8 +668,8 @@ def render_stock_detail(row):
     meta = []
     rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
     if pd.notna(rank_val):
-        meta.append(f"Rank: {int(rank_val)}")
-    meta.append(f"Metric: {structure_score(row)}")
+        meta.append(f"Dataset Rank: {int(rank_val)}")
+    meta.append(f"Structure Index: {structure_score(row)}")
     st.write(" • ".join(meta))
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -653,7 +677,7 @@ def render_stock_detail(row):
     with col2:
         st.markdown('<div class="info-card"><b>Recent model change</b><br>' + signal_summary(row) + '</div>', unsafe_allow_html=True)
     with col3:
-        st.markdown('<div class="info-card"><b>Industry</b><br>' + str(row.get("Industry", "Not available")) + '</div>', unsafe_allow_html=True)
+        st.markdown('<div class="info-card"><b>Industry</b><br>' + f"{industry_icon(row.get('Industry', ''))} {str(row.get('Industry', 'Not available'))}" + '</div>', unsafe_allow_html=True)
 
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
@@ -807,6 +831,46 @@ with tabs[2]:
         st.markdown("#### Watchlist cards")
         for _, r in current.iterrows():
             card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
+        portfolio_ordered = current.sort_values(["Company Name", "ticker"], ascending=[True, True]).reset_index(drop=True)
+        if not portfolio_ordered.empty:
+            st.divider()
+            st.markdown("### Watchlist charts")
+            st.session_state["watchlist_chart_index"] = max(0, min(st.session_state["watchlist_chart_index"], len(portfolio_ordered) - 1))
+            prow = portfolio_ordered.iloc[st.session_state["watchlist_chart_index"]]
+            pticker_short = str(prow["ticker"]).replace(".NS", "")
+
+            pc1, pc2 = st.columns(2)
+            with pc1:
+                st.markdown(f"#### Daily chart • {pticker_short} • Dataset Rank {get_stock_rank(prow['ticker'])}")
+                pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
+                if pdpath:
+                    st.image(safe_image_bytes(pdpath), use_container_width=True)
+                else:
+                    st.info("Daily chart not available.")
+            with pc2:
+                st.markdown(f"#### Weekly chart • {pticker_short} • Dataset Rank {get_stock_rank(prow['ticker'])}")
+                pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
+                if pwpath:
+                    st.image(safe_image_bytes(pwpath), use_container_width=True)
+                else:
+                    st.info("Weekly chart not available.")
+
+            nav1, nav2 = st.columns(2)
+            with nav1:
+                wprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["watchlist_chart_index"] == 0), key="watchlist_prev_btn")
+            with nav2:
+                wnext = st.button("Next", use_container_width=True, disabled=(st.session_state["watchlist_chart_index"] >= len(portfolio_ordered) - 1), key="watchlist_next_btn")
+
+            if wprev and st.session_state["watchlist_chart_index"] > 0:
+                st.session_state["watchlist_chart_index"] -= 1
+                st.rerun()
+            if wnext and st.session_state["watchlist_chart_index"] < len(portfolio_ordered) - 1:
+                st.session_state["watchlist_chart_index"] += 1
+                st.rerun()
+
+            card(prow, use_stage_color=True, stock_rank=get_stock_rank(prow["ticker"]))
+            render_stock_detail(prow)
+
         removable = [""] + sorted(st.session_state["watchlist_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="watchlist_remove_name")
         if st.button("Remove from watchlist", use_container_width=True, key="watchlist_remove_btn") and selected_remove:
