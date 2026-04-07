@@ -26,11 +26,24 @@ DEFAULT_CONFIG = {
 class MarketRegime:
     index_symbol: str
     last_close: float
-    ma_fast: float
-    ma_slow: float
-    trend_up: bool
-    above_fast: bool
-    above_slow: bool
+    ma20: float
+    ma50: float
+    ma200: float
+    slope20_pct: float
+    slope50_pct: float
+    slope200_pct: float
+    ret_1m_pct: float
+    ret_3m_pct: float
+    drawdown_52w_pct: float
+    above_20: bool
+    above_50: bool
+    above_200: bool
+    breadth_above_20_pct: float
+    breadth_above_50_pct: float
+    breadth_above_200_pct: float
+    breadth_stage2_pct: float
+    trend_score: float
+    breadth_score: float
     regime_label: str
 
 @dataclass
@@ -340,17 +353,255 @@ def compute_pivot(high: pd.Series, lookback: int, base_duration: Optional[float]
     _, _, pivot = compute_pivot_zone(high, lookback, base_duration=base_duration, is_weekly=False)
     return pivot
 
+def classify_market_regime(score: float) -> str:
+    if score >= 14:
+        return "strong_risk_on"
+    if score >= 8:
+        return "risk_on"
+    if score >= 3:
+        return "mixed"
+    if score >= -3:
+        return "risk_off"
+    return "strong_risk_off"
+
+
+def compute_market_breadth(
+    price_data: Dict[str, pd.DataFrame],
+    universe_tickers: List[str],
+) -> Dict[str, float]:
+    above20 = above50 = above200 = eligible20 = eligible50 = eligible200 = 0
+    stage2_count = stage_eligible = 0
+
+    for ticker in universe_tickers:
+        df = price_data.get(ticker)
+        if df is None or df.empty or "Close" not in df.columns:
+            continue
+
+        close = df["Close"].dropna().astype(float)
+        if len(close) >= 20:
+            ma20 = float(close.rolling(20).mean().iloc[-1])
+            if np.isfinite(ma20):
+                eligible20 += 1
+                if float(close.iloc[-1]) > ma20:
+                    above20 += 1
+
+        if len(close) >= 50:
+            ma50 = float(close.rolling(50).mean().iloc[-1])
+            if np.isfinite(ma50):
+                eligible50 += 1
+                if float(close.iloc[-1]) > ma50:
+                    above50 += 1
+
+        if len(close) >= 200:
+            ma200 = float(close.rolling(200).mean().iloc[-1])
+            if np.isfinite(ma200):
+                eligible200 += 1
+                if float(close.iloc[-1]) > ma200:
+                    above200 += 1
+
+        if len(close) >= 260:
+            ma50 = float(close.rolling(50).mean().iloc[-1])
+            ma150 = float(close.rolling(150).mean().iloc[-1])
+            ma200 = float(close.rolling(200).mean().iloc[-1])
+            stage = determine_stage(close, ma50, ma150, ma200)
+            stage_eligible += 1
+            if stage == "Stage 2":
+                stage2_count += 1
+
+    def pct(n: int, d: int) -> float:
+        return round((n / d) * 100, 2) if d else np.nan
+
+    return {
+        "breadth_above_20_pct": pct(above20, eligible20),
+        "breadth_above_50_pct": pct(above50, eligible50),
+        "breadth_above_200_pct": pct(above200, eligible200),
+        "breadth_stage2_pct": pct(stage2_count, stage_eligible),
+    }
+
+
 def market_regime(
-index_df: pd.DataFrame, index_symbol: str, ma_fast: int, ma_slow: int) -> MarketRegime:
-    close = index_df["Close"].dropna()
+    index_df: pd.DataFrame,
+    index_symbol: str,
+    ma_fast: int,
+    ma_slow: int,
+    price_data: Optional[Dict[str, pd.DataFrame]] = None,
+    universe_tickers: Optional[List[str]] = None,
+) -> MarketRegime:
+    close = index_df["Close"].dropna().astype(float)
+    if len(close) < 260:
+        raise ValueError("Not enough index history to compute market regime")
+
+    ma20_series = close.rolling(20).mean()
+    ma50_series = close.rolling(ma_fast).mean()
+    ma200_series = close.rolling(ma_slow).mean()
+
     last_close = float(close.iloc[-1])
-    fast = float(close.rolling(ma_fast).mean().iloc[-1])
-    slow = float(close.rolling(ma_slow).mean().iloc[-1])
-    above_fast = last_close > fast
-    above_slow = last_close > slow
-    trend_up = fast > slow and rolling_slope(close.rolling(ma_slow).mean(), 20) > 0
-    label = "risk_on" if (above_fast and above_slow and trend_up) else ("mixed" if above_slow else "risk_off")
-    return MarketRegime(index_symbol, round(last_close, 2), round(fast, 2), round(slow, 2), bool(trend_up), bool(above_fast), bool(above_slow), label)
+    ma20 = float(ma20_series.iloc[-1])
+    ma50 = float(ma50_series.iloc[-1])
+    ma200 = float(ma200_series.iloc[-1])
+
+    slope20_pct = slope_pct(ma20_series, 20)
+    slope50_pct = slope_pct(ma50_series, 20)
+    slope200_pct = slope_pct(ma200_series, 20)
+
+    ret_1m_pct = pct_return(close, 21)
+    ret_3m_pct = pct_return(close, 63)
+
+    high_52w = float(close.iloc[-252:].max())
+    drawdown_52w_pct = (last_close / high_52w - 1) * 100 if high_52w > 0 else np.nan
+
+    above_20 = last_close > ma20 if pd.notna(ma20) else False
+    above_50 = last_close > ma50 if pd.notna(ma50) else False
+    above_200 = last_close > ma200 if pd.notna(ma200) else False
+
+    breadth = {
+        "breadth_above_20_pct": np.nan,
+        "breadth_above_50_pct": np.nan,
+        "breadth_above_200_pct": np.nan,
+        "breadth_stage2_pct": np.nan,
+    }
+    if price_data is not None and universe_tickers:
+        breadth = compute_market_breadth(price_data, universe_tickers)
+
+    trend_score = 0.0
+
+    if above_20:
+        trend_score += 2
+    else:
+        trend_score -= 2
+
+    if above_50:
+        trend_score += 3
+    else:
+        trend_score -= 3
+
+    if above_200:
+        trend_score += 4
+    else:
+        trend_score -= 4
+
+    if pd.notna(ma20) and pd.notna(ma50) and pd.notna(ma200):
+        if ma20 > ma50 > ma200:
+            trend_score += 4
+        elif ma50 > ma200:
+            trend_score += 2
+        elif ma20 < ma50 < ma200:
+            trend_score -= 4
+        elif ma50 < ma200:
+            trend_score -= 2
+
+    if pd.notna(slope20_pct):
+        if slope20_pct > 0.0010:
+            trend_score += 2
+        elif slope20_pct < -0.0010:
+            trend_score -= 2
+
+    if pd.notna(slope50_pct):
+        if slope50_pct > 0.0005:
+            trend_score += 2
+        elif slope50_pct < -0.0005:
+            trend_score -= 2
+
+    if pd.notna(slope200_pct):
+        if slope200_pct > 0.0001:
+            trend_score += 2
+        elif slope200_pct < -0.0001:
+            trend_score -= 2
+
+    if pd.notna(ret_1m_pct):
+        if ret_1m_pct > 3:
+            trend_score += 1
+        elif ret_1m_pct < -3:
+            trend_score -= 1
+
+    if pd.notna(ret_3m_pct):
+        if ret_3m_pct > 8:
+            trend_score += 2
+        elif ret_3m_pct < -8:
+            trend_score -= 2
+
+    if pd.notna(drawdown_52w_pct):
+        if drawdown_52w_pct >= -5:
+            trend_score += 2
+        elif drawdown_52w_pct >= -10:
+            trend_score += 1
+        elif drawdown_52w_pct <= -30:
+            trend_score -= 3
+        elif drawdown_52w_pct <= -20:
+            trend_score -= 2
+
+    breadth_score = 0.0
+    b20 = breadth["breadth_above_20_pct"]
+    b50 = breadth["breadth_above_50_pct"]
+    b200 = breadth["breadth_above_200_pct"]
+    bstage2 = breadth["breadth_stage2_pct"]
+
+    if pd.notna(b20):
+        if b20 >= 70:
+            breadth_score += 2
+        elif b20 >= 55:
+            breadth_score += 1
+        elif b20 <= 35:
+            breadth_score -= 1
+        elif b20 <= 25:
+            breadth_score -= 2
+
+    if pd.notna(b50):
+        if b50 >= 65:
+            breadth_score += 3
+        elif b50 >= 50:
+            breadth_score += 1.5
+        elif b50 <= 35:
+            breadth_score -= 1.5
+        elif b50 <= 25:
+            breadth_score -= 3
+
+    if pd.notna(b200):
+        if b200 >= 60:
+            breadth_score += 3
+        elif b200 >= 45:
+            breadth_score += 1.5
+        elif b200 <= 30:
+            breadth_score -= 1.5
+        elif b200 <= 20:
+            breadth_score -= 3
+
+    if pd.notna(bstage2):
+        if bstage2 >= 35:
+            breadth_score += 2
+        elif bstage2 >= 25:
+            breadth_score += 1
+        elif bstage2 <= 12:
+            breadth_score -= 1
+        elif bstage2 <= 7:
+            breadth_score -= 2
+
+    final_score = trend_score + breadth_score
+    regime_label = classify_market_regime(final_score)
+
+    return MarketRegime(
+        index_symbol=index_symbol,
+        last_close=round(last_close, 2),
+        ma20=round(ma20, 2) if pd.notna(ma20) else np.nan,
+        ma50=round(ma50, 2) if pd.notna(ma50) else np.nan,
+        ma200=round(ma200, 2) if pd.notna(ma200) else np.nan,
+        slope20_pct=round(float(slope20_pct), 6) if pd.notna(slope20_pct) else np.nan,
+        slope50_pct=round(float(slope50_pct), 6) if pd.notna(slope50_pct) else np.nan,
+        slope200_pct=round(float(slope200_pct), 6) if pd.notna(slope200_pct) else np.nan,
+        ret_1m_pct=round(float(ret_1m_pct), 2) if pd.notna(ret_1m_pct) else np.nan,
+        ret_3m_pct=round(float(ret_3m_pct), 2) if pd.notna(ret_3m_pct) else np.nan,
+        drawdown_52w_pct=round(float(drawdown_52w_pct), 2) if pd.notna(drawdown_52w_pct) else np.nan,
+        above_20=bool(above_20),
+        above_50=bool(above_50),
+        above_200=bool(above_200),
+        breadth_above_20_pct=round(float(b20), 2) if pd.notna(b20) else np.nan,
+        breadth_above_50_pct=round(float(b50), 2) if pd.notna(b50) else np.nan,
+        breadth_above_200_pct=round(float(b200), 2) if pd.notna(b200) else np.nan,
+        breadth_stage2_pct=round(float(bstage2), 2) if pd.notna(bstage2) else np.nan,
+        trend_score=round(float(trend_score), 2),
+        breadth_score=round(float(breadth_score), 2),
+        regime_label=regime_label,
+    )
 
 
 def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -> str:
@@ -619,12 +870,21 @@ def vcp_quality_label(score: float, base_bars: float, depths: List[float], min_b
         return "weak"
     return "strong" if score >= 0.66 else ("moderate" if score >= 0.5 else "weak")
 
-def score_daily(stage: str, trend_template_ok: bool, market_regime_ok: bool, liquidity_ok: bool, near_pivot_ok: bool, breakout_today: bool, contraction_score_val: float, base_duration: float, dist_from_high: float, volume_dryup_ratio: float, breakout_volume_ratio: float, rs_3m: float, rs_6m: float) -> float:
+def score_daily(stage: str, trend_template_ok: bool, regime_label: str, liquidity_ok: bool, near_pivot_ok: bool, breakout_today: bool, contraction_score_val: float, base_duration: float, dist_from_high: float, volume_dryup_ratio: float, breakout_volume_ratio: float, rs_3m: float, rs_6m: float) -> float:
     score = 0.0
     if trend_template_ok:
         score += 18
-    if market_regime_ok:
+
+    if regime_label == "strong_risk_on":
+        score += 12
+    elif regime_label == "risk_on":
         score += 8
+    elif regime_label == "mixed":
+        score += 3
+    elif regime_label == "risk_off":
+        score -= 6
+    elif regime_label == "strong_risk_off":
+        score -= 12
     if liquidity_ok:
         score += 8
     if near_pivot_ok:
@@ -735,7 +995,7 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     weekly_ma10 = float(weekly_close.rolling(10).mean().iloc[-1]) if len(weekly_close) >= 10 else np.nan
     weekly_ma30 = float(weekly_close.rolling(30).mean().iloc[-1]) if len(weekly_close) >= 30 else np.nan
 
-    market_regime_ok = regime.regime_label != "risk_off"
+    market_regime_ok = regime.regime_label in {"strong_risk_on", "risk_on", "mixed"}
 
     daily_window = df.iloc[-140:]
     daily_depths, daily_durations, daily_base_duration = detect_vcp_contractions(
@@ -885,7 +1145,7 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     daily_score = score_daily(
         stage,
         trend_template_ok,
-        market_regime_ok,
+        regime.regime_label,
         liquidity_ok,
         near_pivot_ok,
         breakout_today,
@@ -980,7 +1240,14 @@ def build_vcp_universe_report(tickers: List[str], config: Optional[dict] = None)
     if cfg["market_index"] not in data:
         raise RuntimeError(f"Missing market index data for {cfg['market_index']}")
     benchmark_df = data[cfg["market_index"]]
-    regime = market_regime(benchmark_df, cfg["market_index"], cfg["market_ma_fast"], cfg["market_ma_slow"])
+    regime = market_regime(
+        benchmark_df,
+        cfg["market_index"],
+        cfg["market_ma_fast"],
+        cfg["market_ma_slow"],
+        price_data=data,
+        universe_tickers=tickers,
+    )
 
     rows = []
     for ticker in tickers:
