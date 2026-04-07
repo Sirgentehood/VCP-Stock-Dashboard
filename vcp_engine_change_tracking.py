@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass, asdict
 from pathlib import Path
+from datetime import timedelta
 from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -1215,8 +1216,16 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     ax1.legend(loc="upper left", ncol=2)
     ax1.tick_params(axis="both", labelsize=36, pad=8)
     ax1.set_ylabel("Price")
-    ax1.margins(x=0)
-    ax1.set_xlim(x[0], x[-1])
+
+    if len(x) >= 2:
+        if hasattr(x, "dtype") and "datetime" in str(x.dtype):
+            step = x[-1] - x[-2]
+            if pd.isna(step) or step == pd.Timedelta(0):
+                step = pd.Timedelta(days=7 if is_weekly else 1)
+            right_pad = step * (3 if is_weekly else 6)
+        else:
+            right_pad = 3 if is_weekly else 6
+        ax1.set_xlim(x[0], x[-1] + right_pad)
 
     margin_top = y_span * 0.10
     margin_bottom = y_span * 0.18
@@ -1233,13 +1242,20 @@ def export_chart(df: pd.DataFrame, symbol: str, title: str, outfile: Path, pivot
     ax2.set_yticks([])
     ax2.tick_params(axis="y", which="both", length=0, labelleft=False)
     ax2.tick_params(axis="x", labelsize=34, pad=8)
-    ax2.margins(x=0)
-    ax2.set_xlim(x[0], x[-1])
+    if len(x) >= 2:
+        if hasattr(x, "dtype") and "datetime" in str(x.dtype):
+            step = x[-1] - x[-2]
+            if pd.isna(step) or step == pd.Timedelta(0):
+                step = pd.Timedelta(days=7 if is_weekly else 1)
+            right_pad = step * (3 if is_weekly else 6)
+        else:
+            right_pad = 3 if is_weekly else 6
+        ax2.set_xlim(x[0], x[-1] + right_pad)
     if vol_ma.notna().sum() == len(volume):
         ax2.legend(loc="upper left")
 
-    plt.subplots_adjust(right=0.95)
-    fig.tight_layout(rect=[0, 0, 0.96, 1])
+    plt.subplots_adjust(right=0.96)
+    fig.tight_layout(rect=[0, 0, 0.97, 1])
     outfile.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(outfile, dpi=240, bbox_inches="tight", pad_inches=0.25)
     plt.close(fig)
