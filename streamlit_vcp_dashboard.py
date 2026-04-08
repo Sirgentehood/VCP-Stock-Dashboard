@@ -289,7 +289,7 @@ def signal_summary(row: pd.Series) -> str:
 def render_disclosure():
     st.markdown("""
 <div class="disclosure">
-This engine converts rule-based structure data into directional trade actions. It is still a model, not certainty. Execution quality, sizing, liquidity, slippage, and stop discipline remain your responsibility.
+This platform provides rule-based market structure analytics and visualization only. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. It does not rank, recommend, prioritize, or suggest any securities for investment purposes. No output on this dashboard should be treated as a personalized recommendation, model portfolio, suitability assessment, or allocation advice. Users remain solely responsible for any investment decisions.
 </div>
 """, unsafe_allow_html=True)
 
@@ -626,289 +626,6 @@ def render_distribution(stage_counts: dict):
         )
     st.markdown("</div>", unsafe_allow_html=True)
 
-def market_bias_score(stage_counts: dict, regime_df: pd.DataFrame) -> int:
-    total = max(1, sum(stage_counts.values()))
-    stage2 = int(stage_counts.get("Stage 2", 0))
-    stage4 = int(stage_counts.get("Stage 4", 0))
-    stage3 = int(stage_counts.get("Stage 3", 0))
-    score = 50
-    score += round((stage2 / total) * 60)
-    score -= round((stage4 / total) * 55)
-    score -= round((stage3 / total) * 18)
-    if not regime_df.empty and "regime_label" in regime_df.columns:
-        regime_label = str(regime_df.iloc[0].get("regime_label", "")).lower().strip()
-        score += {"risk_on": 12, "mixed": 0, "risk_off": -12}.get(regime_label, 0)
-    return int(max(0, min(100, score)))
-
-def market_action_bias(stage_counts: dict, regime_df: pd.DataFrame) -> str:
-    score = market_bias_score(stage_counts, regime_df)
-    if score >= 65:
-        return "Long Bias"
-    if score <= 38:
-        return "Short Bias"
-    return "Two-Sided"
-
-def market_action_text(stage_counts: dict, regime_df: pd.DataFrame) -> str:
-    bias = market_action_bias(stage_counts, regime_df)
-    score = market_bias_score(stage_counts, regime_df)
-    if bias == "Long Bias":
-        return f"Market internals favour long setups. Long score {score}/100. Prioritize Stage 2 strength, rising ranks, and leading industries."
-    if bias == "Short Bias":
-        return f"Market internals favour short setups. Short score {100-score}/100. Prioritize Stage 4 weakness, failed rebounds, and weak industries."
-    return f"Market internals are mixed. Bias score {score}/100. Trade smaller, demand industry confirmation, and keep both long and short lists ready."
-
-def build_industry_support_map(industry_df: pd.DataFrame, combined_df: pd.DataFrame) -> dict:
-    support = {}
-    if combined_df.empty or "Industry" not in combined_df.columns:
-        return support
-    stage2_counts = stage2_count_by_industry(combined_df)
-    stage2_map = {}
-    if not stage2_counts.empty:
-        stage2_map = dict(zip(stage2_counts["Industry"].astype(str), stage2_counts["Stage 2 Stocks"]))
-    for ind in combined_df["Industry"].dropna().astype(str).unique().tolist():
-        support[ind] = {"industry_score": 50, "industry_rank": None, "stage2_count": int(stage2_map.get(ind, 0)), "industry_view": "Neutral"}
-    if not industry_df.empty and "Industry" in industry_df.columns:
-        temp = industry_df.copy()
-        if "current_rank" in temp.columns:
-            temp["current_rank"] = pd.to_numeric(temp["current_rank"], errors="coerce")
-        if "avg_combined_score" in temp.columns:
-            temp["avg_combined_score"] = pd.to_numeric(temp["avg_combined_score"], errors="coerce")
-        for _, row in temp.iterrows():
-            ind = str(row.get("Industry", "")).strip()
-            if not ind:
-                continue
-            rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-            avg_score = pd.to_numeric(row.get("avg_combined_score"), errors="coerce")
-            base = 50
-            if pd.notna(avg_score):
-                base += max(-20, min(20, int(round((avg_score - 50) * 0.6))))
-            if pd.notna(rank):
-                base += max(-18, min(18, 22 - int(rank)))
-            base += min(18, int(stage2_map.get(ind, 0)) * 2)
-            base = int(max(0, min(100, base)))
-            view = "Neutral"
-            if base >= 68:
-                view = "Strong Tailwind"
-            elif base >= 56:
-                view = "Positive"
-            elif base <= 35:
-                view = "Weak"
-            elif base <= 45:
-                view = "Fragile"
-            support[ind] = {
-                "industry_score": base,
-                "industry_rank": (int(rank) if pd.notna(rank) else None),
-                "stage2_count": int(stage2_map.get(ind, 0)),
-                "industry_view": view,
-            }
-    return support
-
-def boolish(v) -> bool:
-    if isinstance(v, bool):
-        return v
-    if pd.isna(v):
-        return False
-    return str(v).strip().lower() in {"1", "true", "yes", "y", "t"}
-
-def compute_trade_action(row: pd.Series, market_bias: str, market_bias_score_value: int, industry_support_map: dict) -> pd.Series:
-    stage = str(row.get("stage", "")).strip()
-    label = str(row.get("label", row.get("classification", "Developing"))).strip()
-    score = pd.to_numeric(row.get("final_combined_score", row.get("avg_combined_score", row.get("combined_score"))), errors="coerce")
-    rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    rs3 = pd.to_numeric(row.get("rs_3m_pct"), errors="coerce")
-    rs6 = pd.to_numeric(row.get("rs_6m_pct"), errors="coerce")
-    price_1d = pd.to_numeric(row.get("change_1d_pct"), errors="coerce")
-    price_1w = pd.to_numeric(row.get("change_1w_pct"), errors="coerce")
-    industry_name = str(row.get("Industry", "")).strip()
-    industry_meta = industry_support_map.get(industry_name, {"industry_score": 50, "industry_rank": None, "stage2_count": 0, "industry_view": "Neutral"})
-
-    long_score = 0
-    short_score = 0
-    reasons_long = []
-    reasons_short = []
-
-    long_score += {"Stage 1": 18, "Stage 2": 38, "Stage 3": 10, "Stage 4": 0}.get(stage, 8)
-    short_score += {"Stage 1": 2, "Stage 2": 0, "Stage 3": 24, "Stage 4": 40}.get(stage, 8)
-    long_score += {"Strong": 22, "Developing": 12, "Cautious": 5, "Weak": 0}.get(label, 8)
-    short_score += {"Strong": 0, "Developing": 4, "Cautious": 14, "Weak": 22}.get(label, 8)
-
-    if pd.notna(score):
-        long_score += max(0, min(24, int(round((score - 48) * 0.75))))
-        short_score += max(0, min(24, int(round((55 - score) * 0.75))))
-    if pd.notna(rank):
-        long_score += max(0, 16 - min(int(rank), 16))
-        short_score += max(0, min(int(rank) - 18, 16))
-    if pd.notna(rank_change):
-        if rank_change > 0:
-            long_score += min(12, int(rank_change * 1.4))
-            reasons_long.append(f"rank improving by {int(rank_change)}")
-        elif rank_change < 0:
-            short_score += min(12, int(abs(rank_change) * 1.4))
-            reasons_short.append(f"rank falling by {abs(int(rank_change))}")
-    if pd.notna(rs3) and pd.notna(rs6):
-        if rs3 > 0 and rs6 > 0:
-            long_score += 12
-            reasons_long.append("3M and 6M relative strength positive")
-        if rs3 < 0 and rs6 < 0:
-            short_score += 12
-            reasons_short.append("3M and 6M relative strength negative")
-    if pd.notna(price_1w):
-        if price_1w > 0:
-            long_score += min(8, int(round(price_1w)))
-        elif price_1w < 0:
-            short_score += min(8, int(round(abs(price_1w))))
-    if pd.notna(price_1d):
-        if price_1d > 0:
-            long_score += min(4, int(round(price_1d)))
-        elif price_1d < 0:
-            short_score += min(4, int(round(abs(price_1d))))
-
-    if boolish(row.get("entered_stage_2", False)):
-        long_score += 14
-        reasons_long.append("fresh move into Stage 2")
-    if boolish(row.get("new_weekly_breakout", False)):
-        long_score += 12
-        reasons_long.append("weekly breakout")
-    if boolish(row.get("new_daily_breakout", False)):
-        long_score += 8
-        reasons_long.append("daily breakout")
-
-    if stage == "Stage 4":
-        reasons_short.append("Stage 4 decline structure")
-    elif stage == "Stage 3":
-        reasons_short.append("transition structure vulnerable to breakdown")
-    elif stage == "Stage 2":
-        reasons_long.append("Stage 2 advancing structure")
-    elif stage == "Stage 1":
-        reasons_long.append("base-building structure")
-
-    industry_score = int(industry_meta.get("industry_score", 50))
-    long_score += max(-8, min(14, int(round((industry_score - 50) * 0.35))))
-    short_score += max(-8, min(14, int(round((50 - industry_score) * 0.35))))
-
-    if market_bias == "Long Bias":
-        long_score += 8
-        short_score -= 6
-    elif market_bias == "Short Bias":
-        short_score += 8
-        long_score -= 6
-
-    long_score = int(max(0, min(100, long_score)))
-    short_score = int(max(0, min(100, short_score)))
-
-    action = "No Trade"
-    action_confidence = max(long_score, short_score)
-    setup_quality = "Low"
-    if action_confidence >= 75:
-        setup_quality = "High"
-    elif action_confidence >= 60:
-        setup_quality = "Medium"
-
-    if long_score >= short_score + 10 and long_score >= 58:
-        action = "Buy" if market_bias != "Short Bias" else "Tactical Buy"
-    elif short_score >= long_score + 10 and short_score >= 58:
-        action = "Short" if market_bias != "Long Bias" else "Tactical Short"
-    elif long_score >= 50 and stage in {"Stage 1", "Stage 2"}:
-        action = "Watch for Long"
-    elif short_score >= 50 and stage in {"Stage 3", "Stage 4"}:
-        action = "Watch for Short"
-
-    trade_side = "Long" if "Buy" in action or action == "Watch for Long" else ("Short" if "Short" in action or action == "Watch for Short" else "Neutral")
-    stop_framework = "Not defined"
-    if trade_side == "Long":
-        stop_framework = "Below recent swing low / failed breakout / Stage change back to 1 or 3 weakness"
-    elif trade_side == "Short":
-        stop_framework = "Above recent swing high / failed breakdown / sharp rank recovery"
-
-    rationale = reasons_long[:3] if trade_side == "Long" else reasons_short[:3]
-    if not rationale:
-        rationale = ["structure not strong enough for a clean directional trade"]
-
-    return pd.Series({
-        "market_bias": market_bias,
-        "market_bias_score": market_bias_score_value,
-        "industry_score": industry_score,
-        "industry_view": industry_meta.get("industry_view", "Neutral"),
-        "industry_rank": industry_meta.get("industry_rank"),
-        "industry_stage2_count": industry_meta.get("stage2_count", 0),
-        "long_score": long_score,
-        "short_score": short_score,
-        "action": action,
-        "trade_side": trade_side,
-        "action_confidence": action_confidence,
-        "setup_quality": setup_quality,
-        "rationale": " • ".join(rationale),
-        "stop_framework": stop_framework,
-    })
-
-def build_decision_engine_table(combined_df: pd.DataFrame, changes_df: pd.DataFrame, industry_df: pd.DataFrame, regime_df: pd.DataFrame) -> pd.DataFrame:
-    if combined_df.empty:
-        return pd.DataFrame()
-    df = combined_df.copy()
-    if not changes_df.empty and "ticker" in changes_df.columns:
-        change_cols = [c for c in ["ticker", "entered_stage_2", "new_weekly_breakout", "new_daily_breakout"] if c in changes_df.columns]
-        df = df.merge(changes_df[change_cols].drop_duplicates(subset=["ticker"]), on="ticker", how="left", suffixes=("", "_chg"))
-    stage_counts = stage_count_summary(df)
-    bias = market_action_bias(stage_counts, regime_df)
-    bias_score = market_bias_score(stage_counts, regime_df)
-    industry_support_map = build_industry_support_map(industry_df, df)
-    decision_cols = df.apply(lambda row: compute_trade_action(row, bias, bias_score, industry_support_map), axis=1)
-    df = pd.concat([df, decision_cols], axis=1)
-    df["decision_priority"] = df[["long_score", "short_score"]].max(axis=1)
-    return df
-
-def top_trade_candidates(decision_df: pd.DataFrame, side: str, top_n: int = 8) -> pd.DataFrame:
-    if decision_df.empty:
-        return pd.DataFrame()
-    if side == "Long":
-        candidates = decision_df[decision_df["trade_side"] == "Long"].copy()
-        if candidates.empty:
-            return candidates
-        return candidates.sort_values(["long_score", "action_confidence", "industry_score", "current_rank"], ascending=[False, False, False, True], na_position="last").head(top_n)
-    candidates = decision_df[decision_df["trade_side"] == "Short"].copy()
-    if candidates.empty:
-        return candidates
-    return candidates.sort_values(["short_score", "action_confidence", "industry_score", "current_rank"], ascending=[False, False, True, True], na_position="last").head(top_n)
-
-def render_trade_card(row: pd.Series):
-    side = str(row.get("trade_side", "Neutral"))
-    action = str(row.get("action", "No Trade"))
-    score = int(row.get("long_score", 0) if side == "Long" else row.get("short_score", 0))
-    title = stock_display_label(row)
-    industry_name = str(row.get("Industry", "")).strip()
-    industry_view = str(row.get("industry_view", "Neutral"))
-    rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    rank_txt = f"Dataset Rank {int(rank_val)}" if pd.notna(rank_val) else "Rank n/a"
-    st.markdown(f"""
-<div class='stock-card {_stage_card_class(str(row.get("stage", "")))}'>
-  <div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem;'>
-    <div style='min-width:0;'>
-      <div class='stock-title'>{title}</div>
-      <div class='meta-line'>{action} • {side} • Score {score}/100</div>
-      <div class='stock-subtitle'>{str(row.get("rationale", ""))}</div>
-      <div class='small-note' style='margin-top:0.2rem;'>{industry_icon(industry_name)} {industry_name or 'Unknown industry'} • {industry_view}</div>
-      <div class='small-note' style='margin-top:0.15rem;'>Stop framework: {str(row.get("stop_framework", "Not defined"))}</div>
-    </div>
-    <div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>
-      <div class='status-pill {'status-strong' if side == 'Long' else 'status-weak' if side == 'Short' else 'status-cautious'}'>{action}</div>
-      <div class='rank-text'>{rank_txt}</div>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-def decision_summary_stats(decision_df: pd.DataFrame) -> dict:
-    if decision_df.empty:
-        return {"buy": 0, "short": 0, "watch": 0, "no_trade": 0}
-    actions = decision_df["action"].astype(str)
-    return {
-        "buy": int(actions.str.contains("Buy", regex=False).sum()),
-        "short": int(actions.str.contains("Short", regex=False).sum()),
-        "watch": int(actions.str.contains("Watch", regex=False).sum()),
-        "no_trade": int((actions == "No Trade").sum()),
-    }
-
 
 def portfolio_health_summary(current: pd.DataFrame):
     if current is None or current.empty:
@@ -1041,10 +758,6 @@ alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 TOP_MOVER_RANK_MAP = build_simple_rank_map(top_movers)
 INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=21)
-DECISION_DF = build_decision_engine_table(combined, changes, industry, regime)
-DECISION_STATS = decision_summary_stats(DECISION_DF)
-TOP_LONGS = top_trade_candidates(DECISION_DF, "Long", top_n=10)
-TOP_SHORTS = top_trade_candidates(DECISION_DF, "Short", top_n=10)
 
 def get_stock_rank(ticker: str) -> str:
     t = str(ticker).strip()
@@ -1062,43 +775,21 @@ if "chart_selected_ticker" not in st.session_state:
     first_ticker = combined["ticker"].dropna().astype(str).head(1).tolist()
     st.session_state["chart_selected_ticker"] = first_ticker[0] if first_ticker else None
 
-st.title("Market Decision Engine")
-st.caption("Structure-led trade engine with long, short, and watchlist actions")
-view_mode = st.radio("View mode", ["Execution", "Research"], horizontal=True, index=0)
-tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
+st.title("Market Structure Radar")
+st.caption("Rule-based market structure analytics and visualization")
+view_mode = st.radio("View mode", ["Beginner", "Pro"], horizontal=True, index=0)
+tab_names = ["Today", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer"] if view_mode == "Beginner" else ["Today", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
 tabs = st.tabs(tab_names)
 
 with tabs[0]:
     current_market_tone = market_tone(regime, combined)
-    current_bias = market_action_bias(stage_counts, regime)
-    current_bias_score = market_bias_score(stage_counts, regime)
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3 = st.columns(3)
     with c1:
         render_summary_card("Market mode", current_market_tone, market_tone_text(current_market_tone))
     with c2:
-        render_summary_card("Action bias", current_bias, market_action_text(stage_counts, regime))
+        render_summary_card("Stage 2 count", str(stage_counts["Stage 2"]), "Stocks currently in advancing phase")
     with c3:
-        render_summary_card("Buy candidates", str(DECISION_STATS["buy"]), "Names currently marked as Buy or Tactical Buy")
-    with c4:
-        render_summary_card("Short candidates", str(DECISION_STATS["short"]), "Names currently marked as Short or Tactical Short")
-
-    st.markdown("### Top trade actions for today")
-    lcol, scol = st.columns(2)
-    with lcol:
-        st.markdown("#### Top longs")
-        if TOP_LONGS.empty:
-            st.info("No strong long candidate today.")
-        else:
-            for _, r in TOP_LONGS.head(5).iterrows():
-                render_trade_card(r)
-    with scol:
-        st.markdown("#### Top shorts")
-        if TOP_SHORTS.empty:
-            st.info("No strong short candidate today.")
-        else:
-            for _, r in TOP_SHORTS.head(5).iterrows():
-                render_trade_card(r)
-
+        render_summary_card("Top industries in view", top_industry_text(industry), "Industries at the top of the current industry table")
     st.markdown("### What changed today")
     if top_changed_df.empty:
         st.info("No recent change rows are available.")
@@ -1107,14 +798,12 @@ with tabs[0]:
         for i, (_, r) in enumerate(top_changed_df.head(6).iterrows()):
             with cols[i % 3]:
                 card(r, use_stage_color=True, show_change_text=str(r.get("what_changed", "")), stock_rank=get_stock_rank(r["ticker"]))
-
     st.markdown("### Market snapshot")
     left, right = st.columns([1.15, 0.85])
     with left:
         render_distribution(stage_counts)
     with right:
-        st.markdown(f'<div class="info-card"><b>Execution note</b><ul class="list-tight"><li>Bias: <b>{current_bias}</b> ({current_bias_score}/100).</li><li>Top longs should ideally come from industries with positive support.</li><li>Top shorts should ideally come from weak or fragile industries.</li><li>Trade Board shows the full ranked action list.</li></ul></div>', unsafe_allow_html=True)
-
+        st.markdown('<div class="info-card"><b>How to read today’s view</b><ul class="list-tight"><li>Start with market mode.</li><li>See what changed today.</li><li>Use Explore for filters and Watchlist for your own basket.</li><li>This app explains structure. It does not tell users what to buy.</li></ul></div>', unsafe_allow_html=True)
     st.markdown("### Sample structures from the dataset")
     for title, stage_key in [("Advancing structures (sample)", "Stage 2"), ("Base structures (sample)", "Stage 1"), ("Transition or decline structures (sample)", "Stage 3_4")]:
         st.markdown(f"#### {title}")
@@ -1129,44 +818,9 @@ with tabs[0]:
             for i, (_, r) in enumerate(sample_df.iterrows()):
                 with cols[i % 3]:
                     card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
+    render_disclosure()
 
 with tabs[1]:
-    st.markdown("### Trade Board")
-    if DECISION_DF.empty:
-        st.info("Decision engine table is not available.")
-    else:
-        side_filter = st.selectbox("Trade side", ["All", "Long", "Short", "Neutral"], key="trade_board_side")
-        action_filter = st.selectbox("Action", ["All", "Buy", "Tactical Buy", "Watch for Long", "Short", "Tactical Short", "Watch for Short", "No Trade"], key="trade_board_action")
-        min_score = st.slider("Minimum action confidence", 0, 100, 55, 1, key="trade_board_confidence")
-        board = DECISION_DF.copy()
-        if side_filter != "All":
-            board = board[board["trade_side"] == side_filter]
-        if action_filter != "All":
-            board = board[board["action"] == action_filter]
-        board = board[board["action_confidence"] >= min_score]
-        board = board.sort_values(["decision_priority", "industry_score", "current_rank"], ascending=[False, False, True], na_position="last")
-
-        t1, t2, t3, t4 = st.columns(4)
-        with t1:
-            render_summary_card("Buy", str(int(board["action"].astype(str).str.contains("Buy", regex=False).sum())), "Rows on current filter")
-        with t2:
-            render_summary_card("Short", str(int(board["action"].astype(str).str.contains("Short", regex=False).sum())), "Rows on current filter")
-        with t3:
-            render_summary_card("Avg industry support", str(int(board["industry_score"].fillna(0).mean())) if not board.empty else "0", "Higher helps longs, lower helps shorts")
-        with t4:
-            render_summary_card("Rows", str(len(board)), "Filtered trade rows")
-
-        for _, r in board.head(20).iterrows():
-            render_trade_card(r)
-
-        show_cols = [c for c in [
-            "Company Name", "ticker", "Industry", "stage", "label", "action", "trade_side",
-            "long_score", "short_score", "action_confidence", "industry_score", "industry_view",
-            "current_rank", "rank_change", "rationale"
-        ] if c in board.columns]
-        st.dataframe(board[show_cols], use_container_width=True, hide_index=True, height=460)
-
-with tabs[2]:
     st.markdown("### Explore")
     filt1, filt2, filt3 = st.columns(3)
     with filt1:
@@ -1189,7 +843,7 @@ with tabs[2]:
         card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
     render_disclosure()
 
-with tabs[3]:
+with tabs[2]:
     st.markdown("### Movers")
     if moves.empty:
         st.info("Price move data not found yet.")
@@ -1213,7 +867,7 @@ with tabs[3]:
                 card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
-with tabs[4]:
+with tabs[3]:
     st.markdown("### Watchlist")
     portfolio_options = ["Custom", "Strong", "Developing", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
     selected_watchlist = st.selectbox("Watchlist view", portfolio_options, key="watchlist_view")
@@ -1290,7 +944,7 @@ with tabs[4]:
             st.rerun()
     render_disclosure()
 
-with tabs[5]:
+with tabs[4]:
     st.markdown("### Charts")
     ranked_alpha = combined.sort_values(["Company Name", "ticker"], ascending=[True, True]).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
@@ -1391,8 +1045,8 @@ with tabs[5]:
         card(row, use_stage_color=True, stock_rank=get_stock_rank(row["ticker"]))
         render_stock_detail(row)
     render_disclosure()
-tab_offset = 6
-if view_mode == "Research":
+tab_offset = 5
+if view_mode == "Pro":
     with tabs[5]:
         st.markdown("### Market")
         c1, c2, c3, c4 = st.columns(4)
@@ -1424,7 +1078,7 @@ if view_mode == "Research":
             for _, r in alert_candidates.iterrows():
                 card(r, use_stage_color=True, show_change_text=f"{r['alert_type']} • {r['alert_reason']}", stock_rank=get_stock_rank(r["ticker"]))
         render_disclosure()
-    tab_offset = 8
+    tab_offset = 7
 
 with tabs[tab_offset]:
     left, right = st.columns([1.05, 0.95])
