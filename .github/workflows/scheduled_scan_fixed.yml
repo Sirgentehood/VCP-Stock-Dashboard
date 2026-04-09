@@ -3,7 +3,7 @@ name: Update VCP Outputs
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 11 * * 1-5"
+    - cron: "00 10 * * 1-5"
 
 permissions:
   contents: write
