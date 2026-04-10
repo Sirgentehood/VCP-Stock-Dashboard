@@ -1158,6 +1158,14 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         if stage_cls:
             classes.append(stage_cls)
 
+    rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
+    resolved_rank = str(int(rank_val)) if pd.notna(rank_val) else (str(stock_rank).strip() if str(stock_rank).strip() else "n/a")
+    rank_change_val = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    rank_change_html = ""
+    if pd.notna(rank_change_val) and rank_change_val != 0:
+        direction = "↑" if rank_change_val > 0 else "↓"
+        rank_change_html = f"<div class='small-note' style='margin-top:0.1rem;'>Dataset Rank Change {direction} {abs(int(rank_change_val))}</div>"
+
     change_html = ""
     if pct is not None:
         cls = "change-badge-up" if pct > 0 else "change-badge-down"
@@ -1168,7 +1176,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
     action_html = f"<div class='status-pill status-cautious' style='margin-top:0.2rem;'>{action_label}</div>" if action_label else ""
     structure_html = f"<div class='structure-pill'>{structure} · Model Score {score}/100</div>"
-    rank_html = f"<div class='rank-text'>Dataset Rank {stock_rank}</div>"
+    rank_html = f"<div class='rank-text'>Dataset Rank {resolved_rank}</div>"
 
     html = (
         f"<div class='stock-card {class_attr}'>"
@@ -1184,7 +1192,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"{signals_html}{mini_html}"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
-        f"{status_html}{action_html}{rank_html}{change_html}"
+        f"{status_html}{action_html}{rank_html}{rank_change_html}{change_html}"
         f"</div>"
         f"</div>"
         f"{extra_change}"
