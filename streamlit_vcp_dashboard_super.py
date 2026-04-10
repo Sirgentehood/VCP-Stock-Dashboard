@@ -124,9 +124,57 @@ def ensure_current_rank(df: pd.DataFrame) -> pd.DataFrame:
                 out["current_rank"] = pd.to_numeric(out[alt], errors="coerce")
                 break
     if "current_rank" not in out.columns:
-        out["current_rank"] = pd.NA
+        out["current_rank"] = float("nan")
     else:
         out["current_rank"] = pd.to_numeric(out["current_rank"], errors="coerce")
+    return out
+
+def build_rank_lookup_map(*dfs: pd.DataFrame) -> dict:
+    rank_map = {}
+    rank_cols = ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]
+    for df in dfs:
+        if df is None or df.empty:
+            continue
+        ticker_col = None
+        for cand in ["ticker", "Ticker", "symbol", "Symbol"]:
+            if cand in df.columns:
+                ticker_col = cand
+                break
+        if ticker_col is None:
+            continue
+        work = df.copy()
+        work[ticker_col] = work[ticker_col].astype(str).str.strip()
+        chosen_rank_col = None
+        for col in rank_cols:
+            if col in work.columns:
+                chosen_rank_col = col
+                break
+        if chosen_rank_col is None:
+            continue
+        work[chosen_rank_col] = pd.to_numeric(work[chosen_rank_col], errors="coerce")
+        work = work.dropna(subset=[ticker_col, chosen_rank_col])
+        for _, r in work.iterrows():
+            ticker = str(r[ticker_col]).strip()
+            rank_val = pd.to_numeric(r[chosen_rank_col], errors="coerce")
+            if pd.notna(rank_val):
+                rank_map[ticker] = float(rank_val)
+                rank_map[ticker.replace(".NS", "")] = float(rank_val)
+    return rank_map
+
+def backfill_current_rank(df: pd.DataFrame, rank_map: dict) -> pd.DataFrame:
+    if df is None or df.empty:
+        return df
+    out = ensure_current_rank(df.copy())
+    if "ticker" not in out.columns:
+        return out
+    out["ticker"] = out["ticker"].astype(str).str.strip()
+    missing_mask = out["current_rank"].isna()
+    if missing_mask.any():
+        out.loc[missing_mask, "current_rank"] = out.loc[missing_mask, "ticker"].map(rank_map)
+    missing_mask = out["current_rank"].isna()
+    if missing_mask.any():
+        out.loc[missing_mask, "current_rank"] = out.loc[missing_mask, "ticker"].str.replace(".NS", "", regex=False).map(rank_map)
+    out["current_rank"] = pd.to_numeric(out["current_rank"], errors="coerce")
     return out
 
 def sort_by_rank(df: pd.DataFrame, descending: bool = False, company_tiebreak: bool = True) -> pd.DataFrame:
@@ -1159,7 +1207,15 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
             classes.append(stage_cls)
 
     rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    resolved_rank = str(int(rank_val)) if pd.notna(rank_val) else (str(stock_rank).strip() if str(stock_rank).strip() else "n/a")
+    row_ticker = str(row.get("ticker", "")).strip()
+    global_rank = GLOBAL_RANK_MAP.get(row_ticker)
+    if global_rank is None and row_ticker:
+        global_rank = GLOBAL_RANK_MAP.get(row_ticker.replace(".NS", ""))
+    resolved_rank = (
+        str(int(rank_val)) if pd.notna(rank_val)
+        else str(int(global_rank)) if global_rank is not None
+        else (str(stock_rank).strip() if str(stock_rank).strip() else "n/a")
+    )
     rank_change_val = pd.to_numeric(row.get("rank_change"), errors="coerce")
     rank_change_html = ""
     if pd.notna(rank_change_val) and rank_change_val != 0:
@@ -1214,6 +1270,14 @@ if top_movers.empty:
     top_movers = moves.copy()
 regime = safe_read(f"{outdir}/market_regime.csv")
 
+GLOBAL_RANK_MAP = build_rank_lookup_map(combined, daily_df, weekly_df, top_movers, moves, changes)
+combined = backfill_current_rank(combined, GLOBAL_RANK_MAP)
+daily_df = backfill_current_rank(daily_df, GLOBAL_RANK_MAP)
+weekly_df = backfill_current_rank(weekly_df, GLOBAL_RANK_MAP)
+changes = backfill_current_rank(changes, GLOBAL_RANK_MAP)
+moves = backfill_current_rank(moves, GLOBAL_RANK_MAP)
+top_movers = backfill_current_rank(top_movers, GLOBAL_RANK_MAP)
+
 if combined.empty:
     st.error("No data found in the default outputs folder.")
     st.info("Create an outputs folder beside this file and keep the generated CSV files there.")
@@ -1235,6 +1299,7 @@ alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=21)
 DECISION_DF = build_decision_engine_table(combined, changes, industry, regime)
+DECISION_DF = backfill_current_rank(DECISION_DF, GLOBAL_RANK_MAP)
 RANK_SOURCE_DF = DECISION_DF if not DECISION_DF.empty else combined
 TOP_MOVER_RANK_MAP = build_simple_rank_map(RANK_SOURCE_DF)
 DECISION_STATS = decision_summary_stats(DECISION_DF)
@@ -1252,13 +1317,15 @@ if alert_candidates.empty and not DECISION_DF.empty:
 
 def get_stock_rank(ticker: str) -> str:
     t = str(ticker).strip()
-    return (
+    val = (
         TOP_MOVER_RANK_MAP.get(t)
         or TOP_MOVER_RANK_MAP.get(t.replace(".NS", ""))
+        or (str(int(GLOBAL_RANK_MAP.get(t))) if GLOBAL_RANK_MAP.get(t) is not None else "")
+        or (str(int(GLOBAL_RANK_MAP.get(t.replace(".NS", "")))) if GLOBAL_RANK_MAP.get(t.replace(".NS", "")) is not None else "")
         or rank_lookup(RANK_SOURCE_DF, ticker, ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"])
         or rank_lookup(combined, ticker, ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"])
-        or "n/a"
     )
+    return val if str(val).strip() else "n/a"
 
 if "watchlist_names" not in st.session_state:
     st.session_state["watchlist_names"] = []
