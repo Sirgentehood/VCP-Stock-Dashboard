@@ -675,6 +675,46 @@ def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
     return out
 
 
+def parse_ticker_input(raw_text: str) -> list:
+    if not raw_text:
+        return []
+    parts = re.split(r"[\s,;\n\t]+", str(raw_text).strip())
+    out = []
+    seen = set()
+    for part in parts:
+        ticker = part.strip().upper()
+        if not ticker:
+            continue
+        ticker_ns = ticker if ticker.endswith(".NS") else f"{ticker}.NS"
+        for candidate in [ticker_ns, ticker]:
+            if candidate and candidate not in seen:
+                seen.add(candidate)
+                out.append(candidate)
+    return out
+
+
+def names_from_tickers(tickers: list, source_df: pd.DataFrame) -> list:
+    if source_df is None or source_df.empty or not tickers:
+        return []
+    work = source_df.copy()
+    if "ticker" not in work.columns or "Company Name" not in work.columns:
+        return []
+    work["ticker"] = work["ticker"].astype(str).str.strip()
+    work["_ticker_raw"] = work["ticker"].str.replace(".NS", "", regex=False).str.upper()
+    out = []
+    seen = set()
+    for t in tickers:
+        t_norm = str(t).strip().upper()
+        t_raw = t_norm.replace(".NS", "")
+        match = work[(work["ticker"].str.upper() == t_norm) | (work["_ticker_raw"] == t_raw)]
+        if not match.empty:
+            name = str(match.iloc[0]["Company Name"]).strip()
+            if name and name not in seen:
+                seen.add(name)
+                out.append(name)
+    return out
+
+
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame, industries: list) -> list:
     ranked = sort_by_rank(combined, descending=(name == "Stage 4"), company_tiebreak=True).copy()
     names = []
@@ -1376,13 +1416,30 @@ with tabs[4]:
         st.session_state["watchlist_selection_prev"] = selected_watchlist
     st.session_state["watchlist_names"] = dedupe_names(st.session_state["watchlist_names"], limit=MAX_PORTFOLIO_STOCKS)
     selected_to_add = st.selectbox("Add stock", options=[None] + list(chart_choice_map.keys()), index=0, placeholder="Type stock name or ticker", key="watchlist_add_name")
-    if st.button("Add to watchlist", use_container_width=True, key="watchlist_add_btn") and selected_to_add:
-        selected_name = selected_to_add.rsplit(" (", 1)[0]
-        st.session_state["watchlist_names"] = dedupe_names(st.session_state["watchlist_names"] + [selected_name], limit=MAX_PORTFOLIO_STOCKS)
-        st.session_state["custom_watchlist_names"] = dedupe_names(st.session_state["watchlist_names"], limit=MAX_PORTFOLIO_STOCKS)
-        st.rerun()
+    add_cols = st.columns([1.0, 1.2])
+    with add_cols[0]:
+        if st.button("Add selected stock", use_container_width=True, key="watchlist_add_btn") and selected_to_add:
+            selected_name = selected_to_add.rsplit(" (", 1)[0]
+            st.session_state["watchlist_names"] = dedupe_names(st.session_state["watchlist_names"] + [selected_name], limit=MAX_PORTFOLIO_STOCKS)
+            st.session_state["custom_watchlist_names"] = dedupe_names(st.session_state["watchlist_names"], limit=MAX_PORTFOLIO_STOCKS)
+            st.rerun()
+    with add_cols[1]:
+        ticker_text = st.text_area("Add by tickers", value="", height=90, placeholder="RELIANCE, TCS, INFY or RELIANCE.NS, TCS.NS", key="watchlist_add_tickers_text")
+        if st.button("Add ticker list", use_container_width=True, key="watchlist_add_tickers_btn"):
+            parsed_tickers = parse_ticker_input(ticker_text)
+            source_for_lookup = DECISION_DF if not DECISION_DF.empty else combined
+            matched_names = names_from_tickers(parsed_tickers, source_for_lookup)
+            st.session_state["watchlist_names"] = dedupe_names(st.session_state["watchlist_names"] + matched_names, limit=MAX_PORTFOLIO_STOCKS)
+            st.session_state["custom_watchlist_names"] = dedupe_names(st.session_state["watchlist_names"], limit=MAX_PORTFOLIO_STOCKS)
+            all_known = {str(x).replace(".NS", "").upper() for x in (combined["ticker"].dropna().astype(str).tolist() if "ticker" in combined.columns else [])}
+            missing = [t for t in parsed_tickers if t.replace(".NS", "").upper() not in all_known]
+            if matched_names:
+                st.success(f"Added {len(matched_names)} stock(s) from ticker list.")
+            if missing:
+                st.warning("Not found: " + ", ".join(missing[:50]))
+            st.rerun()
     if not st.session_state["watchlist_names"]:
-        st.info("No stocks added yet.")
+        st.info("No stocks added yet. You can add from the dropdown or paste a ticker list.")
     else:
         source_df = DECISION_DF if not DECISION_DF.empty else combined
         current = source_df[source_df["Company Name"].isin(st.session_state["watchlist_names"])].copy()
@@ -1402,38 +1459,26 @@ with tabs[4]:
         if not portfolio_ordered.empty:
             st.divider()
             st.markdown("### Watchlist charts")
-            st.session_state["watchlist_chart_index"] = max(0, min(st.session_state["watchlist_chart_index"], len(portfolio_ordered) - 1))
-            prow = portfolio_ordered.iloc[st.session_state["watchlist_chart_index"]]
-            pticker_short = str(prow["ticker"]).replace(".NS", "")
-
-            pc1, pc2 = st.columns(2)
-            with pc1:
-                st.markdown(f"#### Daily chart • {pticker_short} • Dataset Rank {get_stock_rank(prow['ticker'])}")
-                pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
-                if pdpath:
-                    st.image(safe_image_bytes(pdpath), use_container_width=True)
-                else:
-                    st.info("Daily chart not available.")
-            with pc2:
-                st.markdown(f"#### Weekly chart • {pticker_short} • Dataset Rank {get_stock_rank(prow['ticker'])}")
-                pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
-                if pwpath:
-                    st.image(safe_image_bytes(pwpath), use_container_width=True)
-                else:
-                    st.info("Weekly chart not available.")
-
-            nav1, nav2 = st.columns(2)
-            with nav1:
-                wprev = st.button("Previous", use_container_width=True, disabled=(st.session_state["watchlist_chart_index"] == 0), key="watchlist_prev_btn")
-            with nav2:
-                wnext = st.button("Next", use_container_width=True, disabled=(st.session_state["watchlist_chart_index"] >= len(portfolio_ordered) - 1), key="watchlist_next_btn")
-
-            if wprev and st.session_state["watchlist_chart_index"] > 0:
-                st.session_state["watchlist_chart_index"] -= 1
-                st.rerun()
-            if wnext and st.session_state["watchlist_chart_index"] < len(portfolio_ordered) - 1:
-                st.session_state["watchlist_chart_index"] += 1
-                st.rerun()
+            chart_limit = min(50, len(portfolio_ordered))
+            st.caption(f"Showing charts for the first {chart_limit} watchlist stocks by rank.")
+            for idx, (_, prow) in enumerate(portfolio_ordered.head(chart_limit).iterrows(), start=1):
+                pticker_short = str(prow["ticker"]).replace(".NS", "")
+                st.markdown(f"#### {idx}. {stock_display_label(prow)} • Dataset Rank {get_stock_rank(prow['ticker'])}")
+                pc1, pc2 = st.columns(2)
+                with pc1:
+                    st.markdown(f"**Daily chart • {pticker_short}**")
+                    pdpath = resolve_chart_path(daily_dir, prow["ticker"], "_daily.png")
+                    if pdpath:
+                        st.image(safe_image_bytes(pdpath), use_container_width=True)
+                    else:
+                        st.info("Daily chart not available.")
+                with pc2:
+                    st.markdown(f"**Weekly chart • {pticker_short}**")
+                    pwpath = resolve_chart_path(weekly_dir, prow["ticker"], "_weekly.png")
+                    if pwpath:
+                        st.image(safe_image_bytes(pwpath), use_container_width=True)
+                    else:
+                        st.info("Weekly chart not available.")
 
             st.markdown("#### Watchlist cards")
             for _, r in portfolio_ordered.iterrows():
@@ -1445,7 +1490,7 @@ with tabs[4]:
                     show_change_text=(f"Portfolio Action • {str(r.get('action', 'No Trade'))} • {str(r.get('rationale', ''))}" if "action" in r.index else ""),
                 )
 
-            render_stock_detail(prow)
+            render_stock_detail(portfolio_ordered.iloc[0])
 
         removable = [""] + sorted(st.session_state["watchlist_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="watchlist_remove_name")
