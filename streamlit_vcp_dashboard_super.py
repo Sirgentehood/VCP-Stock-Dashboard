@@ -140,6 +140,20 @@ def sort_by_rank(df: pd.DataFrame, descending: bool = False, company_tiebreak: b
         ascending.append(True)
     return safe_sort_values(out, sort_cols, ascending)
 
+
+def sort_watchlist_view(df: pd.DataFrame, selected_watchlist: str = "") -> pd.DataFrame:
+    if df is None or df.empty:
+        return df
+    out = ensure_current_rank(df.copy())
+    has_action = "action_confidence" in out.columns and "action" in out.columns
+    if selected_watchlist == "Stage 4":
+        if has_action:
+            return safe_sort_values(out, ["action_confidence", "current_rank", "Company Name"], [False, False, True])
+        return safe_sort_values(out, ["current_rank", "Company Name"], [False, True])
+    if has_action:
+        return safe_sort_values(out, ["action_confidence", "current_rank", "Company Name"], [False, True, True])
+    return safe_sort_values(out, ["current_rank", "Company Name"], [True, True])
+
 def build_mini_signal_text(row: pd.Series) -> str:
     parts = []
     dry_candidates = [
@@ -716,9 +730,12 @@ def names_from_tickers(tickers: list, source_df: pd.DataFrame) -> list:
 
 
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame, industries: list) -> list:
-    ranked = sort_by_rank(combined, descending=(name == "Stage 4"), company_tiebreak=True).copy()
+    source_df = DECISION_DF if 'DECISION_DF' in globals() and DECISION_DF is not None and not DECISION_DF.empty else combined
+    ranked = sort_watchlist_view(source_df, selected_watchlist=name).copy()
     names = []
-    if name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
+    if name in {"Buy", "Tactical Buy", "Watch for Long", "Short", "Tactical Short", "Watch for Short", "No Trade"} and "action" in ranked.columns:
+        names = ranked.loc[ranked["action"].astype(str) == name, "Company Name"].dropna().tolist()
+    elif name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
         names = ranked.loc[ranked["stage"] == name, "Company Name"].dropna().tolist()
     elif name in {"Strong", "Developing", "Cautious", "Weak"}:
         names = ranked.loc[ranked["label"] == name, "Company Name"].dropna().tolist()
@@ -1403,7 +1420,24 @@ with tabs[3]:
 
 with tabs[4]:
     st.markdown("### Watchlist")
-    portfolio_options = ["Custom", "Strong", "Developing", "Cautious", "Weak", "Stage 1", "Stage 2", "Stage 3", "Stage 4"] + INDUSTRY_PORTFOLIOS
+    portfolio_options = [
+        "Custom",
+        "Buy",
+        "Tactical Buy",
+        "Watch for Long",
+        "Short",
+        "Tactical Short",
+        "Watch for Short",
+        "No Trade",
+        "Strong",
+        "Developing",
+        "Cautious",
+        "Weak",
+        "Stage 1",
+        "Stage 2",
+        "Stage 3",
+        "Stage 4",
+    ] + INDUSTRY_PORTFOLIOS
     selected_watchlist = st.selectbox("Watchlist view", portfolio_options, key="watchlist_view")
     previous_watchlist = st.session_state.get("watchlist_selection_prev", "Custom")
     if selected_watchlist != previous_watchlist:
@@ -1445,7 +1479,7 @@ with tabs[4]:
         current = source_df[source_df["Company Name"].isin(st.session_state["watchlist_names"])].copy()
         if current.empty:
             current = combined[combined["Company Name"].isin(st.session_state["watchlist_names"])].copy()
-        current = sort_by_rank(current, descending=(selected_watchlist == "Stage 4"), company_tiebreak=True)
+        current = sort_watchlist_view(current, selected_watchlist=selected_watchlist)
         watch_counts = stage_count_summary(current)
         render_distribution(watch_counts)
 
@@ -1480,17 +1514,14 @@ with tabs[4]:
                     else:
                         st.info("Weekly chart not available.")
 
-            st.markdown("#### Watchlist cards")
-            for _, r in portfolio_ordered.iterrows():
                 card(
-                    r,
+                    prow,
                     use_stage_color=True,
-                    stock_rank=get_stock_rank(r["ticker"]),
-                    action_label=str(r.get("action", "No Trade")),
-                    show_change_text=(f"Portfolio Action • {str(r.get('action', 'No Trade'))} • {str(r.get('rationale', ''))}" if "action" in r.index else ""),
+                    stock_rank=get_stock_rank(prow["ticker"]),
+                    action_label=str(prow.get("action", "No Trade")),
+                    show_change_text=(f"Portfolio Action • {str(prow.get('action', 'No Trade'))} • {str(prow.get('rationale', ''))}" if "action" in prow.index else ""),
                 )
-
-            render_stock_detail(portfolio_ordered.iloc[0])
+                render_stock_detail(prow)
 
         removable = [""] + sorted(st.session_state["watchlist_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="watchlist_remove_name")
