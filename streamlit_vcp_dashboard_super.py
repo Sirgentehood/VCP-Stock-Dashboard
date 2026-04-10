@@ -861,15 +861,37 @@ def build_decision_engine_table(combined_df: pd.DataFrame, changes_df: pd.DataFr
 def top_trade_candidates(decision_df: pd.DataFrame, side: str, top_n: int = 8) -> pd.DataFrame:
     if decision_df.empty:
         return pd.DataFrame()
+
+    def _sort_with_fallbacks(df: pd.DataFrame, by: list, ascending: list) -> pd.DataFrame:
+        usable_by, usable_asc = [], []
+        for col, asc in zip(by, ascending):
+            if col in df.columns:
+                usable_by.append(col)
+                usable_asc.append(asc)
+        if not usable_by:
+            return df
+        return df.sort_values(usable_by, ascending=usable_asc, na_position="last")
+
     if side == "Long":
         candidates = decision_df[decision_df["trade_side"] == "Long"].copy()
         if candidates.empty:
             return candidates
-        return candidates.sort_values(["long_score", "action_confidence", "industry_score", "current_rank"], ascending=[False, False, False, True], na_position="last").head(top_n)
+        candidates["_rank_fallback"] = pd.to_numeric(candidates.get("current_rank"), errors="coerce") if "current_rank" in candidates.columns else pd.NA
+        return _sort_with_fallbacks(
+            candidates,
+            ["long_score", "action_confidence", "industry_score", "_rank_fallback"],
+            [False, False, False, True],
+        ).drop(columns=["_rank_fallback"], errors="ignore").head(top_n)
+
     candidates = decision_df[decision_df["trade_side"] == "Short"].copy()
     if candidates.empty:
         return candidates
-    return candidates.sort_values(["short_score", "action_confidence", "industry_score", "current_rank"], ascending=[False, False, True, True], na_position="last").head(top_n)
+    candidates["_rank_fallback"] = pd.to_numeric(candidates.get("current_rank"), errors="coerce") if "current_rank" in candidates.columns else pd.NA
+    return _sort_with_fallbacks(
+        candidates,
+        ["short_score", "action_confidence", "industry_score", "_rank_fallback"],
+        [False, False, True, True],
+    ).drop(columns=["_rank_fallback"], errors="ignore").head(top_n)
 
 def render_trade_card(row: pd.Series):
     side = str(row.get("trade_side", "Neutral"))
