@@ -846,6 +846,13 @@ def build_decision_engine_table(combined_df: pd.DataFrame, changes_df: pd.DataFr
     if combined_df.empty:
         return pd.DataFrame()
     df = combined_df.copy()
+    if "current_rank" not in df.columns:
+        for alt in ["rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+            if alt in df.columns:
+                df["current_rank"] = pd.to_numeric(df[alt], errors="coerce")
+                break
+        if "current_rank" not in df.columns:
+            df["current_rank"] = pd.NA
     if not changes_df.empty and "ticker" in changes_df.columns:
         change_cols = [c for c in ["ticker", "entered_stage_2", "new_weekly_breakout", "new_daily_breakout"] if c in changes_df.columns]
         df = df.merge(changes_df[change_cols].drop_duplicates(subset=["ticker"]), on="ticker", how="left", suffixes=("", "_chg"))
@@ -855,29 +862,37 @@ def build_decision_engine_table(combined_df: pd.DataFrame, changes_df: pd.DataFr
     industry_support_map = build_industry_support_map(industry_df, df)
     decision_cols = df.apply(lambda row: compute_trade_action(row, bias, bias_score, industry_support_map), axis=1)
     df = pd.concat([df, decision_cols], axis=1)
+    for col, default in {
+        "industry_score": 0,
+        "action_confidence": 0,
+        "long_score": 0,
+        "short_score": 0,
+    }.items():
+        if col not in df.columns:
+            df[col] = default
     df["decision_priority"] = df[["long_score", "short_score"]].max(axis=1)
     return df
+
+def safe_sort_values(df: pd.DataFrame, by: list, ascending: list):
+    usable_by, usable_asc = [], []
+    for col, asc in zip(by, ascending):
+        if col in df.columns:
+            usable_by.append(col)
+            usable_asc.append(asc)
+    if not usable_by:
+        return df
+    return df.sort_values(usable_by, ascending=usable_asc, na_position="last")
 
 def top_trade_candidates(decision_df: pd.DataFrame, side: str, top_n: int = 8) -> pd.DataFrame:
     if decision_df.empty:
         return pd.DataFrame()
-
-    def _sort_with_fallbacks(df: pd.DataFrame, by: list, ascending: list) -> pd.DataFrame:
-        usable_by, usable_asc = [], []
-        for col, asc in zip(by, ascending):
-            if col in df.columns:
-                usable_by.append(col)
-                usable_asc.append(asc)
-        if not usable_by:
-            return df
-        return df.sort_values(usable_by, ascending=usable_asc, na_position="last")
 
     if side == "Long":
         candidates = decision_df[decision_df["trade_side"] == "Long"].copy()
         if candidates.empty:
             return candidates
         candidates["_rank_fallback"] = pd.to_numeric(candidates.get("current_rank"), errors="coerce") if "current_rank" in candidates.columns else pd.NA
-        return _sort_with_fallbacks(
+        return safe_sort_values(
             candidates,
             ["long_score", "action_confidence", "industry_score", "_rank_fallback"],
             [False, False, False, True],
@@ -887,7 +902,7 @@ def top_trade_candidates(decision_df: pd.DataFrame, side: str, top_n: int = 8) -
     if candidates.empty:
         return candidates
     candidates["_rank_fallback"] = pd.to_numeric(candidates.get("current_rank"), errors="coerce") if "current_rank" in candidates.columns else pd.NA
-    return _sort_with_fallbacks(
+    return safe_sort_values(
         candidates,
         ["short_score", "action_confidence", "industry_score", "_rank_fallback"],
         [False, False, True, True],
@@ -1166,7 +1181,7 @@ with tabs[1]:
         if action_filter != "All":
             board = board[board["action"] == action_filter]
         board = board[board["action_confidence"] >= min_score]
-        board = board.sort_values(["decision_priority", "industry_score", "current_rank"], ascending=[False, False, True], na_position="last")
+        board = safe_sort_values(board, ["decision_priority", "industry_score", "current_rank"], [False, False, True])
 
         t1, t2, t3, t4 = st.columns(4)
         with t1:
