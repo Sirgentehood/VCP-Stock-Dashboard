@@ -80,7 +80,7 @@ LABELS = {
     "Weak": {"css": "status-weak"},
     "Cautious": {"css": "status-cautious"},
 }
-MAX_PORTFOLIO_STOCKS = 5000
+MAX_PORTFOLIO_STOCKS = None
 
 @st.cache_data(show_spinner=False)
 def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
@@ -114,6 +114,70 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
         out = out.drop(columns=drop_cols)
     return out
 
+def ensure_current_rank(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return df
+    out = df.copy()
+    if "current_rank" not in out.columns:
+        for alt in ["rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+            if alt in out.columns:
+                out["current_rank"] = pd.to_numeric(out[alt], errors="coerce")
+                break
+    if "current_rank" not in out.columns:
+        out["current_rank"] = pd.NA
+    else:
+        out["current_rank"] = pd.to_numeric(out["current_rank"], errors="coerce")
+    return out
+
+def sort_by_rank(df: pd.DataFrame, descending: bool = False, company_tiebreak: bool = True) -> pd.DataFrame:
+    if df is None or df.empty:
+        return df
+    out = ensure_current_rank(df)
+    sort_cols = ["current_rank"]
+    ascending = [not descending]
+    if company_tiebreak and "Company Name" in out.columns:
+        sort_cols.append("Company Name")
+        ascending.append(True)
+    return safe_sort_values(out, sort_cols, ascending)
+
+def build_mini_signal_text(row: pd.Series) -> str:
+    parts = []
+    dry_candidates = [
+        ("volume_is_drying_up", "Volume drying up"),
+        ("volume_drying_up", "Volume drying up"),
+        ("volume_dry_up", "Volume drying up"),
+        ("vol_dry_up", "Volume drying up"),
+        ("drying_up", "Volume drying up"),
+    ]
+    for col, label in dry_candidates:
+        if col in row.index and boolish(row.get(col, False)):
+            parts.append(label)
+            break
+
+    for col, label in [("volume_ratio", "Vol ratio"), ("avg_volume_ratio", "Avg vol ratio"), ("vol_ratio", "Vol ratio")]:
+        val = pd.to_numeric(row.get(col), errors="coerce")
+        if pd.notna(val):
+            parts.append(f"{label} {val:.2f}x")
+            break
+
+    for col, label in [("rs_3m_pct", "RS 3M"), ("rs_6m_pct", "RS 6M"), ("change_1w_pct", "1W"), ("change_1m_pct", "1M")]:
+        val = pd.to_numeric(row.get(col), errors="coerce")
+        if pd.notna(val):
+            parts.append(f"{label} {val:+.1f}%")
+
+    if boolish(row.get("entered_stage_2", False)):
+        parts.append("Entered Stage 2")
+    if boolish(row.get("new_weekly_breakout", False)):
+        parts.append("Weekly breakout")
+    elif boolish(row.get("new_daily_breakout", False)):
+        parts.append("Daily breakout")
+
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    if pd.notna(rank_change) and rank_change != 0:
+        parts.append(f"Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}")
+
+    return " • ".join(parts[:5])
+
 def classify_stock(row: pd.Series) -> str:
     stage = str(row.get("stage", ""))
     score = pd.to_numeric(row.get("final_combined_score", row.get("combined_score")), errors="coerce")
@@ -140,7 +204,7 @@ def classify_stock(row: pd.Series) -> str:
     return "Developing"
 
 def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
-    out = normalize_columns(df)
+    out = ensure_current_rank(normalize_columns(df))
     numeric_cols = [
         "final_combined_score", "avg_combined_score", "current_rank", "prev_rank", "rank_change",
         "combined_score_change", "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct", "rs_rank"
@@ -319,12 +383,34 @@ def company_choices(df: pd.DataFrame):
     tmp = tmp.drop_duplicates(subset=["Company Name"], keep="first")
     return dict(zip(tmp["Company Name"], tmp["ticker"]))
 
+def resolve_rank_series(df: pd.DataFrame) -> pd.Series:
+    if df is None or df.empty:
+        return pd.Series(dtype="float64")
+    for col in ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+        if col in df.columns:
+            return pd.to_numeric(df[col], errors="coerce")
+    return pd.Series([float("nan")] * len(df), index=df.index, dtype="float64")
+
+
+def ensure_rank_column(df: pd.DataFrame) -> pd.DataFrame:
+    if df is None or df.empty:
+        return df
+    out = df.copy()
+    if "current_rank" not in out.columns:
+        out["current_rank"] = resolve_rank_series(out)
+    else:
+        out["current_rank"] = pd.to_numeric(out["current_rank"], errors="coerce")
+    return out
+
+
 def chart_dropdown_options(df: pd.DataFrame):
     if df.empty:
         return {}
     tmp = ensure_rank_column(df.dropna(subset=["Company Name", "ticker"]).copy())
     tmp["display_label"] = tmp.apply(stock_display_label, axis=1)
-    tmp = tmp.sort_values(["current_rank", "display_label"], ascending=[True, True], na_position="last").drop_duplicates(subset=["ticker"], keep="first")
+    sort_cols = [c for c in ["current_rank", "display_label"] if c in tmp.columns]
+    asc = [True, True][:len(sort_cols)]
+    tmp = tmp.sort_values(sort_cols, ascending=asc, na_position="last").drop_duplicates(subset=["ticker"], keep="first")
     return dict(zip(tmp["display_label"], tmp["ticker"]))
 
 def resolve_chart_path(charts_dir: str, ticker: str, suffix: str):
@@ -380,44 +466,6 @@ def stage2_count_by_industry(combined_df: pd.DataFrame) -> pd.DataFrame:
     if combined_df.empty or "Industry" not in combined_df.columns or "stage" not in combined_df.columns:
         return pd.DataFrame(columns=["Industry", "Stage 2 Stocks"])
     return combined_df.groupby("Industry", dropna=True)["stage"].apply(lambda s: int((s == "Stage 2").sum())).reset_index(name="Stage 2 Stocks")
-
-
-def resolve_rank_series(df: pd.DataFrame) -> pd.Series:
-    if df is None or df.empty:
-        return pd.Series(dtype="float64")
-    for col in ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
-        if col in df.columns:
-            return pd.to_numeric(df[col], errors="coerce")
-    return pd.Series([pd.NA] * len(df), index=df.index, dtype="float64")
-
-
-def ensure_rank_column(df: pd.DataFrame) -> pd.DataFrame:
-    if df is None or df.empty:
-        return df
-    out = df.copy()
-    if "current_rank" not in out.columns:
-        out["current_rank"] = resolve_rank_series(out)
-    else:
-        out["current_rank"] = pd.to_numeric(out["current_rank"], errors="coerce")
-        miss = out["current_rank"].isna()
-        if miss.any():
-            fallback = resolve_rank_series(out)
-            out.loc[miss, "current_rank"] = fallback.loc[miss]
-    return out
-
-
-def sort_by_rank(df: pd.DataFrame, stage4_lowest_first: bool = False) -> pd.DataFrame:
-    if df is None or df.empty:
-        return df
-    out = ensure_rank_column(df)
-    asc = True
-    if stage4_lowest_first and "stage" in out.columns:
-        stage_vals = out["stage"].astype(str)
-        if not stage_vals.empty and (stage_vals == "Stage 4").all():
-            asc = False
-    if "Company Name" in out.columns:
-        return out.sort_values(["current_rank", "Company Name", "ticker"], ascending=[asc, True, True], na_position="last")
-    return out.sort_values(["current_rank", "ticker"], ascending=[asc, True], na_position="last")
 
 def build_today_changes(changes_df: pd.DataFrame, industry_changes_df: pd.DataFrame):
     summary = {"New Strong": 0, "Entered Stage 2": 0, "New Breakouts": 0}
@@ -552,7 +600,7 @@ def build_simple_rank_map(df: pd.DataFrame) -> dict:
 
 def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
     if df.empty:
-        return "n/a"
+        return ""
     work = df.copy()
     ticker_col = None
     for cand in ["ticker", "Ticker", "symbol", "Symbol"]:
@@ -560,21 +608,21 @@ def rank_lookup(df: pd.DataFrame, ticker: str, preferred_cols: list) -> str:
             ticker_col = cand
             break
     if ticker_col is None:
-        return "n/a"
+        return ""
     work[ticker_col] = work[ticker_col].astype(str).str.strip()
     ticker_norm = str(ticker).strip()
     match = work[work[ticker_col] == ticker_norm]
     if match.empty:
         match = work[work[ticker_col].str.replace(".NS", "", regex=False) == ticker_norm.replace(".NS", "")]
     if match.empty:
-        return "n/a"
+        return ""
     row = match.iloc[0]
     for col in preferred_cols + ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
         if col in match.columns:
             val = pd.to_numeric(row.get(col), errors="coerce")
             if pd.notna(val):
                 return str(int(val))
-    return "n/a"
+    return ""
 
 def get_industry_portfolio_options(industry_df: pd.DataFrame, combined_df: pd.DataFrame, limit: int = 21) -> list:
     if "Industry" in combined_df.columns:
@@ -622,13 +670,13 @@ def dedupe_names(names: list, limit: int = MAX_PORTFOLIO_STOCKS) -> list:
             continue
         seen.add(name)
         out.append(name)
-        if len(out) >= limit:
+        if limit is not None and len(out) >= limit:
             break
     return out
 
 
 def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFrame, industries: list) -> list:
-    ranked = combined.sort_values(["Company Name", "ticker"], ascending=[True, True], na_position="last").copy()
+    ranked = sort_by_rank(combined, descending=(name == "Stage 4"), company_tiebreak=True).copy()
     names = []
     if name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
         names = ranked.loc[ranked["stage"] == name, "Company Name"].dropna().tolist()
@@ -699,71 +747,46 @@ def build_industry_support_map(industry_df: pd.DataFrame, combined_df: pd.DataFr
     support = {}
     if combined_df.empty or "Industry" not in combined_df.columns:
         return support
-
     stage2_counts = stage2_count_by_industry(combined_df)
     stage2_map = {}
     if not stage2_counts.empty:
         stage2_map = dict(zip(stage2_counts["Industry"].astype(str), stage2_counts["Stage 2 Stocks"]))
-
-    industry_names = combined_df["Industry"].dropna().astype(str).str.strip().unique().tolist()
-    for ind in industry_names:
+    for ind in combined_df["Industry"].dropna().astype(str).unique().tolist():
         support[ind] = {"industry_score": 50, "industry_rank": None, "stage2_count": int(stage2_map.get(ind, 0)), "industry_view": "Neutral"}
-
-    if industry_df.empty or "Industry" not in industry_df.columns:
-        return support
-
-    temp = industry_df.copy()
-    temp["Industry"] = temp["Industry"].astype(str).str.strip()
-    temp = temp[temp["Industry"] != ""].drop_duplicates(subset=["Industry"], keep="first")
-    if temp.empty:
-        return support
-
-    if "avg_combined_score" in temp.columns:
-        temp["avg_combined_score"] = pd.to_numeric(temp["avg_combined_score"], errors="coerce")
-    else:
-        temp["avg_combined_score"] = pd.NA
-
-    temp = ensure_rank_column(temp)
-    temp["stage2_count"] = temp["Industry"].map(lambda x: int(stage2_map.get(x, 0)))
-
-    # Relative scoring works better than absolute thresholds because the raw industry table
-    # can use different scales across datasets.
-    if temp["avg_combined_score"].notna().any():
-        score_pct = temp["avg_combined_score"].rank(method="average", pct=True)
-    else:
-        score_pct = pd.Series([0.5] * len(temp), index=temp.index)
-
-    if temp["current_rank"].notna().any():
-        rank_pct = 1 - temp["current_rank"].rank(method="average", pct=True)
-    else:
-        rank_pct = score_pct
-
-    if temp["stage2_count"].notna().any():
-        stage2_pct = temp["stage2_count"].rank(method="average", pct=True)
-    else:
-        stage2_pct = pd.Series([0.5] * len(temp), index=temp.index)
-
-    temp["industry_score"] = ((score_pct * 0.45) + (rank_pct * 0.40) + (stage2_pct * 0.15)) * 100
-    temp["industry_score"] = temp["industry_score"].round().clip(lower=0, upper=100).astype(int)
-
-    for _, row in temp.iterrows():
-        base = int(row.get("industry_score", 50))
-        if base >= 75:
-            view = "Strong Tailwind"
-        elif base >= 60:
-            view = "Positive"
-        elif base <= 30:
-            view = "Weak"
-        elif base <= 42:
-            view = "Fragile"
-        else:
+    if not industry_df.empty and "Industry" in industry_df.columns:
+        temp = industry_df.copy()
+        if "current_rank" in temp.columns:
+            temp["current_rank"] = pd.to_numeric(temp["current_rank"], errors="coerce")
+        if "avg_combined_score" in temp.columns:
+            temp["avg_combined_score"] = pd.to_numeric(temp["avg_combined_score"], errors="coerce")
+        for _, row in temp.iterrows():
+            ind = str(row.get("Industry", "")).strip()
+            if not ind:
+                continue
+            rank = pd.to_numeric(row.get("current_rank"), errors="coerce")
+            avg_score = pd.to_numeric(row.get("avg_combined_score"), errors="coerce")
+            base = 50
+            if pd.notna(avg_score):
+                base += max(-20, min(20, int(round((avg_score - 50) * 0.6))))
+            if pd.notna(rank):
+                base += max(-18, min(18, 22 - int(rank)))
+            base += min(18, int(stage2_map.get(ind, 0)) * 2)
+            base = int(max(0, min(100, base)))
             view = "Neutral"
-        support[row["Industry"]] = {
-            "industry_score": base,
-            "industry_rank": (int(row["current_rank"]) if pd.notna(row.get("current_rank")) else None),
-            "stage2_count": int(row.get("stage2_count", 0)),
-            "industry_view": view,
-        }
+            if base >= 68:
+                view = "Strong Tailwind"
+            elif base >= 56:
+                view = "Positive"
+            elif base <= 35:
+                view = "Weak"
+            elif base <= 45:
+                view = "Fragile"
+            support[ind] = {
+                "industry_score": base,
+                "industry_rank": (int(rank) if pd.notna(rank) else None),
+                "stage2_count": int(stage2_map.get(ind, 0)),
+                "industry_view": view,
+            }
     return support
 
 def boolish(v) -> bool:
@@ -908,7 +931,14 @@ def compute_trade_action(row: pd.Series, market_bias: str, market_bias_score_val
 def build_decision_engine_table(combined_df: pd.DataFrame, changes_df: pd.DataFrame, industry_df: pd.DataFrame, regime_df: pd.DataFrame) -> pd.DataFrame:
     if combined_df.empty:
         return pd.DataFrame()
-    df = ensure_rank_column(combined_df.copy())
+    df = combined_df.copy()
+    if "current_rank" not in df.columns:
+        for alt in ["rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"]:
+            if alt in df.columns:
+                df["current_rank"] = pd.to_numeric(df[alt], errors="coerce")
+                break
+        if "current_rank" not in df.columns:
+            df["current_rank"] = pd.NA
     if not changes_df.empty and "ticker" in changes_df.columns:
         change_cols = [c for c in ["ticker", "entered_stage_2", "new_weekly_breakout", "new_daily_breakout"] if c in changes_df.columns]
         df = df.merge(changes_df[change_cols].drop_duplicates(subset=["ticker"]), on="ticker", how="left", suffixes=("", "_chg"))
@@ -918,22 +948,51 @@ def build_decision_engine_table(combined_df: pd.DataFrame, changes_df: pd.DataFr
     industry_support_map = build_industry_support_map(industry_df, df)
     decision_cols = df.apply(lambda row: compute_trade_action(row, bias, bias_score, industry_support_map), axis=1)
     df = pd.concat([df, decision_cols], axis=1)
+    for col, default in {
+        "industry_score": 0,
+        "action_confidence": 0,
+        "long_score": 0,
+        "short_score": 0,
+    }.items():
+        if col not in df.columns:
+            df[col] = default
     df["decision_priority"] = df[["long_score", "short_score"]].max(axis=1)
     return df
+
+def safe_sort_values(df: pd.DataFrame, by: list, ascending: list):
+    usable_by, usable_asc = [], []
+    for col, asc in zip(by, ascending):
+        if col in df.columns:
+            usable_by.append(col)
+            usable_asc.append(asc)
+    if not usable_by:
+        return df
+    return df.sort_values(usable_by, ascending=usable_asc, na_position="last")
 
 def top_trade_candidates(decision_df: pd.DataFrame, side: str, top_n: int = 8) -> pd.DataFrame:
     if decision_df.empty:
         return pd.DataFrame()
-    decision_df = ensure_rank_column(decision_df)
+
     if side == "Long":
         candidates = decision_df[decision_df["trade_side"] == "Long"].copy()
         if candidates.empty:
             return candidates
-        return candidates.sort_values(["long_score", "action_confidence", "industry_score", "current_rank"], ascending=[False, False, False, True], na_position="last").head(top_n)
+        candidates["_rank_fallback"] = pd.to_numeric(candidates.get("current_rank"), errors="coerce") if "current_rank" in candidates.columns else float("nan")
+        return safe_sort_values(
+            candidates,
+            ["long_score", "action_confidence", "industry_score", "_rank_fallback"],
+            [False, False, False, True],
+        ).drop(columns=["_rank_fallback"], errors="ignore").head(top_n)
+
     candidates = decision_df[decision_df["trade_side"] == "Short"].copy()
     if candidates.empty:
         return candidates
-    return candidates.sort_values(["short_score", "action_confidence", "industry_score", "current_rank"], ascending=[False, False, True, True], na_position="last").head(top_n)
+    candidates["_rank_fallback"] = pd.to_numeric(candidates.get("current_rank"), errors="coerce") if "current_rank" in candidates.columns else float("nan")
+    return safe_sort_values(
+        candidates,
+        ["short_score", "action_confidence", "industry_score", "_rank_fallback"],
+        [False, False, True, True],
+    ).drop(columns=["_rank_fallback"], errors="ignore").head(top_n)
 
 def render_trade_card(row: pd.Series):
     side = str(row.get("trade_side", "Neutral"))
@@ -943,7 +1002,9 @@ def render_trade_card(row: pd.Series):
     industry_name = str(row.get("Industry", "")).strip()
     industry_view = str(row.get("industry_view", "Neutral"))
     rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    rank_txt = f"Dataset Rank {int(rank_val)}" if pd.notna(rank_val) else "Rank n/a"
+    rank_txt = f"Dataset Rank {int(rank_val)}" if pd.notna(rank_val) else f"Dataset Rank {get_stock_rank(row.get('ticker', ''))}"
+    mini_text = build_mini_signal_text(row)
+    mini_html = f"<div class='small-note' style='margin-top:0.15rem;'>{mini_text}</div>" if mini_text else ""
     st.markdown(f"""
 <div class='stock-card {_stage_card_class(str(row.get("stage", "")))}'>
   <div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem;'>
@@ -952,6 +1013,7 @@ def render_trade_card(row: pd.Series):
       <div class='meta-line'>{action} • {side} • Score {score}/100</div>
       <div class='stock-subtitle'>{str(row.get("rationale", ""))}</div>
       <div class='small-note' style='margin-top:0.2rem;'>{industry_icon(industry_name)} {industry_name or 'Unknown industry'} • {industry_view}</div>
+      {mini_html}
       <div class='small-note' style='margin-top:0.15rem;'>Stop framework: {str(row.get("stop_framework", "Not defined"))}</div>
     </div>
     <div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>
@@ -1015,7 +1077,7 @@ def render_stock_detail(row):
     with col3:
         st.markdown('<div class="info-card"><b>Industry</b><br>' + str(row.get("Industry", "Not available")) + '</div>', unsafe_allow_html=True)
 
-def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a"):
+def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str = "", stock_rank: str = "n/a", action_label: str = ""):
     label = row.get("label", row.get("classification", "Developing"))
     style = LABELS.get(label, LABELS["Developing"])
     stage_raw = str(row.get("stage", "Unknown"))
@@ -1028,6 +1090,8 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     interpret = interpretation_line(row)
     signals = signal_summary(row)
     signals_html = f"<div class='small-note' style='margin-top:0.15rem;'>{signals}</div>" if signals and signals != "No major new structure-change flag in the latest update." else ""
+    mini_text = build_mini_signal_text(row)
+    mini_html = f"<div class='small-note' style='margin-top:0.15rem;'>{mini_text}</div>" if mini_text else ""
     industry_name = str(row.get("Industry", "")).strip()
     industry_with_icon = f"{industry_icon(industry_name)} {industry_name}" if industry_name else "Not available"
 
@@ -1045,6 +1109,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     extra_change = f"<div class='change-text'>{show_change_text}</div>" if show_change_text else ""
     class_attr = " ".join(classes)
     status_html = f"<div class='status-pill {style['css']}'>{label}</div>"
+    action_html = f"<div class='status-pill status-cautious' style='margin-top:0.2rem;'>{action_label}</div>" if action_label else ""
     structure_html = f"<div class='structure-pill'>{structure} · Model Score {score}/100</div>"
     rank_html = f"<div class='rank-text'>Dataset Rank {stock_rank}</div>"
 
@@ -1059,10 +1124,10 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div class='small-note'>Higher model score means stronger structure inside this model. It is not a recommendation.</div>"
         f"<div class='small-note' style='margin-top:0.15rem;'>{stage_desc}</div>"
         f"<div class='small-note' style='margin-top:0.2rem;'>{industry_with_icon}</div>"
-        f"{signals_html}"
+        f"{signals_html}{mini_html}"
         f"</div>"
         f"<div style='display:flex; flex-direction:column; align-items:flex-end; gap:0.05rem;'>"
-        f"{status_html}{rank_html}{change_html}"
+        f"{status_html}{action_html}{rank_html}{change_html}"
         f"</div>"
         f"</div>"
         f"{extra_change}"
@@ -1103,24 +1168,31 @@ chart_choice_map = chart_dropdown_options(combined)
 top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
 alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
-TOP_MOVER_RANK_MAP = build_simple_rank_map(top_movers)
 INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=21)
-DECISION_DF = ensure_rank_column(build_decision_engine_table(combined, changes, industry, regime))
-COMBINED_RANK_MAP = build_simple_rank_map(ensure_rank_column(combined))
-DECISION_RANK_MAP = build_simple_rank_map(DECISION_DF)
+DECISION_DF = build_decision_engine_table(combined, changes, industry, regime)
+RANK_SOURCE_DF = DECISION_DF if not DECISION_DF.empty else combined
+TOP_MOVER_RANK_MAP = build_simple_rank_map(RANK_SOURCE_DF)
 DECISION_STATS = decision_summary_stats(DECISION_DF)
 TOP_LONGS = top_trade_candidates(DECISION_DF, "Long", top_n=10)
 TOP_SHORTS = top_trade_candidates(DECISION_DF, "Short", top_n=10)
+if alert_candidates.empty and not DECISION_DF.empty:
+    alert_candidates = safe_sort_values(
+        DECISION_DF[DECISION_DF["action"].astype(str) != "No Trade"].copy(),
+        ["action_confidence", "decision_priority", "current_rank"],
+        [False, False, True],
+    ).head(20)
+    if not alert_candidates.empty:
+        alert_candidates["alert_type"] = alert_candidates.get("action", "Action")
+        alert_candidates["alert_reason"] = alert_candidates.get("rationale", "")
 
 def get_stock_rank(ticker: str) -> str:
     t = str(ticker).strip()
-    base = t.replace(".NS", "")
     return (
-        DECISION_RANK_MAP.get(t) or DECISION_RANK_MAP.get(base) or
-        COMBINED_RANK_MAP.get(t) or COMBINED_RANK_MAP.get(base) or
-        TOP_MOVER_RANK_MAP.get(t) or TOP_MOVER_RANK_MAP.get(base) or
-        rank_lookup(DECISION_DF, ticker, ["current_rank", "rank", "rs_rank"]) or
-        rank_lookup(combined, ticker, ["current_rank", "rank", "rs_rank"])
+        TOP_MOVER_RANK_MAP.get(t)
+        or TOP_MOVER_RANK_MAP.get(t.replace(".NS", ""))
+        or rank_lookup(RANK_SOURCE_DF, ticker, ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"])
+        or rank_lookup(combined, ticker, ["current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank"])
+        or "n/a"
     )
 
 if "watchlist_names" not in st.session_state:
@@ -1211,13 +1283,13 @@ with tabs[1]:
         side_filter = st.selectbox("Trade side", ["All", "Long", "Short", "Neutral"], key="trade_board_side")
         action_filter = st.selectbox("Action", ["All", "Buy", "Tactical Buy", "Watch for Long", "Short", "Tactical Short", "Watch for Short", "No Trade"], key="trade_board_action")
         min_score = st.slider("Minimum action confidence", 0, 100, 55, 1, key="trade_board_confidence")
-        board = ensure_rank_column(DECISION_DF.copy())
+        board = DECISION_DF.copy()
         if side_filter != "All":
             board = board[board["trade_side"] == side_filter]
         if action_filter != "All":
             board = board[board["action"] == action_filter]
         board = board[board["action_confidence"] >= min_score]
-        board = board.sort_values(["decision_priority", "industry_score", "current_rank"], ascending=[False, False, True], na_position="last")
+        board = safe_sort_values(board, ["decision_priority", "industry_score", "current_rank"], [False, False, True])
 
         t1, t2, t3, t4 = st.columns(4)
         with t1:
@@ -1229,15 +1301,18 @@ with tabs[1]:
         with t4:
             render_summary_card("Rows", str(len(board)), "Filtered trade rows")
 
-        for _, r in board.head(20).iterrows():
-            render_trade_card(r)
-
+        board = board.copy()
+        board["mini_signals"] = board.apply(build_mini_signal_text, axis=1)
         show_cols = [c for c in [
             "Company Name", "ticker", "Industry", "stage", "label", "action", "trade_side",
             "long_score", "short_score", "action_confidence", "industry_score", "industry_view",
-            "current_rank", "rank_change", "rationale"
+            "current_rank", "rank_change", "mini_signals", "rationale"
         ] if c in board.columns]
         st.dataframe(board[show_cols], use_container_width=True, hide_index=True, height=460)
+
+        st.markdown("#### Trade cards")
+        for _, r in board.head(20).iterrows():
+            render_trade_card(r)
 
 with tabs[2]:
     st.markdown("### Explore")
@@ -1309,10 +1384,20 @@ with tabs[4]:
     if not st.session_state["watchlist_names"]:
         st.info("No stocks added yet.")
     else:
-        current = combined[combined["Company Name"].isin(st.session_state["watchlist_names"])].copy()
-        current = sort_by_rank(current, stage4_lowest_first=(selected_watchlist == "Stage 4"))
+        source_df = DECISION_DF if not DECISION_DF.empty else combined
+        current = source_df[source_df["Company Name"].isin(st.session_state["watchlist_names"])].copy()
+        if current.empty:
+            current = combined[combined["Company Name"].isin(st.session_state["watchlist_names"])].copy()
+        current = sort_by_rank(current, descending=(selected_watchlist == "Stage 4"), company_tiebreak=True)
         watch_counts = stage_count_summary(current)
         render_distribution(watch_counts)
+
+        if not current.empty:
+            current["portfolio_action"] = current.get("action", "No Trade")
+            summary_cols = [c for c in ["Company Name", "ticker", "stage", "label", "portfolio_action", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
+            st.markdown("#### Portfolio action table")
+            st.dataframe(current[summary_cols], use_container_width=True, hide_index=True, height=260)
+
         portfolio_ordered = current.reset_index(drop=True)
         if not portfolio_ordered.empty:
             st.divider()
@@ -1350,12 +1435,17 @@ with tabs[4]:
                 st.session_state["watchlist_chart_index"] += 1
                 st.rerun()
 
-            card(prow, use_stage_color=True, stock_rank=get_stock_rank(prow["ticker"]))
-            render_stock_detail(prow)
+            st.markdown("#### Watchlist cards")
+            for _, r in portfolio_ordered.iterrows():
+                card(
+                    r,
+                    use_stage_color=True,
+                    stock_rank=get_stock_rank(r["ticker"]),
+                    action_label=str(r.get("action", "No Trade")),
+                    show_change_text=(f"Portfolio Action • {str(r.get('action', 'No Trade'))} • {str(r.get('rationale', ''))}" if "action" in r.index else ""),
+                )
 
-        st.markdown("#### Watchlist cards")
-        for _, r in current.iterrows():
-            card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
+            render_stock_detail(prow)
 
         removable = [""] + sorted(st.session_state["watchlist_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="watchlist_remove_name")
@@ -1367,7 +1457,7 @@ with tabs[4]:
 
 with tabs[5]:
     st.markdown("### Charts")
-    ranked_alpha = sort_by_rank(combined.copy()).reset_index(drop=True)
+    ranked_alpha = sort_by_rank(DECISION_DF if not DECISION_DF.empty else combined, descending=False, company_tiebreak=True).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
     options = list(chart_choice_map.keys())
 
@@ -1468,7 +1558,7 @@ with tabs[5]:
     render_disclosure()
 tab_offset = 6
 if view_mode == "Research":
-    with tabs[5]:
+    with tabs[6]:
         st.markdown("### Market")
         c1, c2, c3, c4 = st.columns(4)
         with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
@@ -1491,7 +1581,7 @@ if view_mode == "Research":
                 cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in industry_changes.columns]
                 st.dataframe(industry_changes[cols], use_container_width=True, hide_index=True, height=520)
         render_disclosure()
-    with tabs[6]:
+    with tabs[7]:
         st.markdown("### Structure Changes")
         if alert_candidates.empty:
             st.info("No structure-change rows were found in the latest data.")
