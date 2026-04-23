@@ -202,6 +202,17 @@ def sort_watchlist_view(df: pd.DataFrame, selected_watchlist: str = "") -> pd.Da
         return safe_sort_values(out, ["action_confidence", "current_rank", "Company Name"], [False, True, True])
     return safe_sort_values(out, ["current_rank", "Company Name"], [True, True])
 
+def dry_up_status(row: pd.Series) -> str:
+    daily = boolish(row.get("volume_is_drying_up", False))
+    weekly = boolish(row.get("weekly_volume_is_drying_up", False))
+    if daily and weekly:
+        return "Daily + Weekly dry-up"
+    if weekly:
+        return "Weekly dry-up"
+    if daily:
+        return "Daily dry-up"
+    return ""
+
 def build_mini_signal_text(row: pd.Series) -> str:
     parts = []
     dry_candidates = [
@@ -216,7 +227,10 @@ def build_mini_signal_text(row: pd.Series) -> str:
             parts.append(label)
             break
 
-    for col, label in [("volume_ratio", "Vol ratio"), ("avg_volume_ratio", "Avg vol ratio"), ("vol_ratio", "Vol ratio")]:
+    if boolish(row.get("weekly_volume_is_drying_up", False)):
+        parts.append("Weekly dry-up")
+
+    for col, label in [("volume_ratio", "Vol ratio"), ("avg_volume_ratio", "Avg vol ratio"), ("vol_ratio", "Vol ratio"), ("volume_dryup_ratio", "Dry-up ratio")]:
         val = pd.to_numeric(row.get(col), errors="coerce")
         if pd.notna(val):
             parts.append(f"{label} {val:.2f}x")
@@ -1434,11 +1448,12 @@ with tabs[1]:
             render_summary_card("Rows", str(len(board)), "Filtered trade rows")
 
         board = board.copy()
+        board["dry_up_status"] = board.apply(dry_up_status, axis=1)
         board["mini_signals"] = board.apply(build_mini_signal_text, axis=1)
         show_cols = [c for c in [
             "Company Name", "ticker", "Industry", "stage", "label", "action", "trade_side",
             "long_score", "short_score", "action_confidence", "industry_score", "industry_view",
-            "current_rank", "rank_change", "mini_signals", "rationale"
+            "current_rank", "rank_change", "dry_up_status", "mini_signals", "rationale"
         ] if c in board.columns]
         st.dataframe(board[show_cols], use_container_width=True, hide_index=True, height=460)
 
@@ -1560,7 +1575,8 @@ with tabs[4]:
 
         if not current.empty:
             current["portfolio_action"] = current.get("action", "No Trade")
-            summary_cols = [c for c in ["Company Name", "ticker", "stage", "label", "portfolio_action", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
+            current["dry_up_status"] = current.apply(dry_up_status, axis=1)
+            summary_cols = [c for c in ["Company Name", "ticker", "stage", "label", "portfolio_action", "dry_up_status", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
             st.markdown("#### Portfolio action table")
             st.dataframe(current[summary_cols], use_container_width=True, hide_index=True, height=260)
 

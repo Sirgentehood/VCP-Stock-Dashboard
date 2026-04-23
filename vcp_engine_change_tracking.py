@@ -3,6 +3,7 @@ import argparse
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from datetime import timedelta
+from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -78,6 +79,8 @@ class VCPScoreCard:
     combined_score: float
     volume_dryup_ratio: float
     breakout_volume_ratio: float
+    volume_is_drying_up: bool
+    weekly_volume_is_drying_up: bool
     notes: str
 
 def load_nifty500_universe(file_path: str) -> pd.DataFrame:
@@ -606,16 +609,13 @@ def market_regime(
 
 def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -> str:
     """
-    Rule-based stage classifier closer to Weinstein / Minervini chart behaviour.
+    More conservative stage classifier.
 
-    Philosophy:
-    - Stage 2: confirmed advancing structure
-    - Stage 4: confirmed declining structure
-    - Stage 1: post-decline stabilization / basing
-    - Stage 3: topping, failed trend, or ambiguous distribution before full Stage 4
-
-    This version is intentionally harder to classify as Stage 1 than the old one.
-    Borderline weak names should usually become Stage 3, not Stage 1.
+    Key changes vs the prior version:
+    - Stage 1 now requires a much cleaner flat-to-improving base near long-term averages.
+    - Stage 4 is easier to trigger for persistent weak names with failed rallies, falling long MAs,
+      or large drawdowns. This helps avoid misclassifying late-stage weakness as Stage 3 or Stage 1.
+    - Stage 3 is reserved for transition / topping / ambiguous deterioration, not fully broken trends.
     """
     if len(close) < 260:
         return "Unknown"
@@ -638,9 +638,16 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
     ma150_slope = slope_pct(ma150_series, 20)
     ma200_slope = slope_pct(ma200_series, 20)
 
+    weekly_close = c.resample("W-FRI").last().dropna()
+    weekly_ma10 = weekly_close.rolling(10).mean()
+    weekly_ma30 = weekly_close.rolling(30).mean()
+    weekly_ma10_now = float(weekly_ma10.iloc[-1]) if len(weekly_ma10) and pd.notna(weekly_ma10.iloc[-1]) else np.nan
+    weekly_ma30_now = float(weekly_ma30.iloc[-1]) if len(weekly_ma30) and pd.notna(weekly_ma30.iloc[-1]) else np.nan
+    weekly_ma10_slope = slope_pct(weekly_ma10, 6)
+    weekly_ma30_slope = slope_pct(weekly_ma30, 6)
+
     high_52w = float(c.iloc[-252:].max())
     low_52w = float(c.iloc[-252:].min())
-
     dist_from_high = (last / high_52w - 1) * 100 if high_52w > 0 else np.nan
     advance_from_low = (last / low_52w - 1) * 100 if low_52w > 0 else np.nan
 
@@ -670,30 +677,13 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
     def _recent_structure(series: pd.Series, lookback: int = 90, order: int = 5) -> dict:
         s = series.iloc[-lookback:].copy()
         peaks, troughs = _turning_points(s, order=order)
-
         recent_peaks = [float(s.iloc[i]) for i in peaks[-3:]]
         recent_troughs = [float(s.iloc[i]) for i in troughs[-3:]]
-
-        lower_highs = (
-            len(recent_peaks) >= 2 and
-            all(recent_peaks[i] < recent_peaks[i - 1] for i in range(1, len(recent_peaks)))
-        )
-        higher_highs = (
-            len(recent_peaks) >= 2 and
-            all(recent_peaks[i] > recent_peaks[i - 1] for i in range(1, len(recent_peaks)))
-        )
-        lower_lows = (
-            len(recent_troughs) >= 2 and
-            all(recent_troughs[i] < recent_troughs[i - 1] for i in range(1, len(recent_troughs)))
-        )
-        higher_lows = (
-            len(recent_troughs) >= 2 and
-            all(recent_troughs[i] > recent_troughs[i - 1] for i in range(1, len(recent_troughs)))
-        )
-
+        lower_highs = len(recent_peaks) >= 2 and all(recent_peaks[i] < recent_peaks[i - 1] for i in range(1, len(recent_peaks)))
+        higher_highs = len(recent_peaks) >= 2 and all(recent_peaks[i] > recent_peaks[i - 1] for i in range(1, len(recent_peaks)))
+        lower_lows = len(recent_troughs) >= 2 and all(recent_troughs[i] < recent_troughs[i - 1] for i in range(1, len(recent_troughs)))
+        higher_lows = len(recent_troughs) >= 2 and all(recent_troughs[i] > recent_troughs[i - 1] for i in range(1, len(recent_troughs)))
         return {
-            "recent_peaks": recent_peaks,
-            "recent_troughs": recent_troughs,
             "lower_highs": lower_highs,
             "higher_highs": higher_highs,
             "lower_lows": lower_lows,
@@ -709,28 +699,32 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
     ma_stack_bull = last > ma50_now > ma150_now > ma200_now
     ma_stack_bear = last < ma50_now < ma150_now < ma200_now
 
-    near_ma150 = pd.notna(ma150_now) and 0.93 * ma150_now <= last <= 1.07 * ma150_now
-    near_ma200 = pd.notna(ma200_now) and 0.93 * ma200_now <= last <= 1.07 * ma200_now
-    near_long_term_ma = near_ma150 or near_ma200
-
     above_50 = pd.notna(ma50_now) and last > ma50_now
     above_150 = pd.notna(ma150_now) and last > ma150_now
     above_200 = pd.notna(ma200_now) and last > ma200_now
-
     below_50 = pd.notna(ma50_now) and last < ma50_now
     below_150 = pd.notna(ma150_now) and last < ma150_now
     below_200 = pd.notna(ma200_now) and last < ma200_now
 
-    ma50_falling = pd.notna(ma50_slope) and ma50_slope < -0.0005
     ma50_rising = pd.notna(ma50_slope) and ma50_slope > 0.0005
-    ma150_falling = pd.notna(ma150_slope) and ma150_slope < -0.00025
-    ma150_rising = pd.notna(ma150_slope) and ma150_slope > 0.00025
-    ma200_falling = pd.notna(ma200_slope) and ma200_slope < -0.0001
-    ma200_rising = pd.notna(ma200_slope) and ma200_slope > 0.0001
-    ma200_flat = pd.notna(ma200_slope) and -0.00035 <= ma200_slope <= 0.00035
+    ma150_rising = pd.notna(ma150_slope) and ma150_slope > 0.0002
+    ma200_rising = pd.notna(ma200_slope) and ma200_slope > 0.00005
+    ma50_falling = pd.notna(ma50_slope) and ma50_slope < -0.00045
+    ma150_falling = pd.notna(ma150_slope) and ma150_slope < -0.00018
+    ma200_falling = pd.notna(ma200_slope) and ma200_slope < -0.00005
+    ma200_flat = pd.notna(ma200_slope) and -0.0002 <= ma200_slope <= 0.0002
+
+    weekly_bull = pd.notna(weekly_ma10_now) and pd.notna(weekly_ma30_now) and last > weekly_ma10_now > weekly_ma30_now
+    weekly_bear = pd.notna(weekly_ma10_now) and pd.notna(weekly_ma30_now) and last < weekly_ma10_now < weekly_ma30_now
+    weekly_10_rising = pd.notna(weekly_ma10_slope) and weekly_ma10_slope > 0.0008
+    weekly_30_rising = pd.notna(weekly_ma30_slope) and weekly_ma30_slope > 0.0002
+    weekly_10_falling = pd.notna(weekly_ma10_slope) and weekly_ma10_slope < -0.0008
+    weekly_30_falling = pd.notna(weekly_ma30_slope) and weekly_ma30_slope < -0.0002
 
     stage2_score = 0
     if ma_stack_bull:
+        stage2_score += 4
+    if weekly_bull:
         stage2_score += 3
     if ma50_rising:
         stage2_score += 2
@@ -738,131 +732,87 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
         stage2_score += 1
     if ma200_rising or ma200_flat:
         stage2_score += 1
+    if weekly_10_rising:
+        stage2_score += 1
+    if weekly_30_rising:
+        stage2_score += 1
     if pd.notna(ret_13w) and ret_13w > 8:
         stage2_score += 2
     if pd.notna(ret_26w) and ret_26w > 15:
-        stage2_score += 1
-    if pd.notna(dist_from_high) and dist_from_high >= -15:
-        stage2_score += 1
+        stage2_score += 2
+    if pd.notna(dist_from_high) and dist_from_high >= -18:
+        stage2_score += 2
     if pd.notna(advance_from_low) and advance_from_low >= 30:
         stage2_score += 1
     if higher_highs:
         stage2_score += 1
     if higher_lows:
         stage2_score += 2
-    if above_50 and above_150 and above_200:
-        stage2_score += 1
-
-    strong_stage2 = (
-        stage2_score >= 10 and
-        ma_stack_bull and
-        ma50_rising and
-        above_200 and
-        pd.notna(dist_from_high) and dist_from_high >= -20
-    )
-    if strong_stage2:
+    if stage2_score >= 13 and ma_stack_bull and weekly_bull and not lower_lows:
         return "Stage 2"
 
     stage4_score = 0
     if ma_stack_bear:
+        stage4_score += 4
+    if weekly_bear:
         stage4_score += 3
+    if below_150 and below_200:
+        stage4_score += 2
     if ma50_falling:
         stage4_score += 2
     if ma150_falling:
-        stage4_score += 1
+        stage4_score += 2
     if ma200_falling:
         stage4_score += 2
+    if weekly_10_falling:
+        stage4_score += 1
+    if weekly_30_falling:
+        stage4_score += 1
     if pd.notna(ret_13w) and ret_13w < -8:
         stage4_score += 2
-    if pd.notna(ret_26w) and ret_26w < -15:
+    if pd.notna(ret_26w) and ret_26w < -12:
         stage4_score += 2
-    if pd.notna(dist_from_high) and dist_from_high <= -25:
+    if pd.notna(dist_from_high) and dist_from_high <= -22:
+        stage4_score += 2
+    if pd.notna(dist_from_high) and dist_from_high <= -32:
         stage4_score += 2
     if lower_highs:
         stage4_score += 2
     if lower_lows:
         stage4_score += 2
-    if below_50 and below_150 and below_200:
-        stage4_score += 1
-
-    strong_stage4 = (
-        stage4_score >= 10 and
-        below_200 and
-        ma50_falling and
-        lower_highs and
-        lower_lows
-    )
-    if strong_stage4:
+    if stage4_score >= 10 and below_200 and (ma150_falling or ma200_falling or weekly_30_falling) and (lower_highs or weekly_bear):
         return "Stage 4"
+
+    near_ma150 = pd.notna(ma150_now) and 0.93 * ma150_now <= last <= 1.08 * ma150_now
+    near_ma200 = pd.notna(ma200_now) and 0.93 * ma200_now <= last <= 1.08 * ma200_now
+    near_long_term_ma = near_ma150 or near_ma200
 
     stage1_score = 0
     if near_long_term_ma:
-        stage1_score += 2
+        stage1_score += 3
     if ma200_flat:
         stage1_score += 2
-    if pd.notna(ma150_slope) and -0.0004 <= ma150_slope <= 0.0005:
+    if pd.notna(ma150_slope) and -0.0002 <= ma150_slope <= 0.00035:
         stage1_score += 1
-    if pd.notna(range_8w) and range_8w <= 18:
+    if pd.notna(range_8w) and range_8w <= 16:
         stage1_score += 2
-    if pd.notna(range_13w) and range_13w <= 28:
+    if pd.notna(range_13w) and range_13w <= 24:
+        stage1_score += 2
+    if pd.notna(range_26w) and range_26w <= 45:
         stage1_score += 1
-    if pd.notna(range_26w) and range_26w <= 55:
+    if pd.notna(ret_13w) and -5 <= ret_13w <= 10:
         stage1_score += 1
-    if pd.notna(ret_13w) and -8 <= ret_13w <= 12:
+    if pd.notna(ret_26w) and -15 <= ret_26w <= 15:
         stage1_score += 1
-    if pd.notna(ret_26w) and -20 <= ret_26w <= 20:
+    if pd.notna(dist_from_high) and -35 <= dist_from_high <= -8:
         stage1_score += 1
-    if pd.notna(dist_from_high) and -35 <= dist_from_high <= -5:
-        stage1_score += 1
-    if pd.notna(advance_from_low) and 5 <= advance_from_low <= 45:
+    if higher_lows:
         stage1_score += 1
     if not lower_lows:
         stage1_score += 1
-    if not lower_highs:
-        stage1_score += 1
-
-    valid_stage1 = (
-        stage1_score >= 9 and
-        near_long_term_ma and
-        ma200_flat and
-        not (lower_highs and lower_lows) and
-        not (pd.notna(ret_13w) and ret_13w < -10) and
-        not (below_200 and ma50_falling and ma200_falling)
-    )
-    if valid_stage1:
+    if stage1_score >= 10 and near_long_term_ma and ma200_flat and not (lower_highs and lower_lows) and not (pd.notna(ret_13w) and ret_13w < -8):
         return "Stage 1"
 
-    stage3_score = 0
-    if below_50:
-        stage3_score += 2
-    if pd.notna(dist_from_high) and dist_from_high <= -10:
-        stage3_score += 2
-    if pd.notna(ret_4w) and ret_4w < 0:
-        stage3_score += 1
-    if pd.notna(ret_13w) and ret_13w <= 5:
-        stage3_score += 1
-    if lower_highs:
-        stage3_score += 2
-    if lower_lows:
-        stage3_score += 1
-    if pd.notna(range_8w) and range_8w > 18:
-        stage3_score += 1
-    if above_200 and below_50:
-        stage3_score += 1
-    if below_150 and not ma_stack_bear:
-        stage3_score += 1
-    if ma50_falling:
-        stage3_score += 1
-
-    if stage3_score >= 5:
-        return "Stage 3"
-
-    if stage2_score >= 8 and above_150 and not below_50:
-        return "Stage 2"
-    if stage4_score >= 8 and below_200:
-        return "Stage 4"
-    if stage1_score >= 8 and ma200_flat and near_long_term_ma:
-        return "Stage 1"
     return "Stage 3"
 
 def vcp_quality_label(score: float, base_bars: float, depths: List[float], min_base_bars: int) -> str:
@@ -1017,6 +967,7 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     )
 
     volume_dryup_ratio = volume_ratio(volume, config["volume_short_window"], config["volume_long_window"])
+    weekly_volume_dryup_ratio = volume_ratio(weekly_df["Volume"].astype(float), 4, 12) if len(weekly_df) >= 12 else np.nan
     breakout_volume_ratio = recent_breakout_volume_ratio(volume, config["volume_long_window"])
     avg_turnover_inr = avg_turnover(close, volume, 20)
     liquidity_ok = pd.notna(avg_turnover_inr) and avg_turnover_inr >= config["min_avg_turnover_inr"]
@@ -1192,6 +1143,9 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     combo_bucket = combined_bucket(daily_bucket, weekly_bucket)
     combined_score = round(0.55 * daily_score + 0.45 * weekly_score, 2)
 
+    volume_is_drying_up = bool(pd.notna(volume_dryup_ratio) and volume_dryup_ratio <= 0.85)
+    weekly_volume_is_drying_up = bool(pd.notna(weekly_volume_dryup_ratio) and weekly_volume_dryup_ratio <= 0.90)
+
     notes = [stage]
     if trend_template_ok:
         notes.append("trend_template_ok")
@@ -1201,8 +1155,10 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
         notes.append("daily_vcp_ok")
     if weekly_vcp_ok:
         notes.append("weekly_vcp_ok")
-    if pd.notna(volume_dryup_ratio) and volume_dryup_ratio < 0.8:
+    if volume_is_drying_up:
         notes.append("volume_dryup")
+    if weekly_volume_is_drying_up:
+        notes.append("weekly_volume_dryup")
     if breakout_today:
         notes.append("daily_breakout_volume")
     if weekly_quality == "strong":
@@ -1230,6 +1186,8 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
         weekly_quality, combo_bucket, combined_score,
         round(float(volume_dryup_ratio), 2) if pd.notna(volume_dryup_ratio) else np.nan,
         round(float(breakout_volume_ratio), 2) if pd.notna(breakout_volume_ratio) else np.nan,
+        volume_is_drying_up,
+        weekly_volume_is_drying_up,
         ", ".join(notes),
     )
 
@@ -1653,7 +1611,7 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     industry_df = build_industry_strength_table(final_report)
     final_report = apply_industry_boost(final_report, industry_df, config)
 
-    common_cols = ["ticker", "Company Name", "Industry", "stage", "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "notes"]
+    common_cols = ["ticker", "Company Name", "Industry", "stage", "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "volume_dryup_ratio", "volume_is_drying_up", "weekly_volume_is_drying_up", "notes"]
     daily_cols = common_cols + ["daily_setup_bucket", "daily_score", "final_daily_score", "daily_pivot", "daily_breakout_distance_pct", "daily_contraction_depths_pct", "daily_contraction_durations", "daily_contraction_score", "daily_base_duration_days", "volume_dryup_ratio", "breakout_volume_ratio"]
     weekly_cols = common_cols + ["weekly_setup_bucket", "weekly_score", "final_weekly_score", "weekly_pivot", "weekly_breakout_distance_pct", "weekly_contraction_depths_pct", "weekly_contraction_durations", "weekly_contraction_score", "weekly_base_duration_weeks", "weekly_vcp_quality"]
     combined_cols = common_cols + ["daily_setup_bucket", "weekly_setup_bucket", "combined_bucket", "daily_score", "weekly_score", "combined_score", "industry_boost", "final_combined_score"]
@@ -1671,7 +1629,9 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
 
     full_tickers = list(dict.fromkeys(tickers + [DEFAULT_CONFIG["market_index"]]))
     price_data = fetch_prices(full_tickers, DEFAULT_CONFIG["period"], interval="1d")
+    benchmark_hist_df = price_data.get(DEFAULT_CONFIG["market_index"])
     price_moves = build_price_moves(combined_df, price_data)
+    history_file = update_stage_action_history(out_path, combined_df, price_data, benchmark_hist_df, universe_df, cfg)
 
     daily_file = out_path / "vcp_daily_ranked.csv"
     weekly_file = out_path / "vcp_weekly_ranked.csv"
@@ -1694,7 +1654,7 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     price_moves.to_csv(price_moves_file, index=False)
 
     chart_paths = export_all_charts(final_report, price_data, out_path) if export_all_ticker_charts else {"daily_charts_dir": str(out_path / "charts" / "daily"), "weekly_charts_dir": str(out_path / "charts" / "weekly")}
-    return {"daily": str(daily_file), "weekly": str(weekly_file), "combined": str(combined_file), "industry": str(industry_file), "regime": str(regime_file), "stock_changes": str(stock_changes_file), "industry_changes": str(industry_changes_file), "top_movers": str(top_movers_file), "price_moves": str(price_moves_file), **chart_paths}
+    return {"daily": str(daily_file), "weekly": str(weekly_file), "combined": str(combined_file), "industry": str(industry_file), "regime": str(regime_file), "stock_changes": str(stock_changes_file), "industry_changes": str(industry_changes_file), "top_movers": str(top_movers_file), "price_moves": str(price_moves_file), "history": str(history_file), **chart_paths}
 
 
 def _perf_from_close(close: pd.Series, bars_back: int) -> float:
@@ -1755,6 +1715,122 @@ def build_price_moves(current_df: pd.DataFrame, price_data: Dict[str, pd.DataFra
             out[c] = pd.to_numeric(out[c], errors="coerce")
     return out.sort_values(["change_1d_pct", "final_combined_score"], ascending=[False, False]).reset_index(drop=True)
 
+
+def derive_public_action(stage: str, combined_bucket: str, score: float) -> str:
+    if stage == "Stage 2":
+        if combined_bucket in {"high_conviction_breakout", "high_conviction_near_pivot"} and score >= 70:
+            return "Strong Structure"
+        return "Advancing"
+    if stage == "Stage 1":
+        return "Base Building"
+    if stage == "Stage 3":
+        return "Transition"
+    if stage == "Stage 4":
+        return "Weak Structure"
+    return "Mixed"
+
+def derive_super_action(stage: str, combined_bucket: str, score: float) -> str:
+    if stage == "Stage 2":
+        if combined_bucket == "high_conviction_breakout" and score >= 72:
+            return "Buy"
+        if combined_bucket in {"high_conviction_near_pivot", "building_setup"} and score >= 62:
+            return "Watch / Add on confirmation"
+        return "Hold / Trend intact"
+    if stage == "Stage 1":
+        return "Watchlist / Early base"
+    if stage == "Stage 3":
+        return "Reduce / Avoid fresh longs"
+    if stage == "Stage 4":
+        return "Exit / Avoid"
+    return "No Action"
+
+def build_stage_action_history_snapshot(snapshot_df: pd.DataFrame, snapshot_date: pd.Timestamp) -> pd.DataFrame:
+    if snapshot_df is None or snapshot_df.empty:
+        return pd.DataFrame()
+    out = snapshot_df.copy()
+    score_col = "final_combined_score" if "final_combined_score" in out.columns else "combined_score"
+    out[score_col] = pd.to_numeric(out[score_col], errors="coerce")
+    out["snapshot_date"] = pd.Timestamp(snapshot_date).normalize()
+    out["public_action"] = out.apply(lambda r: derive_public_action(str(r.get("stage", "")), str(r.get("combined_bucket", "")), float(pd.to_numeric(r.get(score_col), errors="coerce") if pd.notna(pd.to_numeric(r.get(score_col), errors="coerce")) else 0.0)), axis=1)
+    out["super_action"] = out.apply(lambda r: derive_super_action(str(r.get("stage", "")), str(r.get("combined_bucket", "")), float(pd.to_numeric(r.get(score_col), errors="coerce") if pd.notna(pd.to_numeric(r.get(score_col), errors="coerce")) else 0.0)), axis=1)
+    keep_cols = [c for c in [
+        "snapshot_date", "ticker", "Company Name", "Industry", "stage", "combined_bucket", score_col,
+        "volume_dryup_ratio", "volume_is_drying_up", "weekly_volume_is_drying_up",
+        "public_action", "super_action"
+    ] if c in out.columns]
+    history = out[keep_cols].copy()
+    if score_col in history.columns and score_col != "final_combined_score":
+        history = history.rename(columns={score_col: "final_combined_score"})
+    return history
+
+def build_six_month_history(price_data: Dict[str, pd.DataFrame], benchmark_df: pd.DataFrame, universe_df: pd.DataFrame, config: dict) -> pd.DataFrame:
+    lookback = int(config.get("history_init_lookback_trading_days", 126))
+    history_rows = []
+    tickers = universe_df["Ticker"].tolist()
+    benchmark_close = benchmark_df["Close"].dropna().astype(float)
+
+    for ticker in tickers:
+        df = price_data.get(ticker)
+        if df is None or df.empty or len(df) < max(config.get("min_history", 300), lookback + 260):
+            continue
+        df = df.dropna(subset=["Open", "High", "Low", "Close", "Volume"]).copy()
+        if len(df) < 260:
+            continue
+        snapshot_dates = df.index[-lookback:]
+        company = universe_df.loc[universe_df["Ticker"] == ticker, "Company Name"].iloc[0]
+        industry = universe_df.loc[universe_df["Ticker"] == ticker, "Industry"].iloc[0]
+
+        for snap_date in snapshot_dates:
+            trunc = df.loc[:snap_date].copy()
+            bench_trunc = benchmark_df.loc[:snap_date].copy()
+            if len(trunc) < 260 or len(bench_trunc) < 260:
+                continue
+            try:
+                regime = market_regime(bench_trunc, config["market_index"], config["market_ma_fast"], config["market_ma_slow"], price_data=None, universe_tickers=None)
+                result = analyze_symbol(ticker, trunc, bench_trunc, regime, config)
+                if not result:
+                    continue
+                row = asdict(result)
+                row["snapshot_date"] = pd.Timestamp(snap_date).normalize()
+                row["Company Name"] = company
+                row["Industry"] = industry
+                row["public_action"] = derive_public_action(row.get("stage", ""), row.get("combined_bucket", ""), float(row.get("combined_score", 0) or 0))
+                row["super_action"] = derive_super_action(row.get("stage", ""), row.get("combined_bucket", ""), float(row.get("combined_score", 0) or 0))
+                history_rows.append({k: row.get(k) for k in [
+                    "snapshot_date", "ticker", "Company Name", "Industry", "stage", "combined_bucket", "combined_score",
+                    "volume_dryup_ratio", "volume_is_drying_up", "weekly_volume_is_drying_up", "public_action", "super_action"
+                ]})
+            except Exception:
+                continue
+
+    if not history_rows:
+        return pd.DataFrame()
+    history = pd.DataFrame(history_rows).rename(columns={"combined_score": "final_combined_score"})
+    history = history.sort_values(["snapshot_date", "ticker"]).reset_index(drop=True)
+    return history
+
+def update_stage_action_history(out_path: Path, current_snapshot: pd.DataFrame, price_data: Dict[str, pd.DataFrame], benchmark_df: pd.DataFrame, universe_df: pd.DataFrame, config: dict) -> Path:
+    history_file = out_path / str(config.get("history_file_name", "stage_action_history.csv"))
+    today = pd.Timestamp.utcnow().normalize()
+    current_history = build_stage_action_history_snapshot(current_snapshot, today)
+
+    if history_file.exists():
+        existing = pd.read_csv(history_file, parse_dates=["snapshot_date"])
+    else:
+        existing = build_six_month_history(price_data, benchmark_df, universe_df, config) if bool(config.get("history_init_enabled", True)) else pd.DataFrame()
+
+    if not current_history.empty:
+        existing = pd.concat([existing, current_history], ignore_index=True) if not existing.empty else current_history
+
+    if existing.empty:
+        existing.to_csv(history_file, index=False)
+        return history_file
+
+    existing["snapshot_date"] = pd.to_datetime(existing["snapshot_date"]).dt.normalize()
+    existing = existing.drop_duplicates(subset=["snapshot_date", "ticker"], keep="last")
+    existing = existing.sort_values(["snapshot_date", "ticker"]).reset_index(drop=True)
+    existing.to_csv(history_file, index=False)
+    return history_file
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Daily + Weekly VCP Screener with change tracking")
