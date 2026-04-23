@@ -1693,18 +1693,18 @@ def build_industry_changes(current_df: pd.DataFrame, previous_df: Optional[pd.Da
     return df.sort_values(["current_rank", "avg_combined_score"], ascending=[True, False]).reset_index(drop=True)
 
 def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, export_all_ticker_charts: bool = True) -> Dict[str, str]:
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
+    cfg = {**DEFAULT_CONFIG, **(config or {})}
     universe_df = load_nifty500_universe(universe_path)
     tickers = universe_df["Ticker"].tolist()
-    report, regime = build_vcp_universe_report(tickers, cfg)
+    report, regime = build_vcp_universe_report(tickers, config)
     if report.empty:
         raise RuntimeError("No screener results produced.")
 
     final_report = report.merge(universe_df, left_on="ticker", right_on="Ticker", how="left")
     industry_df = build_industry_strength_table(final_report)
-    final_report = apply_industry_boost(final_report, industry_df, cfg)
+    final_report = apply_industry_boost(final_report, industry_df, config)
 
     common_cols = ["ticker", "Company Name", "Industry", "stage", "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "volume_dryup_ratio", "volume_is_drying_up", "weekly_volume_is_drying_up", "notes"]
     daily_cols = common_cols + ["daily_setup_bucket", "daily_score", "final_daily_score", "daily_pivot", "daily_breakout_distance_pct", "daily_contraction_depths_pct", "daily_contraction_durations", "daily_contraction_score", "daily_base_duration_days", "volume_dryup_ratio", "breakout_volume_ratio"]
@@ -1906,7 +1906,7 @@ def build_six_month_history(price_data: Dict[str, pd.DataFrame], benchmark_df: p
 
 def update_stage_action_history(out_path: Path, current_snapshot: pd.DataFrame, price_data: Dict[str, pd.DataFrame], benchmark_df: pd.DataFrame, universe_df: pd.DataFrame, config: dict) -> Path:
     history_file = out_path / str(config.get("history_file_name", "stage_action_history.csv"))
-    today = pd.Timestamp.utcnow().normalize()
+    today = pd.Timestamp.now("UTC").normalize().tz_localize(None)
     current_history = build_stage_action_history_snapshot(current_snapshot, today)
 
     if history_file.exists():
@@ -1921,7 +1921,7 @@ def update_stage_action_history(out_path: Path, current_snapshot: pd.DataFrame, 
         existing.to_csv(history_file, index=False)
         return history_file
 
-    existing["snapshot_date"] = pd.to_datetime(existing["snapshot_date"]).dt.normalize()
+    existing["snapshot_date"] = pd.to_datetime(existing["snapshot_date"], utc=True).dt.tz_convert(None).dt.normalize()
     existing = existing.drop_duplicates(subset=["snapshot_date", "ticker"], keep="last")
     existing = existing.sort_values(["snapshot_date", "ticker"]).reset_index(drop=True)
     existing.to_csv(history_file, index=False)
