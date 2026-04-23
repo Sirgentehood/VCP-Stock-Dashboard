@@ -1812,7 +1812,7 @@ def build_six_month_history(price_data: Dict[str, pd.DataFrame], benchmark_df: p
 
 def update_stage_action_history(out_path: Path, current_snapshot: pd.DataFrame, price_data: Dict[str, pd.DataFrame], benchmark_df: pd.DataFrame, universe_df: pd.DataFrame, config: dict) -> Path:
     history_file = out_path / str(config.get("history_file_name", "stage_action_history.csv"))
-    today = pd.Timestamp.utcnow().normalize()
+    today = pd.Timestamp.now('UTC').normalize().tz_localize(None)
     current_history = build_stage_action_history_snapshot(current_snapshot, today)
 
     if history_file.exists():
@@ -1827,7 +1827,7 @@ def update_stage_action_history(out_path: Path, current_snapshot: pd.DataFrame, 
         existing.to_csv(history_file, index=False)
         return history_file
 
-    existing["snapshot_date"] = pd.to_datetime(existing["snapshot_date"]).dt.normalize()
+    existing["snapshot_date"] = pd.to_datetime(existing["snapshot_date"], utc=True, errors='coerce').dt.tz_convert(None).dt.normalize()
     existing = existing.drop_duplicates(subset=["snapshot_date", "ticker"], keep="last")
     existing = existing.sort_values(["snapshot_date", "ticker"]).reset_index(drop=True)
     existing.to_csv(history_file, index=False)
