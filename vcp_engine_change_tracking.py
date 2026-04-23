@@ -607,17 +607,20 @@ def market_regime(
     )
 
 
+
 def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -> str:
     """
-    Stage classifier tuned to reduce two recurring errors:
-    - too many weak names getting stuck in Stage 3 instead of Stage 4
-    - too many very-early base candidates getting left in Stage 3 instead of Stage 1
+    Stage classifier with explicit paths for:
+    - Stage 2 breakout / Stage 2 continuation
+    - Stage 1 repair / early base
+    - Stage 4 persistent decline
+    - Stage 3 true transition only
 
-    Practical intent:
-    - Stage 2 = confirmed advancing trend
-    - Stage 4 = persistent decline or failed-rally weakness
-    - Stage 1 = early/repairing base near long-term averages with tightening behaviour
-    - Stage 3 = genuine transition/topping bucket, not the default for every ambiguous name
+    Design goals:
+    - reduce false Stage 1 on quality trend pullbacks
+    - reduce false Stage 2 on weak cyclical bounces
+    - reduce false Stage 4 on quality corrections
+    - keep Stage 3 as a narrow transition bucket
     """
     if len(close) < 260:
         return "Unknown"
@@ -692,8 +695,6 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
             "higher_highs": higher_highs,
             "lower_lows": lower_lows,
             "higher_lows": higher_lows,
-            "peak_count": len(recent_peaks),
-            "trough_count": len(recent_troughs),
         }
 
     structure = _recent_structure(c, lookback=90, order=5)
@@ -712,202 +713,98 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
     below_150 = pd.notna(ma150_now) and last < ma150_now
     below_200 = pd.notna(ma200_now) and last < ma200_now
 
-    ma50_rising = pd.notna(ma50_slope) and ma50_slope > 0.00045
-    ma150_rising = pd.notna(ma150_slope) and ma150_slope > 0.00012
-    ma200_rising = pd.notna(ma200_slope) and ma200_slope > 0.00003
-    ma50_falling = pd.notna(ma50_slope) and ma50_slope < -0.00035
-    ma150_falling = pd.notna(ma150_slope) and ma150_slope < -0.00012
-    ma200_falling = pd.notna(ma200_slope) and ma200_slope < -0.00003
-    ma200_flat = pd.notna(ma200_slope) and -0.00018 <= ma200_slope <= 0.00018
+    ma50_rising = pd.notna(ma50_slope) and ma50_slope > 0.00035
+    ma150_rising = pd.notna(ma150_slope) and ma150_slope > 0.00008
+    ma200_rising = pd.notna(ma200_slope) and ma200_slope > 0.00002
+    ma50_falling = pd.notna(ma50_slope) and ma50_slope < -0.00030
+    ma150_falling = pd.notna(ma150_slope) and ma150_slope < -0.00008
+    ma200_falling = pd.notna(ma200_slope) and ma200_slope < -0.00002
+    ma200_flat = pd.notna(ma200_slope) and -0.00015 <= ma200_slope <= 0.00015
 
     weekly_bull = pd.notna(weekly_ma10_now) and pd.notna(weekly_ma30_now) and last > weekly_ma10_now > weekly_ma30_now
     weekly_bear = pd.notna(weekly_ma10_now) and pd.notna(weekly_ma30_now) and last < weekly_ma10_now < weekly_ma30_now
-    weekly_10_rising = pd.notna(weekly_ma10_slope) and weekly_ma10_slope > 0.0006
-    weekly_30_rising = pd.notna(weekly_ma30_slope) and weekly_ma30_slope > 0.00015
-    weekly_10_falling = pd.notna(weekly_ma10_slope) and weekly_ma10_slope < -0.0006
-    weekly_30_falling = pd.notna(weekly_ma30_slope) and weekly_ma30_slope < -0.00015
+    weekly_10_rising = pd.notna(weekly_ma10_slope) and weekly_ma10_slope > 0.00045
+    weekly_30_rising = pd.notna(weekly_ma30_slope) and weekly_ma30_slope > 0.00010
+    weekly_10_falling = pd.notna(weekly_ma10_slope) and weekly_ma10_slope < -0.00045
+    weekly_30_falling = pd.notna(weekly_ma30_slope) and weekly_ma30_slope < -0.00010
 
-    # --- Stage 2: confirmed advancing structure ---
-    stage2_score = 0
-    if ma_stack_bull:
-        stage2_score += 4
-    if weekly_bull:
-        stage2_score += 3
-    if ma50_rising:
-        stage2_score += 2
-    if ma150_rising:
-        stage2_score += 1
-    if ma200_rising or ma200_flat:
-        stage2_score += 1
-    if weekly_10_rising:
-        stage2_score += 1
-    if weekly_30_rising:
-        stage2_score += 1
-    if pd.notna(ret_13w) and ret_13w > 8:
-        stage2_score += 2
-    if pd.notna(ret_26w) and ret_26w > 15:
-        stage2_score += 2
-    if pd.notna(dist_from_high) and dist_from_high >= -18:
-        stage2_score += 2
-    if pd.notna(advance_from_low) and advance_from_low >= 30:
-        stage2_score += 1
-    if higher_highs:
-        stage2_score += 1
-    if higher_lows:
-        stage2_score += 2
-    if stage2_score >= 13 and ma_stack_bull and weekly_bull and not lower_lows:
+    # ---- Stage 2 breakout / continuation ----
+    stage2_breakout = (
+        above_150 and above_200
+        and ma150_rising
+        and (ma200_rising or ma200_flat)
+        and pd.notna(dist_from_high) and dist_from_high >= -22
+        and pd.notna(ret_13w) and ret_13w >= 5
+        and not (lower_highs and lower_lows)
+    )
+    stage2_continuation = (
+        above_150 and above_200
+        and ma150_rising
+        and ma200_rising
+        and (ma50_rising or weekly_10_rising)
+        and pd.notna(ret_26w) and ret_26w >= 10
+        and pd.notna(dist_from_high) and dist_from_high >= -25
+        and not lower_lows
+        and (higher_lows or higher_highs or weekly_bull or ma_stack_bull)
+    )
+    strong_stage2 = (
+        (ma_stack_bull and weekly_bull and ma50_rising and ma150_rising)
+        or (stage2_continuation and (higher_lows or weekly_bull))
+    )
+    if strong_stage2 or stage2_breakout:
         return "Stage 2"
 
-    # --- Stage 4: broadened to catch practical declines and failed-rally weakness ---
-    weak_trend_cluster = sum([
-        int(below_50),
-        int(below_150),
-        int(below_200),
-        int(ma50_falling),
-        int(ma150_falling),
-        int(ma200_falling),
-        int(weekly_10_falling),
-        int(weekly_30_falling),
-        int(lower_highs),
-        int(lower_lows),
-    ])
-
-    stage4_score = 0
-    if ma_stack_bear:
-        stage4_score += 4
-    if weekly_bear:
-        stage4_score += 3
-    if below_150 and below_200:
-        stage4_score += 3
-    if below_50 and below_150:
-        stage4_score += 2
-    if ma50_falling:
-        stage4_score += 2
-    if ma150_falling:
-        stage4_score += 2
-    if ma200_falling:
-        stage4_score += 2
-    if weekly_10_falling:
-        stage4_score += 1
-    if weekly_30_falling:
-        stage4_score += 1
-    if pd.notna(ret_8w) and ret_8w < -6:
-        stage4_score += 1
-    if pd.notna(ret_13w) and ret_13w < -8:
-        stage4_score += 2
-    if pd.notna(ret_26w) and ret_26w < -12:
-        stage4_score += 2
-    if pd.notna(dist_from_high) and dist_from_high <= -20:
-        stage4_score += 2
-    if pd.notna(dist_from_high) and dist_from_high <= -30:
-        stage4_score += 2
-    if lower_highs:
-        stage4_score += 2
-    if lower_lows:
-        stage4_score += 2
-    if pd.notna(range_13w) and range_13w > 22 and below_150:
-        stage4_score += 1
-
-    # Classic / strong Stage 4
-    if stage4_score >= 10 and (
-        (below_200 and (ma150_falling or ma200_falling or weekly_30_falling) and (lower_highs or weekly_bear))
-        or (ma_stack_bear and weak_trend_cluster >= 5)
-    ):
-        return "Stage 4"
-
-    # Early Stage 4 override: practical decline even before all long MAs fully roll over.
-    early_stage4 = (
-        below_50 and below_150
-        and (ma50_falling or weekly_10_falling)
-        and pd.notna(ret_13w) and ret_13w <= -8
-        and pd.notna(dist_from_high) and dist_from_high <= -20
+    # ---- Stage 4 persistent decline ----
+    persistent_decline = (
+        (below_150 and below_200)
+        and (ma150_falling or ma200_falling or weekly_30_falling)
+        and (lower_highs or lower_lows or weekly_bear)
+        and pd.notna(dist_from_high) and dist_from_high <= -22
+        and pd.notna(ret_13w) and ret_13w <= -6
+    )
+    failed_rally_decline = (
+        below_150
+        and (below_200 or ma200_falling or weekly_30_falling)
+        and lower_highs
+        and pd.notna(ret_8w) and ret_8w <= 0
+        and pd.notna(dist_from_high) and dist_from_high <= -18
         and not higher_lows
     )
-    if early_stage4:
-        return "Stage 4"
-
-    failed_rally_stage4 = (
-        below_150 and (below_200 or ma200_falling or weekly_30_falling)
-        and lower_highs and pd.notna(ret_8w) and ret_8w <= 0
-        and pd.notna(dist_from_high) and dist_from_high <= -18
+    deep_decline = (
+        ma_stack_bear
+        and (ma50_falling or weekly_10_falling)
+        and pd.notna(ret_26w) and ret_26w <= -12
     )
-    if failed_rally_stage4:
+    if persistent_decline or failed_rally_decline or deep_decline:
         return "Stage 4"
 
-    near_ma150 = pd.notna(ma150_now) and 0.93 * ma150_now <= last <= 1.08 * ma150_now
-    near_ma200 = pd.notna(ma200_now) and 0.93 * ma200_now <= last <= 1.08 * ma200_now
+    # ---- Stage 1 repair / early base ----
+    near_ma150 = pd.notna(ma150_now) and 0.94 * ma150_now <= last <= 1.08 * ma150_now
+    near_ma200 = pd.notna(ma200_now) and 0.94 * ma200_now <= last <= 1.08 * ma200_now
     near_long_term_ma = near_ma150 or near_ma200
-
-    # --- Stage 1: allow very-early base candidates, but only if deterioration has stopped and ranges are tightening ---
-    tightening_now = (
+    tightening = (
         pd.notna(range_4w) and pd.notna(range_8w) and pd.notna(range_13w)
-        and range_4w <= range_8w * 0.90
-        and range_8w <= range_13w * 0.92
+        and range_4w <= range_8w * 0.92
+        and range_8w <= range_13w * 0.94
     )
-    early_base_zone = pd.notna(dist_from_high) and -45 <= dist_from_high <= -10
-    off_the_lows = pd.notna(advance_from_low) and 8 <= advance_from_low <= 55
-    not_broken_now = not (below_150 and below_200 and ma50_falling and (lower_highs or lower_lows))
-
-    stage1_score = 0
-    if near_long_term_ma:
-        stage1_score += 3
-    if ma200_flat:
-        stage1_score += 2
-    if pd.notna(ma150_slope) and -0.0002 <= ma150_slope <= 0.00035:
-        stage1_score += 1
-    if pd.notna(ma50_slope) and -0.00025 <= ma50_slope <= 0.00045:
-        stage1_score += 1
-    if pd.notna(range_4w) and range_4w <= 11:
-        stage1_score += 2
-    if pd.notna(range_8w) and range_8w <= 16:
-        stage1_score += 2
-    if pd.notna(range_13w) and range_13w <= 24:
-        stage1_score += 2
-    if pd.notna(range_26w) and range_26w <= 45:
-        stage1_score += 1
-    if tightening_now:
-        stage1_score += 2
-    if pd.notna(ret_13w) and -7 <= ret_13w <= 12:
-        stage1_score += 1
-    if pd.notna(ret_26w) and -20 <= ret_26w <= 18:
-        stage1_score += 1
-    if early_base_zone:
-        stage1_score += 1
-    if off_the_lows:
-        stage1_score += 1
-    if higher_lows:
-        stage1_score += 2
-    elif not lower_lows:
-        stage1_score += 1
-    if not lower_highs:
-        stage1_score += 1
-
-    stage1_confirmed = (
-        stage1_score >= 10
-        and near_long_term_ma
-        and ma200_flat
-        and not (lower_highs and lower_lows)
-        and not (pd.notna(ret_13w) and ret_13w < -8)
-        and not early_stage4
-        and not failed_rally_stage4
-    )
-    if stage1_confirmed:
-        return "Stage 1"
-
-    # Early Stage 1 override for names just coming out of repair.
-    early_stage1 = (
+    base_like = (
         near_long_term_ma
-        and not_broken_now
-        and (ma200_flat or (pd.notna(ma200_slope) and ma200_slope > -0.00008))
-        and (higher_lows or tightening_now)
+        and (ma200_flat or (pd.notna(ma200_slope) and ma200_slope > -0.00005))
+        and pd.notna(dist_from_high) and -45 <= dist_from_high <= -8
+        and pd.notna(ret_13w) and -10 <= ret_13w <= 8
         and pd.notna(range_8w) and range_8w <= 18
-        and pd.notna(ret_13w) and -10 <= ret_13w <= 10
-        and early_base_zone
+        and (tightening or higher_lows or not lower_lows)
+        and not (below_150 and below_200 and (ma150_falling or ma200_falling))
+        and not (lower_highs and lower_lows and pd.notna(ret_13w) and ret_13w < -6)
+        and not stage2_breakout
+        and not stage2_continuation
     )
-    if early_stage1:
+    if base_like:
         return "Stage 1"
 
+    # ---- Stage 3 transition only ----
     return "Stage 3"
+
 
 def vcp_quality_label(score: float, base_bars: float, depths: List[float], min_base_bars: int) -> str:
     if len(depths) < 2 or base_bars < min_base_bars:
@@ -1693,9 +1590,9 @@ def build_industry_changes(current_df: pd.DataFrame, previous_df: Optional[pd.Da
     return df.sort_values(["current_rank", "avg_combined_score"], ascending=[True, False]).reset_index(drop=True)
 
 def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, export_all_ticker_charts: bool = True) -> Dict[str, str]:
+    cfg = {**DEFAULT_CONFIG, **(config or {})}
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
     universe_df = load_nifty500_universe(universe_path)
     tickers = universe_df["Ticker"].tolist()
     report, regime = build_vcp_universe_report(tickers, config)
