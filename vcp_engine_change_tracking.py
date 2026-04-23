@@ -1693,17 +1693,18 @@ def build_industry_changes(current_df: pd.DataFrame, previous_df: Optional[pd.Da
     return df.sort_values(["current_rank", "avg_combined_score"], ascending=[True, False]).reset_index(drop=True)
 
 def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, export_all_ticker_charts: bool = True) -> Dict[str, str]:
+    cfg = {**DEFAULT_CONFIG, **(config or {})}
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
     universe_df = load_nifty500_universe(universe_path)
     tickers = universe_df["Ticker"].tolist()
-    report, regime = build_vcp_universe_report(tickers, config)
+    report, regime = build_vcp_universe_report(tickers, cfg)
     if report.empty:
         raise RuntimeError("No screener results produced.")
 
     final_report = report.merge(universe_df, left_on="ticker", right_on="Ticker", how="left")
     industry_df = build_industry_strength_table(final_report)
-    final_report = apply_industry_boost(final_report, industry_df, config)
+    final_report = apply_industry_boost(final_report, industry_df, cfg)
 
     common_cols = ["ticker", "Company Name", "Industry", "stage", "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "volume_dryup_ratio", "volume_is_drying_up", "weekly_volume_is_drying_up", "notes"]
     daily_cols = common_cols + ["daily_setup_bucket", "daily_score", "final_daily_score", "daily_pivot", "daily_breakout_distance_pct", "daily_contraction_depths_pct", "daily_contraction_durations", "daily_contraction_score", "daily_base_duration_days", "volume_dryup_ratio", "breakout_volume_ratio"]
@@ -1721,9 +1722,9 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     industry_changes = build_industry_changes(industry_df, prev_industry)
     top_movers = stock_changes.sort_values(["new_top_10", "new_top_20", "new_daily_breakout", "new_weekly_breakout", "rank_change", "combined_score_change"], ascending=[False, False, False, False, False, False]).reset_index(drop=True)
 
-    full_tickers = list(dict.fromkeys(tickers + [DEFAULT_CONFIG["market_index"]]))
-    price_data = fetch_prices(full_tickers, DEFAULT_CONFIG["period"], interval="1d")
-    benchmark_hist_df = price_data.get(DEFAULT_CONFIG["market_index"])
+    full_tickers = list(dict.fromkeys(tickers + [cfg["market_index"]]))
+    price_data = fetch_prices(full_tickers, cfg["period"], interval="1d")
+    benchmark_hist_df = price_data.get(cfg["market_index"])
     price_moves = build_price_moves(combined_df, price_data)
     history_file = update_stage_action_history(out_path, combined_df, price_data, benchmark_hist_df, universe_df, cfg)
 
