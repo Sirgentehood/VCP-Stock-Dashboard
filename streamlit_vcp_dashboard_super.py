@@ -1584,7 +1584,7 @@ with tabs[4]:
         if not portfolio_ordered.empty:
             st.divider()
             st.markdown("### Watchlist charts")
-            chart_limit = min(50, len(portfolio_ordered))
+            chart_limit = min(150, len(portfolio_ordered))
             st.caption(f"Showing charts for the first {chart_limit} watchlist stocks by rank.")
             for idx, (_, prow) in enumerate(portfolio_ordered.head(chart_limit).iterrows(), start=1):
                 pticker_short = str(prow["ticker"]).replace(".NS", "")
@@ -1612,7 +1612,7 @@ with tabs[4]:
                     action_label=str(prow.get("action", "No Trade")),
                     show_change_text=(f"Portfolio Action • {str(prow.get('action', 'No Trade'))} • {str(prow.get('rationale', ''))}" if "action" in prow.index else ""),
                 )
-                render_stock_detail(prow)
+                # render_stock_detail(prow)
 
         removable = [""] + sorted(st.session_state["watchlist_names"])
         selected_remove = st.selectbox("Remove stock", removable, key="watchlist_remove_name")
