@@ -4,3 +4,4 @@ numpy>=1.24
 yfinance>=0.2.31
 matplotlib>=3.7
 reportlab
+plotly
