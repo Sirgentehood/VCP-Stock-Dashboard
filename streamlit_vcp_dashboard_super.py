@@ -1355,6 +1355,22 @@ if "chart_selected_ticker" not in st.session_state:
 
 st.title("Market Decision Engine")
 st.caption("Structure-led trade engine with long, short, and watchlist actions")
+
+# --- Private publishing control ---
+# This creates outputs/public_daily.json for your future public mobile website.
+# It removes Buy/Sell/Short language and exports only structure analytics.
+with st.expander("🚀 Private Publishing Controls", expanded=False):
+    st.write("Generate a SEBI-safer public JSON feed from the current processed dashboard data.")
+    public_count = st.slider("Number of public stocks to export", min_value=5, max_value=100, value=30, step=5)
+    if st.button("Export Public Data", type="primary"):
+        try:
+            from export_public_data import export_json
+            exported_path = export_json(combined, max_items=public_count)
+            st.success(f"Public data exported successfully: {exported_path}")
+            st.caption("This export contains structure labels, ranks, sectors, RS metrics, and chart paths only — no Buy/Sell/Short actions.")
+        except Exception as exc:
+            st.error(f"Export failed: {exc}")
+
 view_mode = st.radio("View mode", ["Execution", "Research"], horizontal=True, index=0)
 tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
 tabs = st.tabs(tab_names)
