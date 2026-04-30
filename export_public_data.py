@@ -41,7 +41,7 @@ def build_reason(row):
     return " • ".join(parts[:3])
 
 
-def export_json(df: pd.DataFrame, max_items: int = 30)::
+def export_json(df: pd.DataFrame, max_items: int = 30):
     df = df.copy()
 
     # Protect your moat: only export top 30
