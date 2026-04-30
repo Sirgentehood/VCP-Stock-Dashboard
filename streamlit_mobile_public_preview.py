@@ -1,21 +1,25 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="Mobile Preview", layout="wide")
+st.title("Mobile Preview")
 
-# 🔥 CHANGE THIS (IMPORTANT)
-JSON_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/outputs/public_daily.json"
-
-st.title("📊 Post-Close Market Reset")
+# 👇 Replace YOUR username + repo
+JSON_URL = "https://raw.githubusercontent.com/Sirgentehood/VCP-Stock-Dashboard/main/outputs/public_daily.json"
+# https://github.com/Sirgentehood/VCP-Stock-Dashboard/blob/main/outputs/public_daily.json
 
 try:
     res = requests.get(JSON_URL)
     data = res.json()
 except:
-    st.error("Unable to load JSON from GitHub")
+    st.error("Unable to load data")
     st.stop()
 
 stocks = data.get("top_stocks", [])
+
+st.write(f"Loaded {len(stocks)} stocks")
+
+for s in stocks:
+    st.write(s["company"], "-", s["label"])
 
 st.markdown("### ⚡ Today in 10 Seconds")
 
