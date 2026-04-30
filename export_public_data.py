@@ -2,8 +2,8 @@ import json
 import requests
 import streamlit as st
 
-def export_json(df):
-    df = df.sort_values("current_rank").head(30)
+def export_json(df, max_items=30):
+    df = df.sort_values("current_rank").head(max_items)
 
     items = []
 
