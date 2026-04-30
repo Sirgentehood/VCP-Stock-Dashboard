@@ -1,78 +1,57 @@
 import streamlit as st
-import json
+import requests
 
-st.set_page_config(page_title="Mobile Market Preview", layout="wide")
+st.set_page_config(page_title="Mobile Preview", layout="wide")
 
-# ----------------------------
-# Header
-# ----------------------------
-st.markdown("""
-<h2 style='margin-bottom:5px;'>📊 Post-Close Market Reset</h2>
-<p style='color:gray; margin-top:0;'>Fast mobile-style preview (not investment advice)</p>
-""", unsafe_allow_html=True)
+# 🔥 CHANGE THIS (IMPORTANT)
+JSON_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/outputs/public_daily.json"
 
-# ----------------------------
-# Upload JSON
-# ----------------------------
-uploaded_file = st.file_uploader("Upload public_daily.json", type="json")
+st.title("📊 Post-Close Market Reset")
 
-if uploaded_file is None:
-    st.warning("⬆️ Upload your JSON file from dashboard export to preview")
+try:
+    res = requests.get(JSON_URL)
+    data = res.json()
+except:
+    st.error("Unable to load JSON from GitHub")
     st.stop()
-
-data = json.load(uploaded_file)
 
 stocks = data.get("top_stocks", [])
 
-# ----------------------------
-# Summary
-# ----------------------------
 st.markdown("### ⚡ Today in 10 Seconds")
 
 col1, col2 = st.columns(2)
-col1.metric("Total Stocks", len(stocks))
-col2.metric("Update Type", "Post Close")
+col1.metric("Stocks", len(stocks))
+col2.metric("Type", "Post Close")
 
 st.divider()
 
-# ----------------------------
-# Feed
-# ----------------------------
 st.markdown("### 📈 Structure Feed")
 
 if not stocks:
-    st.warning("No stocks found in JSON")
+    st.warning("No data available")
     st.stop()
 
 for s in stocks:
     with st.container():
-        st.markdown(f"### {s.get('company','')} ({s.get('ticker','')})")
+        st.markdown(f"### {s['company']} ({s['ticker']})")
 
         col1, col2 = st.columns([3,1])
 
         with col1:
-            st.markdown(f"**Sector:** {s.get('sector','-')}")
-            st.markdown(f"**Stage:** {s.get('stage','-')}")
-            st.markdown(f"**Structure:** {s.get('label','-')}")
+            st.write(f"Sector: {s.get('sector','-')}")
+            st.write(f"Stage: {s.get('stage','-')}")
+            st.write(f"Structure: {s.get('label','-')}")
 
         with col2:
             st.metric("Rank", f"#{s.get('rank','-')}")
             if s.get("rank_change", 0) > 0:
                 st.success(f"↑ {s.get('rank_change')}")
 
-        st.markdown(f"🧠 {s.get('reason','')}")
+        st.write(s.get("reason",""))
 
-        # Chart
-        chart_path = s.get("chart")
-        if chart_path:
-            try:
-                st.image(chart_path, use_container_width=True)
-            except:
-                st.info("Chart not found (optional)")
+        if s.get("chart"):
+            st.image(s["chart"], use_container_width=True)
 
         st.divider()
 
-# ----------------------------
-# Footer
-# ----------------------------
-st.caption("This is a data-driven market structure view. Not investment advice.")
+st.caption("Market structure view only. Not investment advice.")
