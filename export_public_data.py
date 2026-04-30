@@ -41,12 +41,11 @@ def build_reason(row):
     return " • ".join(parts[:3])
 
 
-def export_json(df: pd.DataFrame):
+def export_json(df: pd.DataFrame, max_items: int = 30)::
     df = df.copy()
 
     # Protect your moat: only export top 30
-    df = df.sort_values("current_rank").head(30)
-
+    df = df.sort_values("current_rank").head(max_items)
     items = []
 
     for _, row in df.iterrows():
