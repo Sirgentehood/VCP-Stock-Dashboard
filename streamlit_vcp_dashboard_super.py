@@ -1380,17 +1380,6 @@ st.markdown("""
 .pm-progress {font-size:0.78rem; color:rgba(255,255,255,0.64); font-weight:800; margin:0.45rem 0; text-align:center;}
 .pm-hint {font-size:0.75rem; color:rgba(255,255,255,0.56); text-align:center; margin:0.25rem 0 0.55rem 0;}
 .pm-disclaimer {border-left: 4px solid rgba(240,180,41,0.52); background:rgba(240,180,41,0.075); border-radius:14px; padding:0.65rem 0.72rem; font-size:0.78rem; color:rgba(255,255,255,0.78); line-height:1.34; margin:0.7rem 0;}
-.pm-section-title {font-size:0.92rem; font-weight:950; margin:0.92rem 0 0.42rem 0; letter-spacing:-0.01em;}
-.pm-mini-list {display:flex; flex-direction:column; gap:0.42rem; margin-bottom:0.65rem;}
-.pm-mini-item {border:1px solid rgba(255,255,255,0.11); background:rgba(255,255,255,0.045); border-radius:16px; padding:0.55rem 0.62rem;}
-.pm-mini-top {display:flex; justify-content:space-between; align-items:flex-start; gap:0.55rem;}
-.pm-mini-name {font-size:0.86rem; font-weight:950; line-height:1.16;}
-.pm-mini-meta {font-size:0.70rem; color:rgba(255,255,255,0.58); margin-top:0.10rem;}
-.pm-mini-reason {font-size:0.75rem; color:rgba(255,255,255,0.74); line-height:1.30; margin-top:0.30rem;}
-.pm-rank-move {flex:0 0 auto; font-size:0.70rem; font-weight:950; padding:0.20rem 0.48rem; border-radius:999px; border:1px solid rgba(255,255,255,0.13); background:rgba(255,255,255,0.06); color:#eef3ff;}
-.pm-rank-up {background:rgba(30,201,119,0.14); color:#39e99b; border-color:rgba(30,201,119,0.30);}
-.pm-rank-down {background:rgba(255,107,107,0.13); color:#ff8585; border-color:rgba(255,107,107,0.32);}
-.pm-safe-note {font-size:0.69rem; color:rgba(255,255,255,0.52); line-height:1.25; margin-top:0.28rem;}
 @media (min-width: 769px) {.pm-shell {max-width: 540px;}}
 </style>
 """, unsafe_allow_html=True)
@@ -1507,7 +1496,7 @@ def _pm_render_card(row: pd.Series, daily_chart_dir: str, weekly_chart_dir: str,
     rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
     rank_chip = ""
     if pd.notna(rank_change) and rank_change != 0:
-        rank_chip = f"<span class='pm-chip {'pm-green' if rank_change > 0 else 'pm-red'}'>Structure Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}</span>"
+        rank_chip = f"<span class='pm-chip {'pm-green' if rank_change > 0 else 'pm-red'}'>Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}</span>"
     st.markdown("<div class='pm-card'>", unsafe_allow_html=True)
     st.markdown(f"""
 <div class='pm-card-head'>
@@ -1552,93 +1541,6 @@ def _pm_render_card(row: pd.Series, daily_chart_dir: str, weekly_chart_dir: str,
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-
-def _pm_rank_move_html(row: pd.Series, fallback_label: str = "Structure Rank") -> str:
-    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    if pd.notna(rank_change) and rank_change != 0:
-        cls = "pm-rank-up" if rank_change > 0 else "pm-rank-down"
-        arrow = "↑" if rank_change > 0 else "↓"
-        return f"<span class='pm-rank-move {cls}'>{fallback_label} {arrow} {abs(int(rank_change))}</span>"
-    rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
-    if pd.notna(rank_val):
-        return f"<span class='pm-rank-move'>{fallback_label} #{int(rank_val)}</span>"
-    return ""
-
-
-def _pm_change_reason(row: pd.Series) -> str:
-    parts = []
-    if boolish(row.get("entered_stage_2", False)):
-        parts.append("Moved into Stage 2 structure")
-    if boolish(row.get("new_weekly_breakout", False)):
-        parts.append("Weekly breakout flag")
-    if boolish(row.get("new_daily_breakout", False)):
-        parts.append("Daily breakout flag")
-    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    if pd.notna(rank_change) and rank_change != 0:
-        direction = "improved" if rank_change > 0 else "declined"
-        parts.append(f"Model structure rank {direction} by {abs(int(rank_change))}")
-    mini = build_mini_signal_text(row)
-    if mini:
-        parts.append(mini)
-    return " • ".join(parts[:3]) or _pm_reason(row)
-
-
-def _pm_build_structure_changes(prepared: pd.DataFrame, limit: int = 5) -> pd.DataFrame:
-    if prepared is None or prepared.empty:
-        return pd.DataFrame()
-    df = prepared.copy()
-    df["_rank_change_num"] = pd.to_numeric(df.get("rank_change"), errors="coerce").fillna(0) if "rank_change" in df.columns else 0
-    mask = df["_rank_change_num"].abs() >= 5
-    for col in ["entered_stage_2", "new_weekly_breakout", "new_daily_breakout"]:
-        if col in df.columns:
-            mask = mask | df[col].fillna(False).astype(bool)
-    df = df[mask].copy()
-    if df.empty:
-        return df
-    df["_event_score"] = df["_rank_change_num"].clip(lower=0, upper=30)
-    for col, weight in [("entered_stage_2", 45), ("new_weekly_breakout", 35), ("new_daily_breakout", 25)]:
-        if col in df.columns:
-            df["_event_score"] += df[col].fillna(False).astype(bool).astype(int) * weight
-    return df.sort_values(["_event_score", "current_rank"], ascending=[False, True], na_position="last").head(limit)
-
-
-def _pm_build_strongest_structures(prepared: pd.DataFrame, limit: int = 5) -> pd.DataFrame:
-    if prepared is None or prepared.empty:
-        return pd.DataFrame()
-    df = prepared.copy()
-    df["_structure_score"] = df.apply(structure_score, axis=1)
-    df["_rank_num"] = pd.to_numeric(df.get("current_rank"), errors="coerce") if "current_rank" in df.columns else float("nan")
-    # Descriptive only: strongest by rule-based structure score, not a trade list.
-    return df.sort_values(["_structure_score", "_rank_num"], ascending=[False, True], na_position="last").head(limit)
-
-
-def _pm_render_mini_section(title: str, subtitle: str, rows: pd.DataFrame, *, reason_func=_pm_reason):
-    if rows is None or rows.empty:
-        return
-    st.markdown(f"<div class='pm-section-title'>{title}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='pm-safe-note'>{subtitle}</div>", unsafe_allow_html=True)
-    st.markdown("<div class='pm-mini-list'>", unsafe_allow_html=True)
-    for _, row in rows.iterrows():
-        name = stock_display_label(row)
-        industry_name = str(row.get("Industry", "-") or "-")
-        stage = str(row.get("stage", "-") or "-")
-        label = structure_category(row)
-        rank_move = _pm_rank_move_html(row)
-        reason = reason_func(row)
-        st.markdown(f"""
-<div class='pm-mini-item'>
-  <div class='pm-mini-top'>
-    <div style='min-width:0;'>
-      <div class='pm-mini-name'>{name}</div>
-      <div class='pm-mini-meta'>{industry_icon(industry_name)} {industry_name} • {stage} • {label}</div>
-    </div>
-    {rank_move}
-  </div>
-  <div class='pm-mini-reason'>{reason}</div>
-</div>
-""", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
 def render_production_mobile_ui(feed_df: pd.DataFrame, daily_chart_dir: str, weekly_chart_dir: str):
     st.markdown("<div class='pm-shell'>", unsafe_allow_html=True)
     st.markdown("""
@@ -1674,28 +1576,11 @@ def render_production_mobile_ui(feed_df: pd.DataFrame, daily_chart_dir: str, wee
         if not top_sectors.empty:
             chips = "".join([f"<div class='pm-sector'>{industry_icon(str(k))} {k} · {int(v)}</div>" for k, v in top_sectors.items()])
             st.markdown(f"<div class='pm-strip'>{chips}</div>", unsafe_allow_html=True)
-
-    structure_changes = _pm_build_structure_changes(prepared, limit=5)
-    _pm_render_mini_section(
-        "Today’s Structure Changes",
-        "Notable changes in rule-based market structure after today’s close. This is descriptive analytics only.",
-        structure_changes,
-        reason_func=_pm_change_reason,
-    )
-
-    strongest_structures = _pm_build_strongest_structures(prepared, limit=5)
-    _pm_render_mini_section(
-        "Strongest Structures Today",
-        "Highest model-defined structure scores today. This is not a recommendation or investment advice.",
-        strongest_structures,
-        reason_func=_pm_reason,
-    )
-
     mode = st.radio("Mode", ["Feed", "Swipe"], horizontal=True, label_visibility="collapsed")
     filter_choice = st.radio("Filter", ["Top", "Improving", "Stage 2", "Weakening", "New Flags"], horizontal=True, label_visibility="collapsed")
     max_cards = st.slider("Cards", min_value=5, max_value=60, value=25, step=5, label_visibility="collapsed")
     view = _pm_prepare_view(prepared, filter_choice, max_cards)
-    st.markdown("<div class='pm-disclaimer'>Public-view prototype: structure labels, model ranks, sectors and charts only. No buy/sell/short recommendation, target, stop-loss or position-sizing guidance is shown.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='pm-disclaimer'>This screen is a public-view prototype: structure labels, ranks, sectors and charts only. No buy/sell/short recommendation is shown.</div>", unsafe_allow_html=True)
     if view.empty:
         st.info("No stocks match this filter.")
         st.markdown("</div>", unsafe_allow_html=True)
