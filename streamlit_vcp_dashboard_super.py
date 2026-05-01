@@ -74,59 +74,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-
-st.markdown("""
-<style>
-/* Viral mobile preview feed */
-.mobile-shell {
-  max-width: 460px;
-  margin: 0 auto;
-}
-.mobile-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  padding: 0.55rem 0.35rem 0.65rem 0.35rem;
-  backdrop-filter: blur(16px);
-  background: rgba(8, 10, 18, 0.92);
-  border-bottom: 1px solid rgba(255,255,255,0.10);
-}
-.mobile-title {font-size:1.35rem; font-weight:900; line-height:1.1; margin:0;}
-.mobile-subtitle {font-size:0.84rem; color:var(--muted); margin-top:0.22rem;}
-.mobile-metric-grid {display:grid; grid-template-columns: repeat(2, 1fr); gap:0.45rem; margin:0.65rem 0 0.45rem 0;}
-.mobile-metric {border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:0.58rem 0.62rem; background:rgba(255,255,255,0.055);}
-.mobile-metric-label {font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.03em;}
-.mobile-metric-value {font-size:1.18rem; font-weight:900; margin-top:0.08rem;}
-.mobile-card {
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
-  overflow: hidden;
-  margin: 0.72rem auto;
-  box-shadow: 0 14px 34px rgba(0,0,0,0.22);
-}
-.mobile-chart {background:#05070d; border-bottom:1px solid rgba(255,255,255,0.08);}
-.mobile-body {padding:0.78rem 0.82rem 0.85rem 0.82rem;}
-.mobile-row {display:flex; justify-content:space-between; gap:0.7rem; align-items:flex-start;}
-.mobile-company {font-size:1.02rem; font-weight:900; line-height:1.15; margin-bottom:0.12rem;}
-.mobile-meta {font-size:0.79rem; color:var(--muted); font-weight:650; line-height:1.25;}
-.mobile-rank {text-align:right; min-width:58px;}
-.mobile-rank-label {font-size:0.64rem; color:var(--muted); text-transform:uppercase; font-weight:800;}
-.mobile-rank-value {font-size:1.2rem; font-weight:950; line-height:1; margin-top:0.08rem;}
-.mobile-chip-row {display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.58rem;}
-.mobile-chip {font-size:0.72rem; font-weight:850; padding:0.18rem 0.48rem; border-radius:999px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.07); color:#eef3ff;}
-.mobile-chip-green {background:rgba(30,201,119,0.14); color:#38e99a; border-color:rgba(30,201,119,0.28);}
-.mobile-chip-yellow {background:rgba(240,180,41,0.13); color:#ffd166; border-color:rgba(240,180,41,0.30);}
-.mobile-chip-red {background:rgba(255,107,107,0.13); color:#ff8585; border-color:rgba(255,107,107,0.30);}
-.mobile-note {font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.35; margin-top:0.58rem;}
-.mobile-share {font-size:0.76rem; color:var(--muted); margin-top:0.5rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.5rem;}
-@media (min-width: 769px) {
-  .mobile-shell {max-width: 520px;}
-}
-</style>
-""", unsafe_allow_html=True)
-
 LABELS = {
     "Strong": {"css": "status-strong"},
     "Developing": {"css": "status-developing"},
@@ -1323,155 +1270,6 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     )
     st.markdown(html, unsafe_allow_html=True)
 
-
-
-def _mobile_chip_class(row: pd.Series) -> str:
-    stage = str(row.get("stage", ""))
-    label = str(row.get("label", row.get("classification", "")))
-    if stage == "Stage 2" or label == "Strong":
-        return "mobile-chip mobile-chip-green"
-    if stage in {"Stage 3", "Stage 4"} or label == "Weak":
-        return "mobile-chip mobile-chip-red"
-    return "mobile-chip mobile-chip-yellow"
-
-
-def _mobile_reason(row: pd.Series) -> str:
-    parts = []
-    stage = str(row.get("stage", ""))
-    if stage == "Stage 2":
-        parts.append("Advancing structure")
-    elif stage == "Stage 3":
-        parts.append("Transition phase")
-    elif stage == "Stage 4":
-        parts.append("Declining structure")
-    elif stage == "Stage 1":
-        parts.append("Base formation")
-
-    for col, label in [("rs_3m_pct", "RS 3M"), ("rs_6m_pct", "RS 6M")]:
-        val = pd.to_numeric(row.get(col), errors="coerce")
-        if pd.notna(val):
-            parts.append(f"{label} {val:+.1f}%")
-
-    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-    if pd.notna(rank_change) and rank_change != 0:
-        parts.append(f"Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}")
-
-    if boolish(row.get("new_weekly_breakout", False)):
-        parts.append("Weekly breakout flag")
-    elif boolish(row.get("new_daily_breakout", False)):
-        parts.append("Daily breakout flag")
-
-    return " • ".join(parts[:4]) if parts else "No major new structure-change flag in the latest update."
-
-
-def render_mobile_feed(feed_df: pd.DataFrame, daily_chart_dir: str, weekly_chart_dir: str):
-    st.markdown("<div class='mobile-shell'>", unsafe_allow_html=True)
-    st.markdown("""
-<div class='mobile-sticky'>
-  <div class='mobile-title'>Post-Close Market Reset</div>
-  <div class='mobile-subtitle'>Fast structure scan after market close. Data view only, not investment advice.</div>
-</div>
-""", unsafe_allow_html=True)
-
-    if feed_df is None or feed_df.empty:
-        st.info("No data available for mobile feed.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
-
-    feed_df = ensure_label(ensure_current_rank(feed_df.copy()))
-    feed_df = sort_by_rank(feed_df).copy()
-
-    stage_counts_local = stage_count_summary(feed_df)
-    stage2 = stage_counts_local.get("Stage 2", 0)
-    transition = stage_counts_local.get("Stage 3", 0) + stage_counts_local.get("Stage 4", 0)
-    leader_sector = "-"
-    if "Industry" in feed_df.columns and "stage" in feed_df.columns:
-        sector_counts = feed_df[feed_df["stage"].eq("Stage 2")].groupby("Industry").size().sort_values(ascending=False)
-        if not sector_counts.empty:
-            leader_sector = str(sector_counts.index[0])
-
-    st.markdown(f"""
-<div class='mobile-metric-grid'>
-  <div class='mobile-metric'><div class='mobile-metric-label'>Stage 2</div><div class='mobile-metric-value'>{stage2}</div></div>
-  <div class='mobile-metric'><div class='mobile-metric-label'>Weakening</div><div class='mobile-metric-value'>{transition}</div></div>
-  <div class='mobile-metric'><div class='mobile-metric-label'>Leader Sector</div><div class='mobile-metric-value' style='font-size:0.98rem;'>{leader_sector}</div></div>
-  <div class='mobile-metric'><div class='mobile-metric-label'>Updated</div><div class='mobile-metric-value' style='font-size:0.98rem;'>Post Close</div></div>
-</div>
-""", unsafe_allow_html=True)
-
-    filter_choice = st.segmented_control(
-        "Feed filter",
-        ["Top", "Improving", "Stage 2", "Weakening"],
-        default="Top",
-        label_visibility="collapsed",
-    )
-
-    view = feed_df.copy()
-    if filter_choice == "Improving" and "rank_change" in view.columns:
-        view["_rank_change_num"] = pd.to_numeric(view["rank_change"], errors="coerce").fillna(0)
-        view = view[view["_rank_change_num"] > 0].sort_values("_rank_change_num", ascending=False)
-    elif filter_choice == "Stage 2":
-        view = view[view["stage"].astype(str).eq("Stage 2")]
-    elif filter_choice == "Weakening":
-        view = view[view["stage"].astype(str).isin(["Stage 3", "Stage 4"])]
-
-    view = view.head(30)
-
-    for _, row in view.iterrows():
-        ticker = str(row.get("ticker", "")).strip()
-        chart_path = resolve_chart_path(daily_chart_dir, ticker, "_daily.png") or resolve_chart_path(daily_chart_dir, ticker, ".png")
-        if chart_path is None:
-            chart_path = resolve_chart_path(weekly_chart_dir, ticker, "_weekly.png") or resolve_chart_path(weekly_chart_dir, ticker, ".png")
-        img = safe_image_bytes(chart_path) if chart_path is not None else None
-
-        rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
-        rank_text = f"#{int(rank_val)}" if pd.notna(rank_val) else "-"
-        company = stock_display_label(row)
-        industry = str(row.get("Industry", "-") or "-")
-        stage = str(row.get("stage", "-") or "-")
-        structure = structure_category(row)
-        score = structure_score(row)
-        chip_class = _mobile_chip_class(row)
-        reason = _mobile_reason(row)
-        rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
-        rank_chip = ""
-        if pd.notna(rank_change) and rank_change != 0:
-            rank_chip = f"<span class='mobile-chip {'mobile-chip-green' if rank_change > 0 else 'mobile-chip-red'}'>Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}</span>"
-
-        st.markdown("<div class='mobile-card'>", unsafe_allow_html=True)
-        if img:
-            st.markdown("<div class='mobile-chart'>", unsafe_allow_html=True)
-            st.image(img, use_container_width=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            st.markdown("<div class='mobile-chart' style='padding:1.4rem; color:rgba(255,255,255,0.55); text-align:center;'>Chart not available</div>", unsafe_allow_html=True)
-
-        st.markdown(f"""
-<div class='mobile-body'>
-  <div class='mobile-row'>
-    <div style='min-width:0;'>
-      <div class='mobile-company'>{company}</div>
-      <div class='mobile-meta'>{industry_icon(industry)} {industry} • {stage}</div>
-    </div>
-    <div class='mobile-rank'>
-      <div class='mobile-rank-label'>Rank</div>
-      <div class='mobile-rank-value'>{rank_text}</div>
-    </div>
-  </div>
-  <div class='mobile-chip-row'>
-    <span class='{chip_class}'>{structure}</span>
-    <span class='mobile-chip'>Score {score}/100</span>
-    {rank_chip}
-  </div>
-  <div class='mobile-note'>{reason}</div>
-  <div class='mobile-share'>Tap-worthy card format for daily WhatsApp/LinkedIn sharing later.</div>
-</div>
-""", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
@@ -1543,6 +1341,274 @@ def get_stock_rank(ticker: str) -> str:
     )
     return val if str(val).strip() else "n/a"
 
+
+
+# ============================
+# Production Mobile UI Layer
+# ============================
+st.markdown("""
+<style>
+.pm-shell {max-width: 480px; margin: 0 auto;}
+.pm-sticky {position: sticky; top: 0; z-index: 999; padding: 0.55rem 0.35rem 0.7rem 0.35rem; backdrop-filter: blur(18px); background: rgba(5,7,13,0.94); border-bottom: 1px solid rgba(255,255,255,0.09);}
+.pm-title {font-size: 1.35rem; font-weight: 950; line-height: 1.05; letter-spacing: -0.02em;}
+.pm-subtitle {font-size: 0.79rem; color: rgba(255,255,255,0.62); margin-top: 0.22rem; line-height: 1.25;}
+.pm-metrics {display:grid; grid-template-columns: repeat(2, 1fr); gap:0.45rem; margin:0.72rem 0 0.58rem 0;}
+.pm-metric {border: 1px solid rgba(255,255,255,0.11); border-radius: 18px; padding: 0.58rem 0.62rem; background: linear-gradient(180deg, rgba(255,255,255,0.070), rgba(255,255,255,0.035)); box-shadow: 0 10px 24px rgba(0,0,0,0.18);}
+.pm-metric-label {font-size:0.67rem; color:rgba(255,255,255,0.60); font-weight:850; text-transform:uppercase; letter-spacing:0.05em;}
+.pm-metric-value {font-size:1.14rem; font-weight:950; margin-top:0.08rem; line-height:1.05;}
+.pm-strip {display:flex; gap:0.45rem; overflow-x:auto; padding:0.08rem 0 0.3rem 0; margin-bottom:0.4rem; scrollbar-width:none;}
+.pm-strip::-webkit-scrollbar {display:none;}
+.pm-sector {flex:0 0 auto; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.055); border-radius:999px; padding:0.32rem 0.62rem; font-size:0.76rem; font-weight:850; color:#eef3ff;}
+.pm-card {border:1px solid rgba(255,255,255,0.12); border-radius:26px; background:linear-gradient(180deg, rgba(255,255,255,0.078), rgba(255,255,255,0.030)); overflow:hidden; margin:0.82rem auto; box-shadow:0 16px 34px rgba(0,0,0,0.26);}
+.pm-card-head {padding:0.78rem 0.82rem 0.68rem 0.82rem; border-bottom:1px solid rgba(255,255,255,0.08);}
+.pm-row {display:flex; justify-content:space-between; align-items:flex-start; gap:0.7rem;}
+.pm-company {font-size:1.04rem; font-weight:950; line-height:1.15; letter-spacing:-0.01em; margin-bottom:0.12rem;}
+.pm-meta {font-size:0.78rem; color:rgba(255,255,255,0.63); font-weight:720; line-height:1.25;}
+.pm-rank-box {text-align:right; min-width:62px;}
+.pm-rank-label {font-size:0.62rem; color:rgba(255,255,255,0.54); text-transform:uppercase; font-weight:900; letter-spacing:0.05em;}
+.pm-rank-value {font-size:1.22rem; font-weight:950; line-height:1; margin-top:0.08rem;}
+.pm-chips {display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.58rem;}
+.pm-chip {font-size:0.70rem; font-weight:850; padding:0.20rem 0.50rem; border-radius:999px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.07); color:#eef3ff;}
+.pm-green {background:rgba(30,201,119,0.14); color:#39e99b; border-color:rgba(30,201,119,0.30);}
+.pm-yellow {background:rgba(240,180,41,0.14); color:#ffd166; border-color:rgba(240,180,41,0.32);}
+.pm-red {background:rgba(255,107,107,0.13); color:#ff8585; border-color:rgba(255,107,107,0.32);}
+.pm-note {font-size:0.81rem; color:rgba(255,255,255,0.77); line-height:1.34; margin-top:0.56rem;}
+.pm-chart-label {font-size:0.66rem; color:rgba(255,255,255,0.54); font-weight:950; text-transform:uppercase; letter-spacing:0.08em; padding:0.52rem 0.75rem 0.28rem 0.75rem; background:rgba(0,0,0,0.20);}
+.pm-chart-wrap {background:#05070d; border-top:1px solid rgba(255,255,255,0.06);}
+.pm-chart-missing {padding:1.35rem 0.8rem; text-align:center; color:rgba(255,255,255,0.50); font-size:0.78rem; background:#05070d; border-top:1px solid rgba(255,255,255,0.06);}
+.pm-actions {display:grid; grid-template-columns: repeat(3, 1fr); gap:0.45rem; padding:0.70rem 0.75rem 0.78rem 0.75rem; border-top:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.025);}
+.pm-progress {font-size:0.78rem; color:rgba(255,255,255,0.64); font-weight:800; margin:0.45rem 0; text-align:center;}
+.pm-hint {font-size:0.75rem; color:rgba(255,255,255,0.56); text-align:center; margin:0.25rem 0 0.55rem 0;}
+.pm-disclaimer {border-left: 4px solid rgba(240,180,41,0.52); background:rgba(240,180,41,0.075); border-radius:14px; padding:0.65rem 0.72rem; font-size:0.78rem; color:rgba(255,255,255,0.78); line-height:1.34; margin:0.7rem 0;}
+@media (min-width: 769px) {.pm-shell {max-width: 540px;}}
+</style>
+""", unsafe_allow_html=True)
+
+
+def _pm_rerun():
+    if hasattr(st, "rerun"):
+        st.rerun()
+    else:
+        st.experimental_rerun()
+
+
+def _pm_chip_class(row: pd.Series) -> str:
+    stage = str(row.get("stage", ""))
+    label = str(row.get("label", row.get("classification", "")))
+    if stage == "Stage 2" or label == "Strong":
+        return "pm-chip pm-green"
+    if stage in {"Stage 3", "Stage 4"} or label == "Weak":
+        return "pm-chip pm-red"
+    return "pm-chip pm-yellow"
+
+
+def _pm_reason(row: pd.Series) -> str:
+    parts = []
+    stage = str(row.get("stage", ""))
+    if stage == "Stage 2":
+        parts.append("Advancing structure")
+    elif stage == "Stage 3":
+        parts.append("Transition phase")
+    elif stage == "Stage 4":
+        parts.append("Declining structure")
+    elif stage == "Stage 1":
+        parts.append("Base formation")
+
+    for col, label in [("rs_3m_pct", "RS 3M"), ("rs_6m_pct", "RS 6M")]:
+        val = pd.to_numeric(row.get(col), errors="coerce")
+        if pd.notna(val):
+            parts.append(f"{label} {val:+.1f}%")
+
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    if pd.notna(rank_change) and rank_change != 0:
+        parts.append(f"Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}")
+
+    if boolish(row.get("new_weekly_breakout", False)):
+        parts.append("Weekly breakout flag")
+    elif boolish(row.get("new_daily_breakout", False)):
+        parts.append("Daily breakout flag")
+
+    mini = build_mini_signal_text(row)
+    if mini:
+        parts.append(mini)
+
+    return " • ".join([p for p in parts if p][:4]) or "No major new structure-change flag in the latest update."
+
+
+def _pm_prepare_view(feed_df: pd.DataFrame, filter_choice: str, limit: int) -> pd.DataFrame:
+    view = ensure_label(ensure_current_rank(feed_df.copy()))
+    view = sort_by_rank(view).copy()
+    if filter_choice == "Improving" and "rank_change" in view.columns:
+        view["_rank_change_num"] = pd.to_numeric(view["rank_change"], errors="coerce").fillna(0)
+        view = view[view["_rank_change_num"] > 0].sort_values("_rank_change_num", ascending=False)
+    elif filter_choice == "Stage 2":
+        view = view[view["stage"].astype(str).eq("Stage 2")]
+    elif filter_choice == "Weakening":
+        view = view[view["stage"].astype(str).isin(["Stage 3", "Stage 4"])]
+    elif filter_choice == "New Flags":
+        masks = []
+        for col in ["entered_stage_2", "new_weekly_breakout", "new_daily_breakout"]:
+            if col in view.columns:
+                masks.append(view[col].fillna(False).astype(bool))
+        if masks:
+            mask = masks[0]
+            for m in masks[1:]:
+                mask = mask | m
+            view = view[mask]
+    return view.head(limit).reset_index(drop=True)
+
+
+def _pm_chart_bytes(chart_dir: str, ticker: str, suffix: str):
+    path = resolve_chart_path(chart_dir, ticker, suffix) or resolve_chart_path(chart_dir, ticker, ".png")
+    return safe_image_bytes(path) if path is not None else None
+
+
+def _pm_render_charts(ticker: str, daily_chart_dir: str, weekly_chart_dir: str):
+    daily_img = _pm_chart_bytes(daily_chart_dir, ticker, "_daily.png")
+    weekly_img = _pm_chart_bytes(weekly_chart_dir, ticker, "_weekly.png")
+    st.markdown("<div class='pm-chart-label'>Daily chart</div>", unsafe_allow_html=True)
+    if daily_img:
+        st.markdown("<div class='pm-chart-wrap'>", unsafe_allow_html=True)
+        st.image(daily_img, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.markdown("<div class='pm-chart-missing'>Daily chart not available</div>", unsafe_allow_html=True)
+    st.markdown("<div class='pm-chart-label'>Weekly chart</div>", unsafe_allow_html=True)
+    if weekly_img:
+        st.markdown("<div class='pm-chart-wrap'>", unsafe_allow_html=True)
+        st.image(weekly_img, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.markdown("<div class='pm-chart-missing'>Weekly chart not available</div>", unsafe_allow_html=True)
+
+
+def _pm_render_card(row: pd.Series, daily_chart_dir: str, weekly_chart_dir: str, show_actions: bool = False):
+    ticker = str(row.get("ticker", "")).strip()
+    rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
+    rank_text = f"#{int(rank_val)}" if pd.notna(rank_val) else "-"
+    company = stock_display_label(row)
+    industry_name = str(row.get("Industry", "-") or "-")
+    stage = str(row.get("stage", "-") or "-")
+    structure = structure_category(row)
+    score = structure_score(row)
+    chip_class = _pm_chip_class(row)
+    reason = _pm_reason(row)
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    rank_chip = ""
+    if pd.notna(rank_change) and rank_change != 0:
+        rank_chip = f"<span class='pm-chip {'pm-green' if rank_change > 0 else 'pm-red'}'>Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}</span>"
+    st.markdown("<div class='pm-card'>", unsafe_allow_html=True)
+    st.markdown(f"""
+<div class='pm-card-head'>
+  <div class='pm-row'>
+    <div style='min-width:0;'>
+      <div class='pm-company'>{company}</div>
+      <div class='pm-meta'>{industry_icon(industry_name)} {industry_name} • {stage} • {stage_primary_label(stage)}</div>
+    </div>
+    <div class='pm-rank-box'>
+      <div class='pm-rank-label'>Rank</div>
+      <div class='pm-rank-value'>{rank_text}</div>
+    </div>
+  </div>
+  <div class='pm-chips'>
+    <span class='{chip_class}'>{structure}</span>
+    <span class='pm-chip'>Score {score}/100</span>
+    {rank_chip}
+  </div>
+  <div class='pm-note'>{reason}</div>
+</div>
+""", unsafe_allow_html=True)
+    _pm_render_charts(ticker, daily_chart_dir, weekly_chart_dir)
+    if show_actions:
+        st.markdown("<div class='pm-actions'>", unsafe_allow_html=True)
+        a, b, c = st.columns(3)
+        with a:
+            if st.button("👎 Skip", use_container_width=True, key=f"pm_skip_{ticker}"):
+                st.session_state["pm_swipe_index"] = st.session_state.get("pm_swipe_index", 0) + 1
+                _pm_rerun()
+        with b:
+            if st.button("⭐ Save", use_container_width=True, key=f"pm_save_{ticker}"):
+                saved = st.session_state.setdefault("pm_saved_tickers", [])
+                if ticker and ticker not in saved:
+                    saved.append(ticker)
+                st.session_state["pm_swipe_index"] = st.session_state.get("pm_swipe_index", 0) + 1
+                _pm_rerun()
+        with c:
+            if st.button("➡️ Next", use_container_width=True, key=f"pm_next_{ticker}"):
+                st.session_state["pm_swipe_index"] = st.session_state.get("pm_swipe_index", 0) + 1
+                _pm_rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_production_mobile_ui(feed_df: pd.DataFrame, daily_chart_dir: str, weekly_chart_dir: str):
+    st.markdown("<div class='pm-shell'>", unsafe_allow_html=True)
+    st.markdown("""
+<div class='pm-sticky'>
+  <div class='pm-title'>Post-Close Market Reset</div>
+  <div class='pm-subtitle'>Fast structure scan after market close. Daily + weekly charts stacked. Data view only, not investment advice.</div>
+</div>
+""", unsafe_allow_html=True)
+    if feed_df is None or feed_df.empty:
+        st.info("No data available for mobile feed.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+    prepared = ensure_label(ensure_current_rank(feed_df.copy()))
+    prepared = sort_by_rank(prepared).copy()
+    counts = stage_count_summary(prepared)
+    stage2 = counts.get("Stage 2", 0)
+    weakening = counts.get("Stage 3", 0) + counts.get("Stage 4", 0)
+    leader_sector = "-"
+    if "Industry" in prepared.columns and "stage" in prepared.columns:
+        sector_counts = prepared[prepared["stage"].eq("Stage 2")].groupby("Industry").size().sort_values(ascending=False)
+        if not sector_counts.empty:
+            leader_sector = str(sector_counts.index[0])
+    st.markdown(f"""
+<div class='pm-metrics'>
+  <div class='pm-metric'><div class='pm-metric-label'>Stage 2</div><div class='pm-metric-value'>{stage2}</div></div>
+  <div class='pm-metric'><div class='pm-metric-label'>Weakening</div><div class='pm-metric-value'>{weakening}</div></div>
+  <div class='pm-metric'><div class='pm-metric-label'>Leader Sector</div><div class='pm-metric-value' style='font-size:0.92rem;'>{leader_sector}</div></div>
+  <div class='pm-metric'><div class='pm-metric-label'>Updated</div><div class='pm-metric-value' style='font-size:0.92rem;'>Post Close</div></div>
+</div>
+""", unsafe_allow_html=True)
+    if "Industry" in prepared.columns:
+        top_sectors = prepared[prepared["stage"].astype(str).eq("Stage 2")].groupby("Industry").size().sort_values(ascending=False).head(8)
+        if not top_sectors.empty:
+            chips = "".join([f"<div class='pm-sector'>{industry_icon(str(k))} {k} · {int(v)}</div>" for k, v in top_sectors.items()])
+            st.markdown(f"<div class='pm-strip'>{chips}</div>", unsafe_allow_html=True)
+    mode = st.radio("Mode", ["Feed", "Swipe"], horizontal=True, label_visibility="collapsed")
+    filter_choice = st.radio("Filter", ["Top", "Improving", "Stage 2", "Weakening", "New Flags"], horizontal=True, label_visibility="collapsed")
+    max_cards = st.slider("Cards", min_value=5, max_value=60, value=25, step=5, label_visibility="collapsed")
+    view = _pm_prepare_view(prepared, filter_choice, max_cards)
+    st.markdown("<div class='pm-disclaimer'>This screen is a public-view prototype: structure labels, ranks, sectors and charts only. No buy/sell/short recommendation is shown.</div>", unsafe_allow_html=True)
+    if view.empty:
+        st.info("No stocks match this filter.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+    if mode == "Swipe":
+        if "pm_swipe_index" not in st.session_state:
+            st.session_state["pm_swipe_index"] = 0
+        if st.session_state["pm_swipe_index"] >= len(view):
+            st.success("Done for this filtered set.")
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("Restart", use_container_width=True):
+                    st.session_state["pm_swipe_index"] = 0
+                    _pm_rerun()
+            with c2:
+                saved = st.session_state.get("pm_saved_tickers", [])
+                st.write(f"Saved: {len(saved)}")
+            st.markdown("</div>", unsafe_allow_html=True)
+            return
+        idx = int(st.session_state["pm_swipe_index"])
+        st.markdown(f"<div class='pm-progress'>{idx + 1} / {len(view)}</div>", unsafe_allow_html=True)
+        st.markdown("<div class='pm-hint'>Use Skip / Save / Next like a Tinder-style review flow.</div>", unsafe_allow_html=True)
+        _pm_render_card(view.iloc[idx], daily_chart_dir, weekly_chart_dir, show_actions=True)
+    else:
+        for _, row in view.iterrows():
+            _pm_render_card(row, daily_chart_dir, weekly_chart_dir, show_actions=False)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 if "watchlist_names" not in st.session_state:
     st.session_state["watchlist_names"] = []
 if "custom_watchlist_names" not in st.session_state:
@@ -1574,7 +1640,7 @@ with st.expander("🚀 Private Publishing Controls", expanded=False):
             st.error(f"Export failed: {exc}")
 
 view_mode = st.radio("View mode", ["Execution", "Research"], horizontal=True, index=0)
-tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer", "Mobile Feed"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer", "Mobile Feed"]
+tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer", "Mobile"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer", "Mobile"]
 tabs = st.tabs(tab_names)
 
 with tabs[0]:
@@ -2017,5 +2083,6 @@ with tabs[tab_offset + 1]:
     render_disclosure()
 
 
+# Production mobile public-view prototype
 with tabs[-1]:
-    render_mobile_feed(combined, daily_dir, weekly_dir)
+    render_production_mobile_ui(combined, daily_dir, weekly_dir)
