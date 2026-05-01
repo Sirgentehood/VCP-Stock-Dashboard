@@ -74,6 +74,59 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
+
+st.markdown("""
+<style>
+/* Viral mobile preview feed */
+.mobile-shell {
+  max-width: 460px;
+  margin: 0 auto;
+}
+.mobile-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  padding: 0.55rem 0.35rem 0.65rem 0.35rem;
+  backdrop-filter: blur(16px);
+  background: rgba(8, 10, 18, 0.92);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.mobile-title {font-size:1.35rem; font-weight:900; line-height:1.1; margin:0;}
+.mobile-subtitle {font-size:0.84rem; color:var(--muted); margin-top:0.22rem;}
+.mobile-metric-grid {display:grid; grid-template-columns: repeat(2, 1fr); gap:0.45rem; margin:0.65rem 0 0.45rem 0;}
+.mobile-metric {border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:0.58rem 0.62rem; background:rgba(255,255,255,0.055);}
+.mobile-metric-label {font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.03em;}
+.mobile-metric-value {font-size:1.18rem; font-weight:900; margin-top:0.08rem;}
+.mobile-card {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+  overflow: hidden;
+  margin: 0.72rem auto;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.22);
+}
+.mobile-chart {background:#05070d; border-bottom:1px solid rgba(255,255,255,0.08);}
+.mobile-body {padding:0.78rem 0.82rem 0.85rem 0.82rem;}
+.mobile-row {display:flex; justify-content:space-between; gap:0.7rem; align-items:flex-start;}
+.mobile-company {font-size:1.02rem; font-weight:900; line-height:1.15; margin-bottom:0.12rem;}
+.mobile-meta {font-size:0.79rem; color:var(--muted); font-weight:650; line-height:1.25;}
+.mobile-rank {text-align:right; min-width:58px;}
+.mobile-rank-label {font-size:0.64rem; color:var(--muted); text-transform:uppercase; font-weight:800;}
+.mobile-rank-value {font-size:1.2rem; font-weight:950; line-height:1; margin-top:0.08rem;}
+.mobile-chip-row {display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.58rem;}
+.mobile-chip {font-size:0.72rem; font-weight:850; padding:0.18rem 0.48rem; border-radius:999px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.07); color:#eef3ff;}
+.mobile-chip-green {background:rgba(30,201,119,0.14); color:#38e99a; border-color:rgba(30,201,119,0.28);}
+.mobile-chip-yellow {background:rgba(240,180,41,0.13); color:#ffd166; border-color:rgba(240,180,41,0.30);}
+.mobile-chip-red {background:rgba(255,107,107,0.13); color:#ff8585; border-color:rgba(255,107,107,0.30);}
+.mobile-note {font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.35; margin-top:0.58rem;}
+.mobile-share {font-size:0.76rem; color:var(--muted); margin-top:0.5rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.5rem;}
+@media (min-width: 769px) {
+  .mobile-shell {max-width: 520px;}
+}
+</style>
+""", unsafe_allow_html=True)
+
 LABELS = {
     "Strong": {"css": "status-strong"},
     "Developing": {"css": "status-developing"},
@@ -1270,6 +1323,155 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     )
     st.markdown(html, unsafe_allow_html=True)
 
+
+
+def _mobile_chip_class(row: pd.Series) -> str:
+    stage = str(row.get("stage", ""))
+    label = str(row.get("label", row.get("classification", "")))
+    if stage == "Stage 2" or label == "Strong":
+        return "mobile-chip mobile-chip-green"
+    if stage in {"Stage 3", "Stage 4"} or label == "Weak":
+        return "mobile-chip mobile-chip-red"
+    return "mobile-chip mobile-chip-yellow"
+
+
+def _mobile_reason(row: pd.Series) -> str:
+    parts = []
+    stage = str(row.get("stage", ""))
+    if stage == "Stage 2":
+        parts.append("Advancing structure")
+    elif stage == "Stage 3":
+        parts.append("Transition phase")
+    elif stage == "Stage 4":
+        parts.append("Declining structure")
+    elif stage == "Stage 1":
+        parts.append("Base formation")
+
+    for col, label in [("rs_3m_pct", "RS 3M"), ("rs_6m_pct", "RS 6M")]:
+        val = pd.to_numeric(row.get(col), errors="coerce")
+        if pd.notna(val):
+            parts.append(f"{label} {val:+.1f}%")
+
+    rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+    if pd.notna(rank_change) and rank_change != 0:
+        parts.append(f"Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}")
+
+    if boolish(row.get("new_weekly_breakout", False)):
+        parts.append("Weekly breakout flag")
+    elif boolish(row.get("new_daily_breakout", False)):
+        parts.append("Daily breakout flag")
+
+    return " • ".join(parts[:4]) if parts else "No major new structure-change flag in the latest update."
+
+
+def render_mobile_feed(feed_df: pd.DataFrame, daily_chart_dir: str, weekly_chart_dir: str):
+    st.markdown("<div class='mobile-shell'>", unsafe_allow_html=True)
+    st.markdown("""
+<div class='mobile-sticky'>
+  <div class='mobile-title'>Post-Close Market Reset</div>
+  <div class='mobile-subtitle'>Fast structure scan after market close. Data view only, not investment advice.</div>
+</div>
+""", unsafe_allow_html=True)
+
+    if feed_df is None or feed_df.empty:
+        st.info("No data available for mobile feed.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    feed_df = ensure_label(ensure_current_rank(feed_df.copy()))
+    feed_df = sort_by_rank(feed_df).copy()
+
+    stage_counts_local = stage_count_summary(feed_df)
+    stage2 = stage_counts_local.get("Stage 2", 0)
+    transition = stage_counts_local.get("Stage 3", 0) + stage_counts_local.get("Stage 4", 0)
+    leader_sector = "-"
+    if "Industry" in feed_df.columns and "stage" in feed_df.columns:
+        sector_counts = feed_df[feed_df["stage"].eq("Stage 2")].groupby("Industry").size().sort_values(ascending=False)
+        if not sector_counts.empty:
+            leader_sector = str(sector_counts.index[0])
+
+    st.markdown(f"""
+<div class='mobile-metric-grid'>
+  <div class='mobile-metric'><div class='mobile-metric-label'>Stage 2</div><div class='mobile-metric-value'>{stage2}</div></div>
+  <div class='mobile-metric'><div class='mobile-metric-label'>Weakening</div><div class='mobile-metric-value'>{transition}</div></div>
+  <div class='mobile-metric'><div class='mobile-metric-label'>Leader Sector</div><div class='mobile-metric-value' style='font-size:0.98rem;'>{leader_sector}</div></div>
+  <div class='mobile-metric'><div class='mobile-metric-label'>Updated</div><div class='mobile-metric-value' style='font-size:0.98rem;'>Post Close</div></div>
+</div>
+""", unsafe_allow_html=True)
+
+    filter_choice = st.segmented_control(
+        "Feed filter",
+        ["Top", "Improving", "Stage 2", "Weakening"],
+        default="Top",
+        label_visibility="collapsed",
+    )
+
+    view = feed_df.copy()
+    if filter_choice == "Improving" and "rank_change" in view.columns:
+        view["_rank_change_num"] = pd.to_numeric(view["rank_change"], errors="coerce").fillna(0)
+        view = view[view["_rank_change_num"] > 0].sort_values("_rank_change_num", ascending=False)
+    elif filter_choice == "Stage 2":
+        view = view[view["stage"].astype(str).eq("Stage 2")]
+    elif filter_choice == "Weakening":
+        view = view[view["stage"].astype(str).isin(["Stage 3", "Stage 4"])]
+
+    view = view.head(30)
+
+    for _, row in view.iterrows():
+        ticker = str(row.get("ticker", "")).strip()
+        chart_path = resolve_chart_path(daily_chart_dir, ticker, "_daily.png") or resolve_chart_path(daily_chart_dir, ticker, ".png")
+        if chart_path is None:
+            chart_path = resolve_chart_path(weekly_chart_dir, ticker, "_weekly.png") or resolve_chart_path(weekly_chart_dir, ticker, ".png")
+        img = safe_image_bytes(chart_path) if chart_path is not None else None
+
+        rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
+        rank_text = f"#{int(rank_val)}" if pd.notna(rank_val) else "-"
+        company = stock_display_label(row)
+        industry = str(row.get("Industry", "-") or "-")
+        stage = str(row.get("stage", "-") or "-")
+        structure = structure_category(row)
+        score = structure_score(row)
+        chip_class = _mobile_chip_class(row)
+        reason = _mobile_reason(row)
+        rank_change = pd.to_numeric(row.get("rank_change"), errors="coerce")
+        rank_chip = ""
+        if pd.notna(rank_change) and rank_change != 0:
+            rank_chip = f"<span class='mobile-chip {'mobile-chip-green' if rank_change > 0 else 'mobile-chip-red'}'>Rank {'↑' if rank_change > 0 else '↓'} {abs(int(rank_change))}</span>"
+
+        st.markdown("<div class='mobile-card'>", unsafe_allow_html=True)
+        if img:
+            st.markdown("<div class='mobile-chart'>", unsafe_allow_html=True)
+            st.image(img, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.markdown("<div class='mobile-chart' style='padding:1.4rem; color:rgba(255,255,255,0.55); text-align:center;'>Chart not available</div>", unsafe_allow_html=True)
+
+        st.markdown(f"""
+<div class='mobile-body'>
+  <div class='mobile-row'>
+    <div style='min-width:0;'>
+      <div class='mobile-company'>{company}</div>
+      <div class='mobile-meta'>{industry_icon(industry)} {industry} • {stage}</div>
+    </div>
+    <div class='mobile-rank'>
+      <div class='mobile-rank-label'>Rank</div>
+      <div class='mobile-rank-value'>{rank_text}</div>
+    </div>
+  </div>
+  <div class='mobile-chip-row'>
+    <span class='{chip_class}'>{structure}</span>
+    <span class='mobile-chip'>Score {score}/100</span>
+    {rank_chip}
+  </div>
+  <div class='mobile-note'>{reason}</div>
+  <div class='mobile-share'>Tap-worthy card format for daily WhatsApp/LinkedIn sharing later.</div>
+</div>
+""", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
@@ -1372,7 +1574,7 @@ with st.expander("🚀 Private Publishing Controls", expanded=False):
             st.error(f"Export failed: {exc}")
 
 view_mode = st.radio("View mode", ["Execution", "Research"], horizontal=True, index=0)
-tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
+tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer", "Mobile Feed"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer", "Mobile Feed"]
 tabs = st.tabs(tab_names)
 
 with tabs[0]:
@@ -1813,3 +2015,7 @@ with tabs[tab_offset + 1]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. It does not rank, recommend, prioritize, or suggest any securities for investment purposes, and it does not provide model portfolios, suitability analysis, or allocation recommendations.")
     render_disclosure()
+
+
+with tabs[-1]:
+    render_mobile_feed(combined, daily_dir, weekly_dir)
