@@ -1270,6 +1270,69 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     )
     st.markdown(html, unsafe_allow_html=True)
 
+
+FO_COLUMN_CANDIDATES = [
+    "F&O", "FNO", "FO", "F_AND_O", "F and O", "F&O Stock", "F&O Stocks",
+    "is_FO", "is_fo", "is_fno", "is_f_and_o", "fno", "fo", "f_o", "FnO", "NSE_FO"
+]
+
+
+def find_fo_column(df: pd.DataFrame) -> str | None:
+    """Return the first F&O marker column found in the dataframe."""
+    if df is None or df.empty:
+        return None
+    direct = {str(c).strip(): c for c in df.columns}
+    lower = {str(c).strip().lower().replace(" ", "_"): c for c in df.columns}
+    for cand in FO_COLUMN_CANDIDATES:
+        if cand in direct:
+            return direct[cand]
+        key = cand.strip().lower().replace(" ", "_")
+        if key in lower:
+            return lower[key]
+    return None
+
+
+def normalize_fo_value(value) -> bool:
+    """Convert common F&O flag values into True/False."""
+    if isinstance(value, bool):
+        return value
+    if pd.isna(value):
+        return False
+    text = str(value).strip().lower()
+    return text in {"1", "true", "yes", "y", "t", "fo", "f&o", "fno", "f and o", "f_and_o"}
+
+
+def add_normalized_fo_column(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a stable is_fo_stock column when an F&O column is present."""
+    if df is None or df.empty:
+        return df
+    out = df.copy()
+    fo_col = find_fo_column(out)
+    if fo_col is None:
+        if "is_fo_stock" not in out.columns:
+            out["is_fo_stock"] = False
+        return out
+    out["is_fo_stock"] = out[fo_col].apply(normalize_fo_value)
+    return out
+
+
+def filter_fo_only(df: pd.DataFrame) -> pd.DataFrame:
+    """Return only F&O stocks if the dataframe has an F&O marker."""
+    if df is None or df.empty:
+        return df
+    out = add_normalized_fo_column(df)
+    if "is_fo_stock" not in out.columns:
+        return out
+    return out[out["is_fo_stock"]].copy()
+
+
+def fo_available(*dfs: pd.DataFrame) -> bool:
+    return any(find_fo_column(df) is not None or (df is not None and "is_fo_stock" in df.columns) for df in dfs)
+
+
+if "show_fo_only" not in st.session_state:
+    st.session_state["show_fo_only"] = False
+
 outdir = "outputs"
 help_image_path = "market_phases_reference.png"
 combined = ensure_label(safe_read(f"{outdir}/vcp_combined_ranked.csv"))
@@ -1283,6 +1346,23 @@ top_movers = ensure_label(safe_read(f"{outdir}/top_movers.csv"))
 if top_movers.empty:
     top_movers = moves.copy()
 regime = safe_read(f"{outdir}/market_regime.csv")
+
+# Normalize F&O marker across all loaded datasets. If the dashboard toggle is ON,
+# every downstream tab/table/chart uses only F&O stocks.
+combined = add_normalized_fo_column(combined)
+daily_df = add_normalized_fo_column(daily_df)
+weekly_df = add_normalized_fo_column(weekly_df)
+changes = add_normalized_fo_column(changes)
+moves = add_normalized_fo_column(moves)
+top_movers = add_normalized_fo_column(top_movers)
+
+if st.session_state.get("show_fo_only", False):
+    combined = filter_fo_only(combined)
+    daily_df = filter_fo_only(daily_df)
+    weekly_df = filter_fo_only(weekly_df)
+    changes = filter_fo_only(changes)
+    moves = filter_fo_only(moves)
+    top_movers = filter_fo_only(top_movers)
 
 GLOBAL_RANK_MAP = build_rank_lookup_map(combined, daily_df, weekly_df, top_movers, moves, changes)
 combined = backfill_current_rank(combined, GLOBAL_RANK_MAP)
@@ -1624,6 +1704,17 @@ if "chart_selected_ticker" not in st.session_state:
 st.title("Market Decision Engine")
 st.caption("Structure-led trade engine with long, short, and watchlist actions")
 
+fo_ui_cols = st.columns([1, 3])
+with fo_ui_cols[0]:
+    st.toggle("F&O only", key="show_fo_only", help="Show only stocks marked as F&O in your data file.")
+with fo_ui_cols[1]:
+    if st.session_state.get("show_fo_only", False):
+        st.caption(f"F&O filter active • {len(combined)} stocks shown")
+    elif fo_available(combined, daily_df, weekly_df, moves, top_movers, DECISION_DF):
+        st.caption("F&O filter available from your data column.")
+    else:
+        st.caption("F&O column not found yet. Add a column like F&O, FO, FNO, or is_FO to enable the filter.")
+
 # --- Private publishing control ---
 # This creates outputs/public_daily.json for your future public mobile website.
 # It removes Buy/Sell/Short language and exports only structure analytics.
@@ -1737,7 +1828,7 @@ with tabs[1]:
         show_cols = [c for c in [
             "Company Name", "ticker", "Industry", "stage", "label", "action", "trade_side",
             "long_score", "short_score", "action_confidence", "industry_score", "industry_view",
-            "current_rank", "rank_change", "dry_up_status", "mini_signals", "rationale"
+            "current_rank", "rank_change", "is_fo_stock", "dry_up_status", "mini_signals", "rationale"
         ] if c in board.columns]
         st.dataframe(board[show_cols], use_container_width=True, hide_index=True, height=460)
 
@@ -1860,7 +1951,7 @@ with tabs[4]:
         if not current.empty:
             current["portfolio_action"] = current.get("action", "No Trade")
             current["dry_up_status"] = current.apply(dry_up_status, axis=1)
-            summary_cols = [c for c in ["Company Name", "ticker", "stage", "label", "portfolio_action", "dry_up_status", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
+            summary_cols = [c for c in ["Company Name", "ticker", "stage", "label", "is_fo_stock", "portfolio_action", "dry_up_status", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
             st.markdown("#### Portfolio action table")
             st.dataframe(current[summary_cols], use_container_width=True, hide_index=True, height=260)
 
