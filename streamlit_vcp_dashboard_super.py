@@ -1302,28 +1302,95 @@ def normalize_fo_value(value) -> bool:
     return text in {"1", "true", "yes", "y", "t", "fo", "f&o", "fno", "f and o", "f_and_o"}
 
 
+def normalize_stock_symbol(value) -> str:
+    """Normalize NSE/Yahoo ticker variants to one comparable key."""
+    if pd.isna(value):
+        return ""
+    text = str(value).strip().upper()
+    text = text.replace(".NS", "")
+    return text
+
+
 def add_normalized_fo_column(df: pd.DataFrame) -> pd.DataFrame:
-    """Create a stable is_fo_stock column when an F&O column is present."""
+    """Create a stable is_fo_stock column only when an F&O column is present."""
     if df is None or df.empty:
         return df
     out = df.copy()
     fo_col = find_fo_column(out)
     if fo_col is None:
-        if "is_fo_stock" not in out.columns:
-            out["is_fo_stock"] = False
         return out
     out["is_fo_stock"] = out[fo_col].apply(normalize_fo_value)
     return out
 
 
+def load_fo_symbol_set_from_universe() -> set:
+    """Load F&O symbols from universe files, then use it to enrich output CSVs.
+
+    Most dashboard output files do not carry the universe F&O column. This lookup
+    prevents the dashboard from going blank when the F&O toggle is switched on.
+    """
+    candidates = [
+        Path("universe.csv"),
+        Path("universe(1).csv"),
+        Path("universe_with_FO.csv"),
+        Path("universe_with_full_FO.csv"),
+        Path("outputs/universe.csv"),
+        Path("outputs/universe_clean.csv"),
+        Path("outputs/universe_with_FO.csv"),
+        Path("outputs/universe_with_full_FO.csv"),
+    ]
+    symbols = set()
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            uni = pd.read_csv(path)
+        except Exception:
+            continue
+        fo_col = find_fo_column(uni)
+        if fo_col is None:
+            continue
+        ticker_col = None
+        for cand in ["ticker", "Ticker", "symbol", "Symbol", "SYMBOL"]:
+            if cand in uni.columns:
+                ticker_col = cand
+                break
+        if ticker_col is None:
+            continue
+        mask = uni[fo_col].apply(normalize_fo_value)
+        symbols.update(uni.loc[mask, ticker_col].apply(normalize_stock_symbol).dropna().tolist())
+    return {s for s in symbols if s}
+
+
+def apply_fo_lookup(df: pd.DataFrame, fo_symbols: set) -> pd.DataFrame:
+    """Add/repair is_fo_stock using a universe-derived F&O symbol set."""
+    if df is None or df.empty or not fo_symbols:
+        return df
+    out = df.copy()
+    ticker_col = None
+    for cand in ["ticker", "Ticker", "symbol", "Symbol", "SYMBOL"]:
+        if cand in out.columns:
+            ticker_col = cand
+            break
+    if ticker_col is None:
+        return out
+    by_symbol = out[ticker_col].apply(normalize_stock_symbol).isin(fo_symbols)
+    if "is_fo_stock" in out.columns:
+        out["is_fo_stock"] = out["is_fo_stock"].fillna(False).astype(bool) | by_symbol
+    else:
+        out["is_fo_stock"] = by_symbol
+    return out
+
+
 def filter_fo_only(df: pd.DataFrame) -> pd.DataFrame:
-    """Return only F&O stocks if the dataframe has an F&O marker."""
+    """Return only F&O stocks when F&O information exists; otherwise keep data visible."""
     if df is None or df.empty:
         return df
     out = add_normalized_fo_column(df)
     if "is_fo_stock" not in out.columns:
         return out
-    return out[out["is_fo_stock"]].copy()
+    filtered = out[out["is_fo_stock"]].copy()
+    return filtered if not filtered.empty else out.iloc[0:0].copy()
 
 
 def fo_available(*dfs: pd.DataFrame) -> bool:
@@ -1355,6 +1422,14 @@ weekly_df = add_normalized_fo_column(weekly_df)
 changes = add_normalized_fo_column(changes)
 moves = add_normalized_fo_column(moves)
 top_movers = add_normalized_fo_column(top_movers)
+
+FO_SYMBOL_SET = load_fo_symbol_set_from_universe()
+combined = apply_fo_lookup(combined, FO_SYMBOL_SET)
+daily_df = apply_fo_lookup(daily_df, FO_SYMBOL_SET)
+weekly_df = apply_fo_lookup(weekly_df, FO_SYMBOL_SET)
+changes = apply_fo_lookup(changes, FO_SYMBOL_SET)
+moves = apply_fo_lookup(moves, FO_SYMBOL_SET)
+top_movers = apply_fo_lookup(top_movers, FO_SYMBOL_SET)
 
 if st.session_state.get("show_fo_only", False):
     combined = filter_fo_only(combined)
@@ -1710,6 +1785,8 @@ with fo_ui_cols[0]:
 with fo_ui_cols[1]:
     if st.session_state.get("show_fo_only", False):
         st.caption(f"F&O filter active • {len(combined)} stocks shown")
+        if combined.empty:
+            st.warning("No matching F&O stocks found. Check that your universe file is beside this app or inside outputs/ and has a ticker/symbol column plus an F&O column.")
     elif fo_available(combined, daily_df, weekly_df, moves, top_movers, DECISION_DF):
         st.caption("F&O filter available from your data column.")
     else:
