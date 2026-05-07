@@ -99334,3 +99334,755 @@ snapshot_date,ticker,Company Name,Industry,stage,combined_bucket,final_combined_
 2026-05-06,ZFCVINDIA.NS,ZF Commercial Vehicle Control Systems India Limited,Automobile and Auto Components,Stage 1,watchlist,14.54,0.96,False,False,Base Building,Watchlist / Early base
 2026-05-06,ZYDUSLIFE.NS,Zydus Lifesciences Limited,Healthcare,Stage 3,watchlist,19.06,1.34,False,False,Transition,Reduce / Avoid fresh longs
 2026-05-06,ZYDUSWELL.NS,Zydus Wellness Limited,Fast Moving Consumer Goods,Stage 2,watchlist,42.95,0.12,True,True,Advancing,Hold / Trend intact
+2026-05-07,360ONE.NS,360 ONE WAM LIMITED,Financial Services,Stage 3,watchlist,11.63,0.96,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,3MINDIA.NS,3M India Limited,Diversified,Stage 1,watchlist,13.18,0.75,True,False,Base Building,Watchlist / Early base
+2026-05-07,AADHARHFC.NS,Aadhar Housing Finance Ltd.,Financial Services,Stage 3,watchlist,29.06,0.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AARTIDRUGS.NS,Aarti Drugs Limited,Healthcare,Stage 3,watchlist,41.47,1.14,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AARTIIND.NS,Aarti Industries Limited,Chemicals,Stage 2,watchlist,46.31,1.71,False,False,Advancing,Hold / Trend intact
+2026-05-07,AARTIPHARM.NS,Aarti Pharmalabs Limited,Healthcare,Stage 3,watchlist,16.79,1.39,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AAVAS.NS,Aavas Financiers Ltd.,Financial Services,Stage 3,watchlist,26.3,0.47,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ABB.NS,ABB India Limited,Capital Goods,Stage 2,watchlist,56.91,0.59,True,False,Advancing,Hold / Trend intact
+2026-05-07,ABBOTINDIA.NS,Abbott India Limited,Healthcare,Stage 4,watchlist,29.2,1.38,False,False,Weak Structure,Exit / Avoid
+2026-05-07,ABCAPITAL.NS,Aditya Birla Capital Limited,Financial Services,Stage 2,watchlist,36.44,0.88,False,True,Advancing,Hold / Trend intact
+2026-05-07,ABFRL.NS,Aditya Birla Fashion and Retail Limited,Consumer Services,Stage 3,watchlist,21.94,1.07,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ABREL.NS,Aditya Birla Real Estate Ltd.,Forest Materials,Stage 3,watchlist,31.63,0.75,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ABSLAMC.NS,Aditya Birla Sun Life AMC Limited,Financial Services,Stage 2,watchlist,50.52,0.97,False,False,Advancing,Hold / Trend intact
+2026-05-07,ACC.NS,ACC Limited,Construction Materials,Stage 4,watchlist,4.06,0.89,False,False,Weak Structure,Exit / Avoid
+2026-05-07,ACE.NS,Action Construction Equipment Limited,Capital Goods,Stage 3,watchlist,50.12,0.79,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ACI.NS,Archean Chemical Industries Limited,Chemicals,Stage 3,watchlist,42.86,0.86,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ACMESOLAR.NS,ACME Solar Holdings Ltd.,Power,Stage 3,watchlist,53.03,0.43,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ADANIENSOL.NS,Adani Energy Solutions Limited,Power,Stage 2,watchlist,80.16,1.64,False,False,Advancing,Hold / Trend intact
+2026-05-07,ADANIENT.NS,Adani Enterprises Limited,Metals & Mining,Stage 3,watchlist,23.85,1.24,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ADANIGREEN.NS,Adani Green Energy Limited,Power,Stage 2,watchlist,79.07,1.1,False,False,Advancing,Hold / Trend intact
+2026-05-07,ADANIPORTS.NS,Adani Ports and Special Economic Zone Limited,Services,Stage 2,watchlist,37.18,1.08,False,False,Advancing,Hold / Trend intact
+2026-05-07,ADANIPOWER.NS,Adani Power Limited,Power,Stage 2,watchlist,79.34,1.09,False,False,Advancing,Hold / Trend intact
+2026-05-07,ADVENZYMES.NS,Advanced Enzyme Technologies Limited,Healthcare,Stage 3,watchlist,17.04,2.18,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AEGISLOG.NS,Aegis Logistics Ltd.,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,10.35,0.32,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AETHER.NS,Aether Industries Limited,Chemicals,Stage 2,watchlist,66.55,0.92,False,False,Advancing,Hold / Trend intact
+2026-05-07,AFCONS.NS,Afcons Infrastructure Ltd.,Construction,Stage 3,watchlist,11.38,0.55,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AFFLE.NS,Affle (India) Limited,Information Technology,Stage 3,watchlist,24.49,0.72,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AGARWALEYE.NS,Dr. Agarwal's Health Care Ltd.,Healthcare,Stage 1,watchlist,25.94,0.61,True,True,Base Building,Watchlist / Early base
+2026-05-07,AGI.NS,AGI Greenpac Limited,Capital Goods,Stage 3,watchlist,19.73,3.58,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AHLUCONT.NS,Ahluwalia Contracts (India) Limited,Construction,Stage 3,watchlist,12.49,0.62,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,AIAENG.NS,AIA Engineering Limited,Capital Goods,Stage 2,watchlist,45.57,0.35,True,True,Advancing,Hold / Trend intact
+2026-05-07,AIIL.NS,Authum Investment & Infrastructure Ltd.,Financial Services,Stage 3,watchlist,13.54,0.37,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,AJANTPHARM.NS,Ajanta Pharma Limited,Healthcare,Stage 2,watchlist,35.73,1.17,False,False,Advancing,Hold / Trend intact
+2026-05-07,AKUMS.NS,Akums Drugs and Pharmaceuticals Ltd.,Healthcare,Stage 3,watchlist,49.78,0.95,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,AKZOINDIA.NS,Akzo Nobel India Limited,Consumer Durables,Stage 3,watchlist,39.94,0.46,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ALKEM.NS,Alkem Laboratories Limited,Healthcare,Stage 3,watchlist,16.83,1.03,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ALKYLAMINE.NS,Alkyl Amines Chemicals Limited,Chemicals,Stage 3,watchlist,12.23,1.05,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ALLCARGO.NS,Allcargo Logistics Limited,Services,Stage 3,watchlist,21.24,0.6,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ALOKINDS.NS,Alok Industries Limited,Textiles,Stage 4,watchlist,9.06,0.7,True,False,Weak Structure,Exit / Avoid
+2026-05-07,AMBER.NS,Amber Enterprises India Limited,Consumer Durables,Stage 3,watchlist,34.72,0.9,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AMBUJACEM.NS,Ambuja Cements Limited,Construction Materials,Stage 4,watchlist,3.49,1.33,False,False,Weak Structure,Exit / Avoid
+2026-05-07,ANANDRATHI.NS,Anand Rathi Wealth Limited,Financial Services,Stage 2,watchlist,70.31,0.9,False,False,Advancing,Hold / Trend intact
+2026-05-07,ANANTRAJ.NS,Anant Raj Limited,Realty,Stage 3,watchlist,7.55,1.73,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ANGELONE.NS,Angel One Limited,Financial Services,Stage 2,watchlist,47.19,0.48,True,False,Advancing,Hold / Trend intact
+2026-05-07,ANURAS.NS,Anupam Rasayan India Limited,Chemicals,Stage 2,watchlist,63.79,1.5,False,False,Advancing,Hold / Trend intact
+2026-05-07,APARINDS.NS,Apar Industries Limited,Capital Goods,Stage 2,watchlist,62.21,0.88,False,False,Advancing,Hold / Trend intact
+2026-05-07,APLAPOLLO.NS,APL Apollo Tubes Limited,Capital Goods,Stage 3,watchlist,19.15,1.3,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,APLLTD.NS,Alembic Pharmaceuticals Limited,Healthcare,Stage 3,watchlist,41.47,1.37,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,APOLLO.NS,Apollo Micro Systems Limited,Capital Goods,Stage 3,watchlist,38.53,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,APOLLOHOSP.NS,Apollo Hospitals Enterprise Limited,Healthcare,Stage 3,watchlist,47.07,0.77,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,APOLLOTYRE.NS,Apollo Tyres Limited,Automobile and Auto Components,Stage 4,watchlist,5.88,1.15,False,False,Weak Structure,Exit / Avoid
+2026-05-07,APTUS.NS,Aptus Value Housing Finance India Limited,Financial Services,Stage 3,watchlist,14.1,1.18,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ARE&M.NS,Amara Raja Energy & Mobility Ltd.,Automobile and Auto Components,Stage 3,watchlist,11.23,1.83,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ARVIND.NS,Arvind Limited,Textiles,Stage 2,watchlist,75.38,2.31,False,False,Advancing,Hold / Trend intact
+2026-05-07,ARVINDFASN.NS,Arvind Fashions Limited,Consumer Services,Stage 3,watchlist,12.16,2.75,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ASAHIINDIA.NS,Asahi India Glass Limited,Automobile and Auto Components,Stage 3,watchlist,9.19,0.24,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ASHOKA.NS,Ashoka Buildcon Limited,Construction,Stage 4,watchlist,7.78,0.76,True,False,Weak Structure,Exit / Avoid
+2026-05-07,ASHOKLEY.NS,Ashok Leyland Limited,Capital Goods,Stage 3,watchlist,20.95,0.69,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ASIANPAINT.NS,Asian Paints Limited,Consumer Durables,Stage 3,watchlist,14.94,0.51,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ASTERDM.NS,Aster DM Healthcare Limited,Healthcare,Stage 2,watchlist,58.53,1.99,False,False,Advancing,Hold / Trend intact
+2026-05-07,ASTRAL.NS,Astral Limited,Capital Goods,Stage 1,watchlist,21.45,0.85,True,False,Base Building,Watchlist / Early base
+2026-05-07,ASTRAMICRO.NS,Astra Microwave Products Limited,Capital Goods,Stage 2,watchlist,45.82,0.72,True,False,Advancing,Hold / Trend intact
+2026-05-07,ASTRAZEN.NS,AstraZeneca Pharma India Limited,Healthcare,Stage 4,watchlist,24.3,0.79,True,False,Weak Structure,Exit / Avoid
+2026-05-07,ATGL.NS,Adani Total Gas Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,35.11,0.61,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ATUL.NS,Atul Limited,Chemicals,Stage 3,watchlist,22.92,1.72,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AUBANK.NS,AU Small Finance Bank Limited,Financial Services,Stage 2,watchlist,45.27,0.7,True,True,Advancing,Hold / Trend intact
+2026-05-07,AUROPHARMA.NS,Aurobindo Pharma Limited,Healthcare,Stage 2,watchlist,50.52,0.84,True,True,Advancing,Hold / Trend intact
+2026-05-07,AWL.NS,Adani Wilmar Limited,Fast Moving Consumer Goods,Stage 3,watchlist,25.47,0.83,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,AXISBANK.NS,Axis Bank Limited,Financial Services,Stage 3,watchlist,10.44,1.07,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BAJAJ-AUTO.NS,Bajaj Auto Limited,Automobile and Auto Components,Stage 2,watchlist,37.27,1.25,False,False,Advancing,Hold / Trend intact
+2026-05-07,BAJAJCON.NS,Bajaj Consumer Care Limited,Fast Moving Consumer Goods,Stage 2,watchlist,44.21,0.91,False,False,Advancing,Hold / Trend intact
+2026-05-07,BAJAJFINSV.NS,Bajaj Finserv Limited,Financial Services,Stage 3,watchlist,9.4,0.9,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BAJAJHFL.NS,Bajaj Housing Finance Ltd.,Financial Services,Stage 3,watchlist,12.18,0.77,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BAJAJHIND.NS,Bajaj Hindusthan Sugar Limited,Fast Moving Consumer Goods,Stage 3,watchlist,35.05,0.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BAJAJHLDNG.NS,Bajaj Holdings & Investment Limited,Financial Services,Stage 3,watchlist,13.49,0.83,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BAJFINANCE.NS,Bajaj Finance Limited,Financial Services,Stage 3,watchlist,11.31,0.85,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BALAMINES.NS,Balaji Amines Limited,Chemicals,Stage 3,watchlist,34.61,1.69,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BALKRISIND.NS,Balkrishna Industries Limited,Automobile and Auto Components,Stage 3,watchlist,12.52,0.63,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BALMLAWRIE.NS,Balmer Lawrie & Company Limited,Diversified,Stage 3,watchlist,14.0,1.61,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BALRAMCHIN.NS,Balrampur Chini Mills Limited,Fast Moving Consumer Goods,Stage 3,watchlist,20.87,0.9,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BANCOINDIA.NS,Banco Products (I) Limited,Automobile and Auto Components,Stage 3,watchlist,37.73,0.68,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BANDHANBNK.NS,Bandhan Bank Limited,Financial Services,Stage 2,watchlist,37.16,1.9,False,False,Advancing,Hold / Trend intact
+2026-05-07,BANKBARODA.NS,Bank of Baroda,Financial Services,Stage 3,watchlist,9.9,0.79,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BANKINDIA.NS,Bank of India,Financial Services,Stage 3,watchlist,5.18,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BASF.NS,BASF India Limited,Chemicals,Stage 3,watchlist,32.83,1.05,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BATAINDIA.NS,Bata India Limited,Consumer Durables,Stage 4,watchlist,6.46,0.65,True,True,Weak Structure,Exit / Avoid
+2026-05-07,BAYERCROP.NS,Bayer Cropscience Limited,Chemicals,Stage 3,watchlist,10.72,0.72,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BBL.NS,Bharat Bijlee Limited,Capital Goods,Stage 3,watchlist,16.62,1.78,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BBOX.NS,Black Box Limited,Information Technology,Stage 2,watchlist,43.2,2.61,False,False,Advancing,Hold / Trend intact
+2026-05-07,BBTC.NS,Bombay Burmah Trading Corporation Limited,Fast Moving Consumer Goods,Stage 4,watchlist,7.29,0.86,False,False,Weak Structure,Exit / Avoid
+2026-05-07,BDL.NS,Bharat Dynamics Limited,Capital Goods,Stage 3,watchlist,34.52,0.77,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BECTORFOOD.NS,Mrs. Bectors Food Specialities Limited,Fast Moving Consumer Goods,Stage 4,watchlist,8.36,0.71,True,False,Weak Structure,Exit / Avoid
+2026-05-07,BEL.NS,Bharat Electronics Limited,Capital Goods,Stage 3,watchlist,25.23,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BEML.NS,BEML Limited,Capital Goods,Stage 3,watchlist,47.2,1.03,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BERGEPAINT.NS,Berger Paints (I) Limited,Consumer Durables,Stage 3,watchlist,15.97,0.46,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BHARATFORG.NS,Bharat Forge Limited,Capital Goods,Stage 2,watchlist,56.86,1.1,False,False,Advancing,Hold / Trend intact
+2026-05-07,BHARATRAS.NS,Bharat Rasayan Limited,Chemicals,Stage 4,watchlist,17.33,0.6,True,True,Weak Structure,Exit / Avoid
+2026-05-07,BHARTIARTL.NS,Bharti Airtel Limited,Telecommunication,Stage 3,watchlist,19.82,0.79,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BHARTIHEXA.NS,Bharti Hexacom Ltd.,Telecommunication,Stage 4,watchlist,39.37,1.27,False,False,Weak Structure,Exit / Avoid
+2026-05-07,BHEL.NS,Bharat Heavy Electricals Limited,Capital Goods,Stage 2,watchlist,73.13,1.65,False,False,Advancing,Hold / Trend intact
+2026-05-07,BIKAJI.NS,Bikaji Foods International Limited,Fast Moving Consumer Goods,Stage 3,watchlist,24.84,0.86,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BIOCON.NS,Biocon Ltd.,Healthcare,Stage 1,watchlist,37.49,0.84,True,True,Base Building,Watchlist / Early base
+2026-05-07,BIRLACORPN.NS,Birla Corporation Limited,Construction Materials,Stage 3,watchlist,19.66,0.5,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BLS.NS,BLS International Services Ltd.,Consumer Services,Stage 3,watchlist,23.27,0.16,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BLUEDART.NS,Blue Dart Express Limited,Services,Stage 3,watchlist,10.22,0.78,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BLUEJET.NS,Blue Jet Healthcare Ltd.,Healthcare,Stage 3,watchlist,25.23,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BLUESTARCO.NS,Blue Star Limited,Consumer Durables,Stage 3,watchlist,7.43,0.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BOMDYEING.NS,Bombay Dyeing & Mfg Company Limited,Textiles,Stage 3,watchlist,27.33,2.65,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BOROLTD.NS,Borosil Limited,Consumer Durables,Stage 3,watchlist,13.47,0.28,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BORORENEW.NS,BOROSIL RENEWABLES LIMITED,Capital Goods,Stage 3,watchlist,22.16,1.05,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BOSCHLTD.NS,Bosch Limited,Automobile and Auto Components,Stage 3,watchlist,16.62,0.78,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BPCL.NS,Bharat Petroleum Corporation Limited,"Oil, Gas & Consumable Fuels",Stage 4,watchlist,2.43,0.85,True,False,Weak Structure,Exit / Avoid
+2026-05-07,BRIGADE.NS,Brigade Enterprises Limited,Realty,Stage 3,watchlist,12.62,0.3,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,BRITANNIA.NS,Britannia Industries Limited,Fast Moving Consumer Goods,Stage 3,watchlist,12.91,1.13,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,BSE.NS,BSE Ltd.,Financial Services,Stage 2,watchlist,53.15,0.69,True,True,Advancing,Hold / Trend intact
+2026-05-07,BSOFT.NS,BIRLASOFT LIMITED,Information Technology,Stage 4,watchlist,6.71,0.53,True,True,Weak Structure,Exit / Avoid
+2026-05-07,CAMPUS.NS,Campus Activewear Limited,Consumer Durables,Stage 3,watchlist,6.33,0.48,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CAMS.NS,Computer Age Management Services Limited,Financial Services,Stage 3,watchlist,29.71,1.63,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CANBK.NS,Canara Bank,Financial Services,Stage 1,watchlist,11.2,0.71,True,True,Base Building,Watchlist / Early base
+2026-05-07,CANFINHOME.NS,Can Fin Homes Limited,Financial Services,Stage 3,watchlist,16.57,1.17,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CAPLIPOINT.NS,Caplin Point Laboratories Limited,Healthcare,Stage 3,watchlist,23.15,1.19,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CARBORUNIV.NS,Carborundum Universal Limited,Capital Goods,Stage 3,watchlist,54.08,0.88,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CARTRADE.NS,Cartrade Tech Limited,Consumer Services,Stage 4,watchlist,7.37,1.95,False,False,Weak Structure,Exit / Avoid
+2026-05-07,CASTROLIND.NS,Castrol India Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,38.76,0.81,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CCL.NS,CCL Products (India) Limited,Fast Moving Consumer Goods,Stage 2,watchlist,61.79,0.73,True,True,Advancing,Hold / Trend intact
+2026-05-07,CDSL.NS,Central Depository Services (India) Ltd.,Financial Services,Stage 3,watchlist,20.73,0.97,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CEATLTD.NS,Ceat Ltd.,Automobile and Auto Components,Stage 4,watchlist,16.42,2.4,False,False,Weak Structure,Exit / Avoid
+2026-05-07,CENTRALBK.NS,Central Bank of India,Financial Services,Stage 3,watchlist,13.92,0.62,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CENTURYPLY.NS,Century Plyboards (India) Limited,Consumer Durables,Stage 3,watchlist,8.28,1.1,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CERA.NS,Cera Sanitaryware Limited,Consumer Durables,Stage 3,watchlist,36.74,0.47,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CESC.NS,CESC Limited,Power,Stage 2,watchlist,48.26,2.0,False,False,Advancing,Hold / Trend intact
+2026-05-07,CGCL.NS,Capri Global Capital Limited,Financial Services,Stage 3,watchlist,37.34,1.5,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CGPOWER.NS,CG Power and Industrial Solutions Limited,Capital Goods,Stage 2,watchlist,64.41,1.36,False,False,Advancing,Hold / Trend intact
+2026-05-07,CHALET.NS,Chalet Hotels Limited,Consumer Services,Stage 3,watchlist,9.77,0.93,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CHAMBLFERT.NS,Chambal Fertilizers & Chemicals Limited,Chemicals,Stage 3,watchlist,43.64,0.65,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CHEMPLASTS.NS,Chemplast Sanmar Limited,Chemicals,Stage 4,watchlist,19.33,0.53,True,True,Weak Structure,Exit / Avoid
+2026-05-07,CHENNPETRO.NS,Chennai Petroleum Corporation Limited,"Oil, Gas & Consumable Fuels",Stage 2,watchlist,56.01,1.16,False,False,Advancing,Hold / Trend intact
+2026-05-07,CHOICEIN.NS,Choice International Limited,Financial Services,Stage 3,watchlist,8.79,1.12,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CHOLAFIN.NS,Cholamandalam Investment and Finance Company Limited,Financial Services,Stage 3,watchlist,13.7,1.19,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CHOLAHLDNG.NS,Cholamandalam Financial Holdings Limited,Financial Services,Stage 3,watchlist,12.35,1.21,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CIEINDIA.NS,CIE Automotive India Limited,Automobile and Auto Components,Stage 2,watchlist,61.08,1.83,False,False,Advancing,Hold / Trend intact
+2026-05-07,CIPLA.NS,Cipla Limited,Healthcare,Stage 3,watchlist,27.69,0.87,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CLEAN.NS,Clean Science and Technology Limited,Chemicals,Stage 3,watchlist,12.66,0.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CMSINFO.NS,CMS Info Systems Limited,Services,Stage 4,watchlist,19.83,0.77,True,True,Weak Structure,Exit / Avoid
+2026-05-07,COALINDIA.NS,Coal India Limited,"Oil, Gas & Consumable Fuels",Stage 2,watchlist,71.37,1.0,False,False,Advancing,Hold / Trend intact
+2026-05-07,COCHINSHIP.NS,Cochin Shipyard Limited,Capital Goods,Stage 3,watchlist,21.92,1.77,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,COFORGE.NS,Coforge Limited,Information Technology,Stage 4,watchlist,16.21,1.23,False,False,Weak Structure,Exit / Avoid
+2026-05-07,COLPAL.NS,Colgate Palmolive (India) Limited,Fast Moving Consumer Goods,Stage 3,watchlist,13.59,0.74,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CONCOR.NS,Container Corporation of India Limited,Services,Stage 3,watchlist,10.92,0.69,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,CONCORDBIO.NS,Concord Biotech Limited,Healthcare,Stage 4,watchlist,36.08,0.59,True,True,Weak Structure,Exit / Avoid
+2026-05-07,COROMANDEL.NS,Coromandel International Limited,Chemicals,Stage 4,watchlist,10.15,0.9,False,False,Weak Structure,Exit / Avoid
+2026-05-07,CRAFTSMAN.NS,Craftsman Automation Limited,Automobile and Auto Components,Stage 2,watchlist,38.07,2.72,False,False,Advancing,Hold / Trend intact
+2026-05-07,CREDITACC.NS,CREDITACCESS GRAMEEN LIMITED,Financial Services,Stage 3,watchlist,28.02,2.69,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CRISIL.NS,CRISIL Limited,Financial Services,Stage 4,watchlist,8.58,0.99,False,False,Weak Structure,Exit / Avoid
+2026-05-07,CROMPTON.NS,Crompton Greaves Consumer Electricals Limited,Consumer Durables,Stage 3,watchlist,31.39,1.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CSBBANK.NS,CSB Bank Limited,Financial Services,Stage 4,watchlist,17.32,1.41,False,False,Weak Structure,Exit / Avoid
+2026-05-07,CUB.NS,City Union Bank Limited,Financial Services,Stage 3,watchlist,9.87,1.15,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CUMMINSIND.NS,Cummins India Limited,Capital Goods,Stage 2,watchlist,81.86,0.49,True,True,Advancing,Hold / Trend intact
+2026-05-07,CYIENT.NS,Cyient Limited,Information Technology,Stage 3,watchlist,6.08,1.5,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,CYIENTDLM.NS,Cyient DLM Limited,Capital Goods,Stage 3,watchlist,27.07,0.3,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DABUR.NS,Dabur India Limited,Fast Moving Consumer Goods,Stage 3,watchlist,11.3,0.77,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DALBHARAT.NS,Dalmia Bharat Limited,Construction Materials,Stage 3,watchlist,8.17,1.28,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DALMIASUG.NS,Dalmia Bharat Sugar and Industries Limited,Fast Moving Consumer Goods,Stage 2,watchlist,39.34,0.3,True,True,Advancing,Hold / Trend intact
+2026-05-07,DATAMATICS.NS,Datamatics Global Services Limited,Information Technology,Stage 3,watchlist,19.49,0.4,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DATAPATTNS.NS,Data Patterns (India) Limited,Capital Goods,Stage 2,watchlist,53.43,1.0,False,False,Advancing,Hold / Trend intact
+2026-05-07,DBCORP.NS,D.B.Corp Limited,"Media, Entertainment & Publication",Stage 3,watchlist,4.46,0.91,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DBL.NS,Dilip Buildcon Limited,Construction,Stage 3,watchlist,9.61,0.64,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DBREALTY.NS,D B Realty Limited,Realty,Stage 3,watchlist,30.92,1.96,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DCAL.NS,Dishman Carbogen Amcis Limited,Healthcare,Stage 4,watchlist,16.39,0.95,False,True,Weak Structure,Exit / Avoid
+2026-05-07,DCBBANK.NS,DCB Bank Limited,Financial Services,Stage 3,watchlist,25.49,1.18,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DCMSHRIRAM.NS,DCM Shriram Limited,Diversified,Stage 3,watchlist,19.61,1.45,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DCXINDIA.NS,DCX Systems Limited,Capital Goods,Stage 3,watchlist,36.83,0.3,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DEEPAKFERT.NS,Deepak Fertilizers and Petrochemicals Corporation Limited,Chemicals,Stage 3,watchlist,28.26,0.54,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DEEPAKNTR.NS,Deepak Nitrite Limited,Chemicals,Stage 3,watchlist,16.46,1.07,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DELHIVERY.NS,Delhivery Limited,Services,Stage 3,watchlist,27.41,1.13,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DELTACORP.NS,Delta Corp Limited,Consumer Services,Stage 3,watchlist,27.09,2.17,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DEVYANI.NS,Devyani International Limited,Consumer Services,Stage 3,watchlist,18.51,1.94,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DHANUKA.NS,Dhanuka Agritech Limited,Chemicals,Stage 3,watchlist,22.36,0.81,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DISHTV.NS,Dish TV India Limited,"Media, Entertainment & Publication",Stage 3,watchlist,9.42,0.32,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DIVISLAB.NS,Divi's Laboratories Limited,Healthcare,Stage 3,watchlist,21.39,1.1,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DIXON.NS,Dixon Technologies (India) Limited,Consumer Durables,Stage 3,watchlist,38.15,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DLF.NS,DLF Limited,Realty,Stage 3,watchlist,10.87,0.55,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DMART.NS,Avenue Supermarts Limited,Consumer Services,Stage 3,watchlist,27.57,0.68,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DODLA.NS,Dodla Dairy Limited,Fast Moving Consumer Goods,Stage 3,watchlist,18.74,0.95,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DOMS.NS,DOMS Industries Ltd.,Fast Moving Consumer Goods,Stage 3,watchlist,10.89,0.2,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,DRREDDY.NS,Dr. Reddy's Laboratories Limited,Healthcare,Stage 3,watchlist,25.55,1.05,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,DYNAMATECH.NS,Dynamatic Technologies Limited,Capital Goods,Stage 2,watchlist,74.4,1.44,False,False,Advancing,Hold / Trend intact
+2026-05-07,EASEMYTRIP.NS,Easy Trip Planners Limited,Consumer Services,Stage 3,watchlist,12.69,0.38,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ECLERX.NS,eClerx Services Limited,Services,Stage 3,watchlist,8.42,0.95,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,EDELWEISS.NS,Edelweiss Financial Services Limited,Financial Services,Stage 2,watchlist,42.74,1.32,False,False,Advancing,Hold / Trend intact
+2026-05-07,EICHERMOT.NS,Eicher Motors Limited,Automobile and Auto Components,Stage 1,watchlist,20.58,0.74,True,False,Base Building,Watchlist / Early base
+2026-05-07,EIDPARRY.NS,EID Parry India Limited,Chemicals,Stage 3,watchlist,37.58,1.41,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,EIHOTEL.NS,EIH Limited,Consumer Services,Stage 3,watchlist,8.15,0.11,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ELECON.NS,Elecon Engineering Company Limited,Capital Goods,Stage 3,watchlist,45.79,1.24,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ELECTCAST.NS,Electrosteel Castings Limited,Capital Goods,Stage 3,watchlist,26.64,1.12,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ELGIEQUIP.NS,Elgi Equipments Limited,Capital Goods,Stage 2,watchlist,67.93,0.63,True,True,Advancing,Hold / Trend intact
+2026-05-07,EMAMILTD.NS,Emami Limited,Fast Moving Consumer Goods,Stage 4,watchlist,9.56,0.62,True,False,Weak Structure,Exit / Avoid
+2026-05-07,EMCURE.NS,Emcure Pharmaceuticals Ltd.,Healthcare,Stage 2,watchlist,58.1,1.56,False,False,Advancing,Hold / Trend intact
+2026-05-07,EMUDHRA.NS,eMudhra Limited,Information Technology,Stage 3,watchlist,14.12,0.64,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ENDURANCE.NS,Endurance Technologies Limited,Automobile and Auto Components,Stage 3,watchlist,29.49,1.41,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ENGINERSIN.NS,Engineers India Limited,Construction,Stage 2,watchlist,42.87,1.07,False,True,Advancing,Hold / Trend intact
+2026-05-07,EPIGRAL.NS,Epigral Limited,Chemicals,Stage 3,watchlist,18.51,1.46,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,EPL.NS,EPL Limited,Capital Goods,Stage 2,watchlist,48.08,0.78,True,False,Advancing,Hold / Trend intact
+2026-05-07,EQUITASBNK.NS,Equitas Small Finance Bank Limited,Financial Services,Stage 3,watchlist,14.87,1.96,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ERIS.NS,Eris Lifesciences Limited,Healthcare,Stage 3,watchlist,31.3,1.25,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ESABINDIA.NS,Esab India Limited,Capital Goods,Stage 2,watchlist,67.73,2.97,False,False,Advancing,Hold / Trend intact
+2026-05-07,ESCORTS.NS,Escorts Kubota Limited,Capital Goods,Stage 3,watchlist,18.12,0.94,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ETERNAL.NS,Eternal Ltd.,Consumer Services,Stage 3,watchlist,21.97,1.05,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,EXIDEIND.NS,Exide Industries Limited,Automobile and Auto Components,Stage 3,watchlist,24.51,1.85,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,FACT.NS,Fertilizers and Chemicals Travancore Limited,Chemicals,Stage 3,watchlist,31.68,0.12,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,FCL.NS,Fineotex Chemical Limited,Chemicals,Stage 3,watchlist,13.92,2.22,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,FDC.NS,FDC Limited,Healthcare,Stage 3,watchlist,9.68,0.88,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,FEDERALBNK.NS,The Federal Bank Limited,Financial Services,Stage 2,watchlist,33.88,0.93,False,False,Advancing,Hold / Trend intact
+2026-05-07,FINCABLES.NS,Finolex Cables Limited,Capital Goods,Stage 2,watchlist,41.08,0.9,False,False,Advancing,Hold / Trend intact
+2026-05-07,FINEORG.NS,Fine Organic Industries Limited,Chemicals,Stage 3,watchlist,12.27,0.43,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,FINPIPE.NS,Finolex Industries Limited,Capital Goods,Stage 4,watchlist,15.75,0.49,True,True,Weak Structure,Exit / Avoid
+2026-05-07,FIRSTCRY.NS,Brainbees Solutions Ltd.,Consumer Services,Stage 4,watchlist,28.87,0.13,True,True,Weak Structure,Exit / Avoid
+2026-05-07,FIVESTAR.NS,Five-Star Business Finance Limited,Financial Services,Stage 3,watchlist,10.62,0.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,FLUOROCHEM.NS,Gujarat Fluorochemicals Limited,Chemicals,Stage 3,watchlist,43.29,1.88,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,FORCEMOT.NS,FORCE MOTORS LTD,Automobile and Auto Components,Stage 3,watchlist,9.02,1.2,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,FORTIS.NS,Fortis Healthcare Limited,Healthcare,Stage 3,watchlist,16.13,0.66,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,FSL.NS,Firstsource Solutions Limited,Services,Stage 3,watchlist,9.69,1.11,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,FUSION.NS,Fusion Micro Finance Limited,Financial Services,Stage 3,watchlist,15.93,1.4,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GABRIEL.NS,Gabriel India Limited,Automobile and Auto Components,Stage 3,watchlist,40.43,1.69,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GAIL.NS,GAIL (India) Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,9.76,0.6,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GALAXYSURF.NS,Galaxy Surfactants Limited,Chemicals,Stage 4,watchlist,7.42,1.03,False,True,Weak Structure,Exit / Avoid
+2026-05-07,GALLANTT.NS,Gallantt Ispat Limited,Capital Goods,Stage 2,watchlist,71.71,0.19,True,False,Advancing,Hold / Trend intact
+2026-05-07,GARFIBRES.NS,Garware Technical Fibres Limited,Textiles,Stage 3,watchlist,20.85,1.4,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GATEWAY.NS,Gateway Distriparks Limited,Services,Stage 3,watchlist,13.34,1.15,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GENSOL.NS,Gensol Engineering Limited,Services,Stage 4,watchlist,16.11,0.07,True,True,Weak Structure,Exit / Avoid
+2026-05-07,GENUSPOWER.NS,Genus Power Infrastructures Limited,Capital Goods,Stage 3,watchlist,47.16,1.57,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GESHIP.NS,The Great Eastern Shipping Company Limited,Services,Stage 2,watchlist,43.14,1.06,False,False,Advancing,Hold / Trend intact
+2026-05-07,GHCL.NS,GHCL Limited,Chemicals,Stage 3,watchlist,13.6,1.13,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GICRE.NS,General Insurance Corporation of India,Financial Services,Stage 2,watchlist,50.13,0.83,True,False,Advancing,Hold / Trend intact
+2026-05-07,GILLETTE.NS,Gillette India Limited,Fast Moving Consumer Goods,Stage 3,watchlist,8.73,0.93,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GLAND.NS,Gland Pharma Limited,Healthcare,Stage 1,watchlist,33.48,1.51,False,False,Base Building,Watchlist / Early base
+2026-05-07,GLAXO.NS,GlaxoSmithKline Pharmaceuticals Limited,Healthcare,Stage 3,watchlist,16.41,1.52,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GLENMARK.NS,Glenmark Pharmaceuticals Limited,Healthcare,Stage 2,watchlist,52.79,1.12,False,False,Advancing,Hold / Trend intact
+2026-05-07,GMDCLTD.NS,Gujarat Mineral Development Corporation Limited,Metals & Mining,Stage 2,watchlist,79.76,0.87,False,False,Advancing,Hold / Trend intact
+2026-05-07,GMMPFAUDLR.NS,GMM Pfaudler Limited,Capital Goods,Stage 3,watchlist,17.51,0.75,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GMRAIRPORT.NS,GMR Airports Ltd.,Services,Stage 2,watchlist,62.59,0.94,False,True,Advancing,Hold / Trend intact
+2026-05-07,GNFC.NS,Gujarat Narmada Valley Fertilizers and Chemicals Limited,Chemicals,Stage 3,watchlist,18.21,0.94,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GOCOLORS.NS,Go Fashion (India) Limited,Consumer Services,Stage 4,watchlist,2.49,1.26,False,False,Weak Structure,Exit / Avoid
+2026-05-07,GODFRYPHLP.NS,Godfrey Phillips India Limited,Fast Moving Consumer Goods,Stage 3,watchlist,6.47,0.81,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GODIGIT.NS,Go Digit General Insurance Ltd.,Financial Services,Stage 4,watchlist,28.43,0.98,False,True,Weak Structure,Exit / Avoid
+2026-05-07,GODREJAGRO.NS,Godrej Agrovet Limited,Fast Moving Consumer Goods,Stage 3,watchlist,26.78,1.18,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GODREJCP.NS,Godrej Consumer Products Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,5.71,1.11,False,False,Weak Structure,Exit / Avoid
+2026-05-07,GODREJIND.NS,Godrej Industries Limited,Diversified,Stage 3,watchlist,18.38,1.11,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GODREJPROP.NS,Godrej Properties Limited,Realty,Stage 3,watchlist,36.28,0.95,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GOKEX.NS,Gokaldas Exports Limited,Textiles,Stage 3,watchlist,39.65,0.63,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GPIL.NS,Godawari Power And Ispat limited,Capital Goods,Stage 2,watchlist,78.26,1.04,False,False,Advancing,Hold / Trend intact
+2026-05-07,GPPL.NS,Gujarat Pipavav Port Limited,Services,Stage 1,watchlist,14.34,0.92,False,False,Base Building,Watchlist / Early base
+2026-05-07,GRANULES.NS,Granules India Limited,Healthcare,Stage 2,watchlist,53.63,1.66,False,False,Advancing,Hold / Trend intact
+2026-05-07,GRAPHITE.NS,Graphite India Limited,Capital Goods,Stage 2,watchlist,54.38,0.59,True,False,Advancing,Hold / Trend intact
+2026-05-07,GRASIM.NS,Grasim Industries Limited,Construction Materials,Stage 3,watchlist,9.21,0.86,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GRAVITA.NS,Gravita India Limited,Metals & Mining,Stage 3,watchlist,18.64,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GREENLAM.NS,Greenlam Industries Limited,Consumer Durables,Stage 3,watchlist,5.91,0.68,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GREENPANEL.NS,Greenpanel Industries Limited,Consumer Durables,Stage 3,watchlist,20.25,1.84,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GRINDWELL.NS,Grindwell Norton Limited,Capital Goods,Stage 3,watchlist,22.88,1.79,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GRINFRA.NS,G R Infraprojects Limited,Construction,Stage 3,watchlist,26.12,1.25,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GRSE.NS,Garden Reach Shipbuilders & Engineers Limited,Capital Goods,Stage 3,watchlist,38.55,1.9,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GRWRHITECH.NS,Garware Hi-Tech Films Limited,Capital Goods,Stage 2,watchlist,66.88,2.7,False,False,Advancing,Hold / Trend intact
+2026-05-07,GSFC.NS,Gujarat State Fertilizers & Chemicals Limited,Chemicals,Stage 3,watchlist,18.76,0.49,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GSPL.NS,Gujarat State Petronet Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,10.67,0.44,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,GUJALKALI.NS,Gujarat Alkalies and Chemicals Limited,Chemicals,Stage 2,watchlist,53.41,0.12,True,True,Advancing,Hold / Trend intact
+2026-05-07,GUJGASLTD.NS,Gujarat Gas Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,7.94,0.39,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,GULFOILLUB.NS,Gulf Oil Lubricants India Limited,"Oil, Gas & Consumable Fuels",Stage 4,watchlist,3.24,0.65,True,True,Weak Structure,Exit / Avoid
+2026-05-07,GVT&D.NS,GE Vernova T&D India Ltd.,Capital Goods,Stage 2,watchlist,57.87,0.97,False,False,Advancing,Hold / Trend intact
+2026-05-07,HAL.NS,Hindustan Aeronautics Limited,Capital Goods,Stage 3,watchlist,21.57,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HAPPSTMNDS.NS,Happiest Minds Technologies Limited,Information Technology,Stage 4,watchlist,4.28,0.19,True,True,Weak Structure,Exit / Avoid
+2026-05-07,HARSHA.NS,Harsha Engineers International Limited,Capital Goods,Stage 3,watchlist,24.99,3.23,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HATHWAY.NS,Hathway Cable & Datacom Limited,"Media, Entertainment & Publication",Stage 3,watchlist,30.36,0.66,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HATSUN.NS,Hatsun Agro Product Limited,Fast Moving Consumer Goods,Stage 2,watchlist,40.34,0.6,True,True,Advancing,Hold / Trend intact
+2026-05-07,HAVELLS.NS,Havells India Limited,Consumer Durables,Stage 4,watchlist,1.38,1.02,False,False,Weak Structure,Exit / Avoid
+2026-05-07,HBLENGINE.NS,HBL Engineering Ltd.,Capital Goods,Stage 3,watchlist,45.72,1.24,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HCC.NS,Hindustan Construction Company Limited,Construction,Stage 3,watchlist,26.22,1.49,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HCG.NS,Healthcare Global Enterprises Limited,Healthcare,Stage 3,watchlist,24.87,0.6,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HCLTECH.NS,HCL Technologies Limited,Information Technology,Stage 4,watchlist,1.44,1.02,False,False,Weak Structure,Exit / Avoid
+2026-05-07,HDFCAMC.NS,HDFC Asset Management Company Limited,Financial Services,Stage 3,watchlist,16.21,0.66,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HDFCBANK.NS,HDFC Bank Limited,Financial Services,Stage 4,watchlist,17.61,0.65,True,True,Weak Structure,Exit / Avoid
+2026-05-07,HDFCLIFE.NS,HDFC Life Insurance Company Limited,Financial Services,Stage 4,watchlist,7.72,1.8,False,False,Weak Structure,Exit / Avoid
+2026-05-07,HEG.NS,HEG Limited,Capital Goods,Stage 2,watchlist,71.88,0.57,True,False,Advancing,Hold / Trend intact
+2026-05-07,HEIDELBERG.NS,HeidelbergCement India Limited,Construction Materials,Stage 3,watchlist,6.8,0.64,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HEMIPROP.NS,Hemisphere Properties India Limited,Realty,Stage 3,watchlist,9.53,1.37,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HEROMOTOCO.NS,Hero MotoCorp Limited,Automobile and Auto Components,Stage 1,watchlist,22.42,1.37,False,False,Base Building,Watchlist / Early base
+2026-05-07,HFCL.NS,HFCL Limited,Telecommunication,Stage 2,watchlist,83.66,2.36,False,False,Advancing,Hold / Trend intact
+2026-05-07,HGINFRA.NS,H.G. Infra Engineering Limited,Construction,Stage 3,watchlist,37.56,0.22,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HGS.NS,Hinduja Global Solutions Limited,Services,Stage 3,watchlist,28.4,0.27,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HIKAL.NS,Hikal Limited,Healthcare,Stage 3,watchlist,21.82,0.97,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HINDALCO.NS,Hindalco Industries Limited,Metals & Mining,Stage 2,watchlist,68.04,0.67,True,True,Advancing,Hold / Trend intact
+2026-05-07,HINDCOPPER.NS,Hindustan Copper Ltd.,Metals & Mining,Stage 3,watchlist,29.68,0.49,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HINDPETRO.NS,Hindustan Petroleum Corporation Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,10.93,0.65,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HINDUNILVR.NS,Hindustan Unilever Limited,Fast Moving Consumer Goods,Stage 3,watchlist,10.7,0.85,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HINDWAREAP.NS,Hindware Home Innovation Limited,Consumer Durables,Stage 3,watchlist,24.68,0.84,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HINDZINC.NS,Hindustan Zinc Limited,Metals & Mining,Stage 3,watchlist,32.23,1.27,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HLEGLAS.NS,HLE Glascoat Limited,Capital Goods,Stage 3,watchlist,19.03,0.74,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HNDFDS.NS,Hindustan Foods Limited,Fast Moving Consumer Goods,Stage 3,watchlist,43.33,1.4,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HOMEFIRST.NS,Home First Finance Company India Limited,Financial Services,Stage 3,watchlist,18.97,0.49,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,HONASA.NS,Honasa Consumer Ltd.,Fast Moving Consumer Goods,Stage 2,watchlist,53.04,0.48,True,True,Advancing,Hold / Trend intact
+2026-05-07,HONAUT.NS,Honeywell Automation India Limited,Capital Goods,Stage 3,watchlist,22.54,0.67,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HSCL.NS,Himadri Speciality Chemical Limited,Chemicals,Stage 2,watchlist,58.02,3.21,False,False,Advancing,Hold / Trend intact
+2026-05-07,HUDCO.NS,Housing & Urban Development Corporation Limited,Financial Services,Stage 3,watchlist,30.59,1.55,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,HYUNDAI.NS,Hyundai Motor India Ltd.,Automobile and Auto Components,Stage 4,watchlist,7.29,0.8,True,False,Weak Structure,Exit / Avoid
+2026-05-07,ICICIBANK.NS,ICICI Bank Limited,Financial Services,Stage 3,watchlist,9.22,0.87,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ICICIGI.NS,ICICI Lombard General Insurance Company Limited,Financial Services,Stage 3,watchlist,14.96,0.79,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ICICIPRULI.NS,ICICI Prudential Life Insurance Company Limited,Financial Services,Stage 3,watchlist,21.54,0.82,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ICIL.NS,Indo Count Industries Limited,Textiles,Stage 3,watchlist,14.89,0.91,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ICRA.NS,ICRA Limited,Financial Services,Stage 3,watchlist,6.27,0.75,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IDBI.NS,IDBI Bank Limited,Financial Services,Stage 4,watchlist,6.76,0.6,True,True,Weak Structure,Exit / Avoid
+2026-05-07,IDEA.NS,Vodafone Idea Limited,Telecommunication,Stage 3,watchlist,23.94,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IDFCFIRSTB.NS,IDFC First Bank Limited,Financial Services,Stage 3,watchlist,12.67,0.47,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IEX.NS,Indian Energy Exchange Limited,Financial Services,Stage 3,watchlist,22.6,1.11,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IFBIND.NS,IFB Industries Limited,Consumer Durables,Stage 3,watchlist,18.61,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IFCI.NS,IFCI Limited,Financial Services,Stage 3,watchlist,28.33,0.88,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IGIL.NS,International Gemmological Institute (India) Ltd.,Services,Stage 3,watchlist,43.18,0.49,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IGL.NS,Indraprastha Gas Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,8.03,0.77,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IIFL.NS,IIFL Finance Limited,Financial Services,Stage 4,watchlist,16.56,2.26,False,False,Weak Structure,Exit / Avoid
+2026-05-07,IKS.NS,Inventurus Knowledge Solutions Ltd.,Information Technology,Stage 3,watchlist,18.5,2.1,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IMAGICAA.NS,Imagicaaworld Entertainment Limited,Consumer Services,Stage 3,watchlist,8.37,0.59,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IMFA.NS,Indian Metals & Ferro Alloys Limited,Metals & Mining,Stage 2,watchlist,81.87,1.85,False,False,Advancing,Hold / Trend intact
+2026-05-07,INDGN.NS,Indegene Ltd.,Healthcare,Stage 3,watchlist,9.15,1.06,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,INDHOTEL.NS,The Indian Hotels Company Limited,Consumer Services,Stage 3,watchlist,21.57,0.59,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,INDIACEM.NS,The India Cements Limited,Construction Materials,Stage 3,watchlist,8.35,3.93,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,INDIAMART.NS,Indiamart Intermesh Limited,Consumer Services,Stage 4,watchlist,19.04,0.72,True,True,Weak Structure,Exit / Avoid
+2026-05-07,INDIANB.NS,Indian Bank,Financial Services,Stage 1,watchlist,7.43,1.4,False,False,Base Building,Watchlist / Early base
+2026-05-07,INDIGO.NS,InterGlobe Aviation Limited,Services,Stage 3,watchlist,22.55,0.79,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,INDIGOPNTS.NS,Indigo Paints Limited,Consumer Durables,Stage 4,watchlist,7.01,0.74,True,True,Weak Structure,Exit / Avoid
+2026-05-07,INDUSINDBK.NS,IndusInd Bank Ltd.,Financial Services,Stage 3,watchlist,18.65,0.93,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,INDUSTOWER.NS,Indus Towers Limited,Telecommunication,Stage 1,watchlist,15.44,1.25,False,False,Base Building,Watchlist / Early base
+2026-05-07,INFY.NS,Infosys Limited,Information Technology,Stage 4,watchlist,3.23,1.0,False,False,Weak Structure,Exit / Avoid
+2026-05-07,INGERRAND.NS,Ingersoll Rand (India) Limited,Capital Goods,Stage 2,watchlist,60.29,1.92,False,False,Advancing,Hold / Trend intact
+2026-05-07,INOXINDIA.NS,INOX India Ltd.,Capital Goods,Stage 2,watchlist,86.59,1.1,False,False,Advancing,Hold / Trend intact
+2026-05-07,INOXWIND.NS,Inox Wind Limited,Capital Goods,Stage 3,watchlist,18.75,1.21,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,INTELLECT.NS,Intellect Design Arena Limited,Information Technology,Stage 3,watchlist,19.13,1.58,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IOB.NS,Indian Overseas Bank,Financial Services,Stage 3,watchlist,21.73,0.88,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IOC.NS,Indian Oil Corporation Ltd.,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,9.65,0.54,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IONEXCHANG.NS,ION Exchange (India) Limited,Construction,Stage 3,watchlist,35.17,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IPCALAB.NS,IPCA Laboratories Limited,Healthcare,Stage 2,watchlist,56.58,0.88,False,True,Advancing,Hold / Trend intact
+2026-05-07,IRB.NS,IRB Infrastructure Developers Limited,Construction,Stage 3,watchlist,23.12,0.54,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IRCON.NS,Ircon International Limited,Construction,Stage 3,watchlist,16.39,0.69,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IRCTC.NS,Indian Railway Catering And Tourism Corporation Ltd.,Consumer Services,Stage 3,watchlist,9.51,0.62,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,IREDA.NS,Indian Renewable Energy Development Agency Ltd.,Financial Services,Stage 3,watchlist,23.36,0.64,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,IRFC.NS,Indian Railway Finance Corporation Limited,Financial Services,Stage 4,watchlist,9.55,0.63,True,False,Weak Structure,Exit / Avoid
+2026-05-07,ISGEC.NS,Isgec Heavy Engineering Limited,Construction,Stage 3,watchlist,44.39,0.67,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ITC.NS,ITC Limited,Fast Moving Consumer Goods,Stage 3,watchlist,36.13,0.87,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ITCHOTELS.NS,ITC Hotels Ltd.,Consumer Services,Stage 4,watchlist,5.99,0.57,True,True,Weak Structure,Exit / Avoid
+2026-05-07,ITDC.NS,India Tourism Development Corporation Limited,Consumer Services,Stage 3,watchlist,10.51,0.07,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ITI.NS,ITI Limited,Telecommunication,Stage 3,watchlist,30.33,0.12,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,J&KBANK.NS,The Jammu & Kashmir Bank Limited,Financial Services,Stage 2,watchlist,42.34,0.81,True,True,Advancing,Hold / Trend intact
+2026-05-07,JAICORPLTD.NS,Jai Corp Limited,Capital Goods,Stage 3,watchlist,45.38,0.62,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JAMNAAUTO.NS,Jamna Auto Industries Limited,Automobile and Auto Components,Stage 3,watchlist,23.94,0.65,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JAYNECOIND.NS,Jayaswal Neco Industries Limited,Capital Goods,Stage 2,watchlist,79.31,1.72,False,False,Advancing,Hold / Trend intact
+2026-05-07,JBCHEPHARM.NS,JB Chemicals & Pharmaceuticals Limited,Healthcare,Stage 2,watchlist,46.05,0.74,True,True,Advancing,Hold / Trend intact
+2026-05-07,JBMA.NS,JBM Auto Ltd.,Automobile and Auto Components,Stage 3,watchlist,25.13,0.22,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JINDALSAW.NS,Jindal Saw Limited,Capital Goods,Stage 2,watchlist,60.44,0.46,True,True,Advancing,Hold / Trend intact
+2026-05-07,JINDALSTEL.NS,Jindal Steel & Power Limited,Metals & Mining,Stage 2,watchlist,51.15,0.96,False,False,Advancing,Hold / Trend intact
+2026-05-07,JINDWORLD.NS,Jindal Worldwide Limited,Textiles,Stage 3,watchlist,21.84,0.4,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JIOFIN.NS,Jio Financial Services Limited,Financial Services,Stage 3,watchlist,21.55,1.29,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JISLJALEQS.NS,Jain Irrigation Systems Limited,Capital Goods,Stage 3,watchlist,37.59,0.79,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JKCEMENT.NS,J.K. Cement Ltd.,Construction Materials,Stage 3,watchlist,21.94,1.2,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JKIL.NS,J.Kumar Infraprojects Limited,Construction,Stage 4,watchlist,8.73,0.51,True,True,Weak Structure,Exit / Avoid
+2026-05-07,JKLAKSHMI.NS,JK Lakshmi Cement Limited,Construction Materials,Stage 3,watchlist,8.53,0.39,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JKPAPER.NS,JK Paper Limited,Forest Materials,Stage 3,watchlist,50.34,0.87,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JKTYRE.NS,JK Tyre & Industries Limited,Automobile and Auto Components,Stage 4,watchlist,17.78,0.76,True,True,Weak Structure,Exit / Avoid
+2026-05-07,JLHL.NS,Jupiter Life Line Hospitals Limited,Healthcare,Stage 3,watchlist,35.45,1.64,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JMFINANCIL.NS,JM Financial Limited,Financial Services,Stage 3,watchlist,40.35,0.92,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JPPOWER.NS,Jaiprakash Power Ventures Limited,Power,Stage 3,watchlist,31.49,1.05,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JSL.NS,Jindal Stainless Limited,Metals & Mining,Stage 1,watchlist,20.91,0.67,True,True,Base Building,Watchlist / Early base
+2026-05-07,JSWENERGY.NS,JSW Energy Limited,Power,Stage 2,watchlist,70.32,0.92,False,False,Advancing,Hold / Trend intact
+2026-05-07,JSWHL.NS,JSW Holdings Limited,Financial Services,Stage 4,watchlist,6.0,0.6,True,True,Weak Structure,Exit / Avoid
+2026-05-07,JSWINFRA.NS,JSW Infrastructure Ltd.,Services,Stage 3,watchlist,22.45,0.97,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JSWSTEEL.NS,JSW Steel Limited,Metals & Mining,Stage 2,watchlist,45.22,0.82,True,False,Advancing,Hold / Trend intact
+2026-05-07,JTLIND.NS,JTL INDUSTRIES LIMITED,Capital Goods,Stage 3,watchlist,28.23,1.17,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JUBLFOOD.NS,Jubilant Foodworks Limited,Consumer Services,Stage 3,watchlist,11.48,0.57,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JUBLINGREA.NS,Jubilant Ingrevia Limited,Chemicals,Stage 3,watchlist,32.75,1.12,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JUBLPHARMA.NS,Jubilant Pharmova Limited,Healthcare,Stage 3,watchlist,15.65,0.71,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JUSTDIAL.NS,Just Dial Limited,Consumer Services,Stage 4,watchlist,5.3,0.7,True,False,Weak Structure,Exit / Avoid
+2026-05-07,JWL.NS,Jupiter Wagons Limited,Capital Goods,Stage 3,watchlist,39.0,0.52,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,JYOTHYLAB.NS,Jyothy Labs Limited,Fast Moving Consumer Goods,Stage 3,watchlist,8.62,1.21,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,JYOTICNC.NS,Jyoti CNC Automation Ltd.,Capital Goods,Stage 3,watchlist,29.65,0.57,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KAJARIACER.NS,Kajaria Ceramics Limited,Consumer Durables,Stage 3,watchlist,35.42,1.37,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KALYANKJIL.NS,Kalyan Jewellers India Limited,Consumer Durables,Stage 3,watchlist,18.0,0.65,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KANSAINER.NS,Kansai Nerolac Paints Limited,Consumer Durables,Stage 3,watchlist,10.11,1.51,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KARURVYSYA.NS,Karur Vysya Bank Limited,Financial Services,Stage 3,watchlist,13.99,0.76,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KAYNES.NS,Kaynes Technology India Limited,Capital Goods,Stage 3,watchlist,33.26,0.67,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KDDL.NS,KDDL Limited,Consumer Durables,Stage 3,watchlist,9.63,1.14,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KEC.NS,KEC International Limited,Capital Goods,Stage 3,watchlist,26.0,1.05,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KEI.NS,KEI Industries Limited,Capital Goods,Stage 2,watchlist,53.98,1.21,False,False,Advancing,Hold / Trend intact
+2026-05-07,KFINTECH.NS,Kfin Technologies Limited,Financial Services,Stage 4,watchlist,6.8,1.58,False,False,Weak Structure,Exit / Avoid
+2026-05-07,KIMS.NS,Krishna Institute of Medical Sciences Limited,Healthcare,Stage 3,watchlist,34.34,0.96,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KIRLOSBROS.NS,Kirloskar Brothers Limited,Capital Goods,Stage 3,watchlist,24.95,0.51,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KIRLOSENG.NS,Kirloskar Oil Engines Limited,Capital Goods,Stage 2,watchlist,53.0,0.92,False,False,Advancing,Hold / Trend intact
+2026-05-07,KIRLOSIND.NS,Kirloskar Industries Limited,Capital Goods,Stage 3,watchlist,45.2,0.6,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KKCL.NS,Kewal Kiran Clothing Limited,Textiles,Stage 3,watchlist,8.7,0.67,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KNRCON.NS,KNR Constructions Limited,Construction,Stage 3,watchlist,27.13,0.66,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KOLTEPATIL.NS,Kolte - Patil Developers Limited,Realty,Stage 3,watchlist,16.78,0.19,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KOTAKBANK.NS,Kotak Mahindra Bank Limited,Financial Services,Stage 3,watchlist,8.86,1.13,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KPIGREEN.NS,KPI Green Energy Limited,Power,Stage 3,watchlist,36.68,1.26,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KPIL.NS,Kalpataru Projects International Limited,Construction,Stage 3,watchlist,28.53,0.87,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KPITTECH.NS,KPIT Technologies Limited,Information Technology,Stage 3,watchlist,24.01,1.46,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KPRMILL.NS,K.P.R. Mill Ltd.,Textiles,Stage 3,watchlist,40.39,0.47,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KRBL.NS,KRBL Limited,Fast Moving Consumer Goods,Stage 3,watchlist,12.83,0.72,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KSB.NS,Ksb Limited,Capital Goods,Stage 2,watchlist,57.7,0.53,True,True,Advancing,Hold / Trend intact
+2026-05-07,KSCL.NS,Kaveri Seed Company Limited,Fast Moving Consumer Goods,Stage 3,watchlist,26.3,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,KSL.NS,Kalyani Steels Limited,Capital Goods,Stage 3,watchlist,22.15,1.17,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,KTKBANK.NS,The Karnataka Bank Limited,Financial Services,Stage 2,watchlist,72.28,0.72,True,True,Advancing,Hold / Trend intact
+2026-05-07,LALPATHLAB.NS,Dr. Lal Path Labs Ltd.,Healthcare,Stage 3,watchlist,31.75,2.42,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,LAOPALA.NS,La Opala RG Limited,Consumer Durables,Stage 3,watchlist,18.32,0.7,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,LATENTVIEW.NS,Latent View Analytics Limited,Information Technology,Stage 4,watchlist,6.8,0.21,True,True,Weak Structure,Exit / Avoid
+2026-05-07,LAURUSLABS.NS,Laurus Labs Limited,Healthcare,Stage 2,watchlist,61.64,1.32,False,False,Advancing,Hold / Trend intact
+2026-05-07,LEMONTREE.NS,Lemon Tree Hotels Limited,Consumer Services,Stage 4,watchlist,16.21,0.41,True,False,Weak Structure,Exit / Avoid
+2026-05-07,LGBBROSLTD.NS,LG Balakrishnan & Bros Limited,Automobile and Auto Components,Stage 1,watchlist,14.86,1.18,False,False,Base Building,Watchlist / Early base
+2026-05-07,LICHSGFIN.NS,LIC Housing Finance Limited,Financial Services,Stage 3,watchlist,14.7,0.81,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,LICI.NS,Life Insurance Corporation Of India,Financial Services,Stage 3,watchlist,7.97,0.7,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,LINDEINDIA.NS,Linde India Limited,Chemicals,Stage 2,watchlist,35.47,1.12,False,False,Advancing,Hold / Trend intact
+2026-05-07,LLOYDSME.NS,Lloyds Metals And Energy Limited,Metals & Mining,Stage 2,watchlist,64.85,1.14,False,False,Advancing,Hold / Trend intact
+2026-05-07,LODHA.NS,Macrotech Developers Limited,Realty,Stage 4,watchlist,2.15,0.86,False,False,Weak Structure,Exit / Avoid
+2026-05-07,LT.NS,Larsen & Toubro Limited,Construction,Stage 3,watchlist,13.09,0.74,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,LTF.NS,L&T Finance Ltd.,Financial Services,Stage 2,watchlist,33.39,0.75,True,True,Advancing,Hold / Trend intact
+2026-05-07,LTFOODS.NS,LT Foods Ltd.,Fast Moving Consumer Goods,Stage 3,watchlist,28.34,0.13,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,LTTS.NS,L&T Technology Services Ltd.,Information Technology,Stage 3,watchlist,23.67,0.45,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,LUPIN.NS,Lupin Limited,Healthcare,Stage 2,watchlist,42.43,1.14,False,False,Advancing,Hold / Trend intact
+2026-05-07,LUXIND.NS,Lux Industries Limited,Textiles,Stage 2,watchlist,62.44,0.65,True,True,Advancing,Hold / Trend intact
+2026-05-07,LXCHEM.NS,Laxmi Organic Industries Limited,Chemicals,Stage 3,watchlist,13.3,0.97,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,M&M.NS,Mahindra & Mahindra Limited,Automobile and Auto Components,Stage 3,watchlist,22.33,1.0,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,M&MFIN.NS,Mahindra & Mahindra Financial Services Limited,Financial Services,Stage 3,watchlist,8.02,2.14,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MAHABANK.NS,Bank of Maharashtra,Financial Services,Stage 2,watchlist,43.36,0.85,True,False,Advancing,Hold / Trend intact
+2026-05-07,MAHLIFE.NS,Mahindra Lifespace Developers Limited,Realty,Stage 4,watchlist,10.93,1.32,False,False,Weak Structure,Exit / Avoid
+2026-05-07,MAHSCOOTER.NS,Maharashtra Scooters Limited,Financial Services,Stage 4,watchlist,10.0,0.68,True,True,Weak Structure,Exit / Avoid
+2026-05-07,MAHSEAMLES.NS,Maharashtra Seamless Limited,Capital Goods,Stage 3,watchlist,37.96,0.67,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MANAPPURAM.NS,Manappuram Finance Limited,Financial Services,Stage 3,watchlist,22.01,0.88,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MANINFRA.NS,Man Infraconstruction Limited,Construction,Stage 3,watchlist,28.63,2.59,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MANKIND.NS,Mankind Pharma Limited,Healthcare,Stage 3,watchlist,34.84,0.79,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MANYAVAR.NS,Vedant Fashions Limited,Consumer Services,Stage 4,watchlist,5.38,0.48,True,True,Weak Structure,Exit / Avoid
+2026-05-07,MAPMYINDIA.NS,C.E. Info Systems Limited,Information Technology,Stage 4,watchlist,7.64,0.56,True,True,Weak Structure,Exit / Avoid
+2026-05-07,MARICO.NS,Marico Limited,Fast Moving Consumer Goods,Stage 2,watchlist,28.94,1.06,False,False,Advancing,Hold / Trend intact
+2026-05-07,MARKSANS.NS,Marksans Pharma Limited,Healthcare,Stage 3,watchlist,24.21,1.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MARUTI.NS,Maruti Suzuki India Limited,Automobile and Auto Components,Stage 4,watchlist,9.17,0.93,False,False,Weak Structure,Exit / Avoid
+2026-05-07,MASFIN.NS,MAS Financial Services Limited,Financial Services,Stage 2,watchlist,35.92,1.84,False,False,Advancing,Hold / Trend intact
+2026-05-07,MASTEK.NS,Mastek Limited,Information Technology,Stage 4,watchlist,6.12,0.56,True,False,Weak Structure,Exit / Avoid
+2026-05-07,MAXHEALTH.NS,Max Healthcare Institute Limited,Healthcare,Stage 3,watchlist,33.91,0.59,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MAZDOCK.NS,Mazagon Dock Shipbuilders Limited,Capital Goods,Stage 3,watchlist,20.92,0.85,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MCX.NS,Multi Commodity Exchange of India Limited,Financial Services,Stage 2,watchlist,45.83,0.6,True,True,Advancing,Hold / Trend intact
+2026-05-07,MEDANTA.NS,Global Health Limited,Healthcare,Stage 3,watchlist,28.42,0.96,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MEDPLUS.NS,Medplus Health Services Limited,Consumer Services,Stage 2,watchlist,62.94,0.51,True,True,Advancing,Hold / Trend intact
+2026-05-07,METROBRAND.NS,Metro Brands Limited,Consumer Durables,Stage 3,watchlist,16.07,0.5,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,METROPOLIS.NS,Metropolis Healthcare Limited,Healthcare,Stage 3,watchlist,31.55,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MFSL.NS,Max Financial Services Limited,Financial Services,Stage 3,watchlist,25.83,0.58,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MGL.NS,Mahanagar Gas Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,29.7,0.4,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MHRIL.NS,Mahindra Holidays & Resorts India Limited,Consumer Services,Stage 4,watchlist,3.23,1.44,False,False,Weak Structure,Exit / Avoid
+2026-05-07,MIDHANI.NS,Mishra Dhatu Nigam Limited,Capital Goods,Stage 3,watchlist,38.73,1.37,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MINDACORP.NS,Minda Corporation Limited,Automobile and Auto Components,Stage 1,watchlist,11.31,0.97,False,False,Base Building,Watchlist / Early base
+2026-05-07,MMTC.NS,MMTC Limited,Services,Stage 3,watchlist,35.29,0.24,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MOTHERSON.NS,Samvardhana Motherson International Limited,Automobile and Auto Components,Stage 2,watchlist,45.39,0.72,True,False,Advancing,Hold / Trend intact
+2026-05-07,MOTILALOFS.NS,Motilal Oswal Financial Services Limited,Financial Services,Stage 3,watchlist,10.29,1.44,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MPHASIS.NS,MphasiS Limited,Information Technology,Stage 4,watchlist,14.81,0.95,False,True,Weak Structure,Exit / Avoid
+2026-05-07,MRF.NS,MRF Limited,Automobile and Auto Components,Stage 4,watchlist,22.1,1.09,False,False,Weak Structure,Exit / Avoid
+2026-05-07,MRPL.NS,Mangalore Refinery and Petrochemicals Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,6.56,0.6,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,MSTCLTD.NS,Mstc Limited,Services,Stage 3,watchlist,10.92,0.74,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MSUMI.NS,Motherson Sumi Wiring India Limited,Automobile and Auto Components,Stage 3,watchlist,9.05,1.53,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,MTARTECH.NS,Mtar Technologies Limited,Capital Goods,Stage 2,watchlist,54.18,1.53,False,False,Advancing,Hold / Trend intact
+2026-05-07,MUTHOOTFIN.NS,Muthoot Finance Limited,Financial Services,Stage 1,watchlist,24.54,0.49,True,True,Base Building,Watchlist / Early base
+2026-05-07,NAM-INDIA.NS,Nippon Life India Asset Management Limited,Financial Services,Stage 2,watchlist,52.79,1.41,False,False,Advancing,Hold / Trend intact
+2026-05-07,NATCOPHARM.NS,Natco Pharma Limited,Healthcare,Stage 2,watchlist,78.25,0.47,True,True,Advancing,Hold / Trend intact
+2026-05-07,NATIONALUM.NS,National Aluminium Company Limited,Metals & Mining,Stage 2,watchlist,65.6,0.65,True,True,Advancing,Hold / Trend intact
+2026-05-07,NAUKRI.NS,Info Edge (India) Limited,Consumer Services,Stage 4,watchlist,5.52,0.67,True,True,Weak Structure,Exit / Avoid
+2026-05-07,NAVA.NS,NAVA LIMITED,Power,Stage 3,watchlist,41.71,0.5,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NAVINFLUOR.NS,Navin Fluorine International Limited,Chemicals,Stage 2,watchlist,44.75,2.17,False,False,Advancing,Hold / Trend intact
+2026-05-07,NAVNETEDUL.NS,Navneet Education Limited,"Media, Entertainment & Publication",Stage 3,watchlist,4.26,0.83,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NAZARA.NS,Nazara Technologies Limited,"Media, Entertainment & Publication",Stage 3,watchlist,11.98,0.9,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NBCC.NS,NBCC (India) Ltd.,Construction,Stage 3,watchlist,25.95,0.82,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,NCC.NS,NCC Limited,Construction,Stage 3,watchlist,19.44,0.93,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NEOGEN.NS,Neogen Chemicals Limited,Chemicals,Stage 2,watchlist,61.45,0.66,True,False,Advancing,Hold / Trend intact
+2026-05-07,NESCO.NS,Nesco Limited,Services,Stage 3,watchlist,24.48,1.02,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NESTLEIND.NS,Nestle India Limited,Fast Moving Consumer Goods,Stage 2,watchlist,45.09,1.26,False,False,Advancing,Hold / Trend intact
+2026-05-07,NETWEB.NS,Netweb Technologies India Limited,Information Technology,Stage 2,watchlist,57.0,0.85,False,True,Advancing,Hold / Trend intact
+2026-05-07,NETWORK18.NS,Network18 Media & Investments Limited,"Media, Entertainment & Publication",Stage 4,watchlist,10.23,0.64,True,True,Weak Structure,Exit / Avoid
+2026-05-07,NEULANDLAB.NS,Neuland Laboratories Limited,Healthcare,Stage 3,watchlist,32.22,1.22,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NEWGEN.NS,Newgen Software Technologies Limited,Information Technology,Stage 3,watchlist,20.11,0.82,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,NFL.NS,National Fertilizers Limited,Chemicals,Stage 3,watchlist,13.88,0.37,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,NH.NS,Narayana Hrudayalaya Ltd.,Healthcare,Stage 3,watchlist,18.27,0.98,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NHPC.NS,NHPC Limited,Power,Stage 1,watchlist,55.1,0.87,False,False,Base Building,Watchlist / Early base
+2026-05-07,NIACL.NS,The New India Assurance Company Limited,Financial Services,Stage 3,watchlist,30.65,0.22,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NIITMTS.NS,NIIT Learning Systems Limited,Consumer Services,Stage 4,watchlist,1.8,0.9,False,True,Weak Structure,Exit / Avoid
+2026-05-07,NIVABUPA.NS,Niva Bupa Health Insurance Company Ltd.,Financial Services,Stage 3,watchlist,24.17,0.63,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,NLCINDIA.NS,NLC India Ltd.,Power,Stage 2,watchlist,80.03,1.44,False,False,Advancing,Hold / Trend intact
+2026-05-07,NMDC.NS,NMDC Limited,Metals & Mining,Stage 2,watchlist,77.37,0.88,False,False,Advancing,Hold / Trend intact
+2026-05-07,NOCIL.NS,NOCIL Limited,Chemicals,Stage 3,watchlist,47.9,0.17,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,NSLNISP.NS,NMDC Steel Limited,Metals & Mining,Stage 3,watchlist,23.26,0.98,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NTPC.NS,NTPC Limited,Power,Stage 2,watchlist,42.88,0.62,True,True,Advancing,Hold / Trend intact
+2026-05-07,NTPCGREEN.NS,NTPC Green Energy Ltd.,Power,Stage 2,watchlist,57.28,0.55,True,False,Advancing,Hold / Trend intact
+2026-05-07,NUCLEUS.NS,Nucleus Software Exports Limited,Information Technology,Stage 3,watchlist,16.1,0.33,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,NUVAMA.NS,Nuvama Wealth Management Ltd.,Financial Services,Stage 3,watchlist,38.74,1.19,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NUVOCO.NS,Nuvoco Vistas Corporation Limited,Construction Materials,Stage 3,watchlist,24.23,1.71,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,NYKAA.NS,FSN E-Commerce Ventures Limited,Consumer Services,Stage 2,watchlist,39.97,0.72,True,True,Advancing,Hold / Trend intact
+2026-05-07,OBEROIRLTY.NS,Oberoi Realty Limited,Realty,Stage 3,watchlist,25.63,0.61,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,OFSS.NS,Oracle Financial Services Software Limited,Information Technology,Stage 2,watchlist,30.11,1.44,False,False,Advancing,Hold / Trend intact
+2026-05-07,OIL.NS,Oil India Limited,"Oil, Gas & Consumable Fuels",Stage 1,watchlist,16.81,0.9,False,True,Base Building,Watchlist / Early base
+2026-05-07,OLAELEC.NS,Ola Electric Mobility Ltd.,Automobile and Auto Components,Stage 3,watchlist,26.99,0.41,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,OLECTRA.NS,Olectra Greentech Limited,Automobile and Auto Components,Stage 3,watchlist,42.46,0.53,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,ONESOURCE.NS,Onesource Specialty Pharma Ltd.,Healthcare,Stage 3,watchlist,25.42,0.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ONGC.NS,Oil & Natural Gas Corporation Limited,"Oil, Gas & Consumable Fuels",Stage 2,watchlist,31.46,0.79,True,True,Advancing,Hold / Trend intact
+2026-05-07,ORIENTELEC.NS,Orient Electric Limited,Consumer Durables,Stage 3,watchlist,28.49,1.27,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ORISSAMINE.NS,The Orissa Minerals Development Company Limited,Metals & Mining,Stage 3,watchlist,25.13,0.63,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PAGEIND.NS,Page Industries Limited,Textiles,Stage 3,watchlist,26.71,0.67,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PAISALO.NS,Paisalo Digital Limited,Financial Services,Stage 2,watchlist,78.98,1.38,False,False,Advancing,Hold / Trend intact
+2026-05-07,PARADEEP.NS,Paradeep Phosphates Limited,Chemicals,Stage 3,watchlist,14.24,0.86,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PATANJALI.NS,Patanjali Foods Ltd.,Fast Moving Consumer Goods,Stage 4,watchlist,31.69,0.84,True,False,Weak Structure,Exit / Avoid
+2026-05-07,PATELENG.NS,Patel Engineering Limited,Construction,Stage 3,watchlist,29.79,0.76,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PAYTM.NS,One 97 Communications Limited,Financial Services,Stage 3,watchlist,25.49,1.68,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PCBL.NS,PCBL LIMITED,Chemicals,Stage 3,watchlist,28.14,0.51,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PDSL.NS,PDS Limited,Textiles,Stage 4,watchlist,2.0,0.29,True,True,Weak Structure,Exit / Avoid
+2026-05-07,PERSISTENT.NS,Persistent Systems Limited,Information Technology,Stage 3,watchlist,15.57,0.75,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PETRONET.NS,Petronet LNG Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,9.47,0.71,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PFC.NS,Power Finance Corporation Limited,Financial Services,Stage 2,watchlist,33.74,0.78,True,False,Advancing,Hold / Trend intact
+2026-05-07,PFIZER.NS,Pfizer Limited,Healthcare,Stage 3,watchlist,36.68,1.01,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PGEL.NS,PG Electroplast Limited,Consumer Durables,Stage 3,watchlist,21.03,0.49,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PGHH.NS,Procter & Gamble Hygiene and Health Care Limited,Fast Moving Consumer Goods,Stage 4,watchlist,8.73,0.52,True,True,Weak Structure,Exit / Avoid
+2026-05-07,PHOENIXLTD.NS,The Phoenix Mills Limited,Realty,Stage 2,watchlist,55.99,0.89,False,True,Advancing,Hold / Trend intact
+2026-05-07,PIDILITIND.NS,Pidilite Industries Limited,Chemicals,Stage 3,watchlist,18.08,0.95,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PIIND.NS,PI Industries Limited,Chemicals,Stage 3,watchlist,25.87,1.06,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PILANIINVS.NS,Pilani Investment and Industries Corporation Limited,Financial Services,Stage 3,watchlist,14.27,0.52,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PNB.NS,Punjab National Bank,Financial Services,Stage 3,watchlist,9.81,1.06,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PNBHOUSING.NS,PNB Housing Finance Limited,Financial Services,Stage 3,watchlist,26.08,0.94,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PNC.NS,Pritish Nandy Communications Limited,"Media, Entertainment & Publication",Stage 4,watchlist,2.79,0.36,True,True,Weak Structure,Exit / Avoid
+2026-05-07,PNCINFRA.NS,PNC Infratech Limited,Construction,Stage 3,watchlist,11.86,0.44,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,POLICYBZR.NS,PB Fintech Limited,Financial Services,Stage 3,watchlist,23.53,0.97,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,POLYCAB.NS,Polycab India Limited,Capital Goods,Stage 2,watchlist,51.2,1.03,False,False,Advancing,Hold / Trend intact
+2026-05-07,POLYMED.NS,Poly Medicure Limited,Healthcare,Stage 3,watchlist,24.47,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,POONAWALLA.NS,Poonawalla Fincorp Limited,Financial Services,Stage 3,watchlist,12.22,1.42,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,POWERGRID.NS,Power Grid Corporation of India Limited,Power,Stage 2,watchlist,52.0,0.53,True,True,Advancing,Hold / Trend intact
+2026-05-07,POWERINDIA.NS,Hitachi Energy India Limited,Capital Goods,Stage 2,watchlist,51.07,0.86,False,False,Advancing,Hold / Trend intact
+2026-05-07,POWERMECH.NS,Power Mech Projects Limited,Construction,Stage 3,watchlist,11.88,0.75,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PPLPHARMA.NS,Piramal Pharma Ltd.,Healthcare,Stage 3,watchlist,36.0,1.86,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PRAJIND.NS,Praj Industries Limited,Capital Goods,Stage 3,watchlist,51.09,0.6,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PREMIERENE.NS,Premier Energies Ltd.,Capital Goods,Stage 3,watchlist,35.05,0.63,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PRESTIGE.NS,Prestige Estates Projects Ltd.,Realty,Stage 3,watchlist,10.94,0.59,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PRICOLLTD.NS,Pricol Limited,Automobile and Auto Components,Stage 3,watchlist,36.66,0.86,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PRINCEPIPE.NS,Prince Pipes And Fittings Limited,Capital Goods,Stage 3,watchlist,28.14,0.8,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PRIVISCL.NS,Privi Speciality Chemicals Limited,Chemicals,Stage 2,watchlist,62.76,0.82,True,False,Advancing,Hold / Trend intact
+2026-05-07,PRSMJOHNSN.NS,Prism Johnson Limited,Construction Materials,Stage 3,watchlist,33.94,1.49,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PRUDENT.NS,Prudent Corporate Advisory Services Limited,Financial Services,Stage 3,watchlist,13.99,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PSB.NS,Punjab & Sind Bank,Financial Services,Stage 3,watchlist,6.88,0.81,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PTCIL.NS,PTC Industries Limited,Capital Goods,Stage 3,watchlist,16.8,0.75,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,PURVA.NS,Puravankara Limited,Realty,Stage 3,watchlist,6.92,0.24,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,PVRINOX.NS,PVR INOX Limited,"Media, Entertainment & Publication",Stage 3,watchlist,35.84,1.27,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,QUESS.NS,Quess Corp Limited,Services,Stage 3,watchlist,7.86,3.65,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RACE.NS,Race Eco Chain Limited,Utilities,Stage 3,watchlist,24.49,0.15,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RADICO.NS,Radico Khaitan Limited,Fast Moving Consumer Goods,Stage 2,watchlist,53.81,0.89,False,False,Advancing,Hold / Trend intact
+2026-05-07,RAILTEL.NS,Railtel Corporation Of India Limited,Telecommunication,Stage 3,watchlist,21.42,0.62,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RAIN.NS,Rain Industries Limited,Chemicals,Stage 3,watchlist,13.63,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RAINBOW.NS,Rainbow Childrens Medicare Limited,Healthcare,Stage 3,watchlist,44.87,0.81,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RAJESHEXPO.NS,Rajesh Exports Limited,Consumer Durables,Stage 4,watchlist,0.0,0.4,True,True,Weak Structure,Exit / Avoid
+2026-05-07,RAJRATAN.NS,Rajratan Global Wire Limited,Automobile and Auto Components,Stage 2,watchlist,36.35,1.04,False,False,Advancing,Hold / Trend intact
+2026-05-07,RALLIS.NS,Rallis India Limited,Chemicals,Stage 3,watchlist,13.35,1.68,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RAMCOCEM.NS,The Ramco Cements Limited,Construction Materials,Stage 4,watchlist,6.53,1.39,False,False,Weak Structure,Exit / Avoid
+2026-05-07,RAMKY.NS,Ramky Infrastructure Limited,Construction,Stage 3,watchlist,20.71,0.11,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RATEGAIN.NS,Rategain Travel Technologies Limited,Information Technology,Stage 3,watchlist,19.0,1.21,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RATNAMANI.NS,Ratnamani Metals & Tubes Limited,Capital Goods,Stage 3,watchlist,54.74,1.7,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RAYMOND.NS,Raymond Limited,Textiles,Stage 3,watchlist,27.06,2.19,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RBA.NS,Restaurant Brands Asia Limited,Consumer Services,Stage 3,watchlist,13.62,1.22,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RBLBANK.NS,RBL Bank Limited,Financial Services,Stage 2,watchlist,46.79,1.55,False,False,Advancing,Hold / Trend intact
+2026-05-07,RCF.NS,Rashtriya Chemicals and Fertilizers Limited,Chemicals,Stage 3,watchlist,27.51,0.25,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RECLTD.NS,REC Limited,Financial Services,Stage 3,watchlist,14.34,0.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,REDINGTON.NS,Redington Limited,Services,Stage 4,watchlist,6.06,0.42,True,True,Weak Structure,Exit / Avoid
+2026-05-07,REDTAPE.NS,Redtape Limited,Consumer Durables,Stage 3,watchlist,23.71,0.93,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RELAXO.NS,Relaxo Footwears Limited,Consumer Durables,Stage 4,watchlist,7.61,0.46,True,True,Weak Structure,Exit / Avoid
+2026-05-07,RELIANCE.NS,Reliance Industries Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,22.39,1.1,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RELIGARE.NS,Religare Enterprises Limited,Financial Services,Stage 3,watchlist,20.46,0.71,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RENUKA.NS,Shree Renuka Sugars Limited,Fast Moving Consumer Goods,Stage 3,watchlist,37.3,1.08,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RESPONIND.NS,Responsive Industries Limited,Consumer Durables,Stage 3,watchlist,5.7,0.86,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RHIM.NS,RHI MAGNESITA INDIA LIMITED,Capital Goods,Stage 3,watchlist,19.71,0.39,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RITES.NS,RITES Limited,Construction,Stage 3,watchlist,12.91,0.84,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RKFORGE.NS,Ramkrishna Forgings Limited,Capital Goods,Stage 3,watchlist,22.69,2.37,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ROLEXRINGS.NS,Rolex Rings Limited,Automobile and Auto Components,Stage 3,watchlist,15.67,0.54,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ROSSARI.NS,Rossari Biotech Limited,Chemicals,Stage 3,watchlist,17.84,3.01,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ROUTE.NS,ROUTE MOBILE LIMITED,Telecommunication,Stage 3,watchlist,43.95,0.8,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RPOWER.NS,Reliance Power Limited,Power,Stage 3,watchlist,22.6,0.73,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RRKABEL.NS,R R Kabel Limited,Capital Goods,Stage 2,watchlist,69.23,2.87,False,False,Advancing,Hold / Trend intact
+2026-05-07,RSYSTEMS.NS,R Systems International Limited,Information Technology,Stage 3,watchlist,19.16,0.27,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RTNINDIA.NS,RattanIndia Enterprises Limited,Services,Stage 3,watchlist,28.09,0.82,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RTNPOWER.NS,RattanIndia Power Limited,Power,Stage 3,watchlist,45.26,1.19,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,RUSTOMJEE.NS,Keystone Realtors Limited,Realty,Stage 3,watchlist,14.73,0.8,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,RVNL.NS,Rail Vikas Nigam Limited,Construction,Stage 3,watchlist,10.33,0.7,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SAFARI.NS,Safari Industries (India) Limited,Consumer Durables,Stage 4,watchlist,3.51,1.51,False,False,Weak Structure,Exit / Avoid
+2026-05-07,SAGILITY.NS,Sagility Ltd.,Information Technology,Stage 3,watchlist,12.65,0.39,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SAIL.NS,Steel Authority of India Limited,Metals & Mining,Stage 2,watchlist,50.0,0.87,False,False,Advancing,Hold / Trend intact
+2026-05-07,SAILIFE.NS,Sai Life Sciences Ltd.,Healthcare,Stage 2,watchlist,53.42,0.87,False,False,Advancing,Hold / Trend intact
+2026-05-07,SAKSOFT.NS,Saksoft Limited,Information Technology,Stage 4,watchlist,11.18,0.92,False,True,Weak Structure,Exit / Avoid
+2026-05-07,SALASAR.NS,Salasar Techno Engineering Limited,Capital Goods,Stage 3,watchlist,15.89,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SAMHI.NS,Samhi Hotels Limited,Consumer Services,Stage 4,watchlist,8.49,0.55,True,True,Weak Structure,Exit / Avoid
+2026-05-07,SAMMAANCAP.NS,Sammaan Capital Ltd.,Financial Services,Stage 3,watchlist,26.33,1.06,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SANDUMA.NS,Sandur Manganese & Iron Ores Limited,"Oil, Gas & Consumable Fuels",Stage 3,watchlist,23.77,0.66,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SANGHVIMOV.NS,Sanghvi Movers Limited,Capital Goods,Stage 3,watchlist,28.98,0.65,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SANOFI.NS,Sanofi India Limited,Healthcare,Stage 4,watchlist,8.04,0.92,False,False,Weak Structure,Exit / Avoid
+2026-05-07,SANSERA.NS,Sansera Engineering Limited,Automobile and Auto Components,Stage 2,watchlist,47.15,0.84,True,False,Advancing,Hold / Trend intact
+2026-05-07,SAPPHIRE.NS,Sapphire Foods India Limited,Consumer Services,Stage 3,watchlist,5.07,2.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SARDAEN.NS,Sarda Energy & Minerals Limited,Metals & Mining,Stage 3,watchlist,51.27,0.85,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SAREGAMA.NS,Saregama India Limited,"Media, Entertainment & Publication",Stage 3,watchlist,38.49,0.9,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SBFC.NS,SBFC Finance Limited,Financial Services,Stage 3,watchlist,25.05,0.83,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SBICARD.NS,SBI Cards and Payment Services Limited,Financial Services,Stage 4,watchlist,17.14,1.34,False,False,Weak Structure,Exit / Avoid
+2026-05-07,SBILIFE.NS,SBI Life Insurance Company Limited,Financial Services,Stage 3,watchlist,21.04,1.18,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SBIN.NS,State Bank of India,Financial Services,Stage 1,watchlist,21.08,0.7,True,True,Base Building,Watchlist / Early base
+2026-05-07,SCHAEFFLER.NS,Schaeffler India Limited,Automobile and Auto Components,Stage 2,watchlist,67.56,0.93,False,False,Advancing,Hold / Trend intact
+2026-05-07,SCHNEIDER.NS,Schneider Electric Infrastructure Limited,Capital Goods,Stage 2,watchlist,69.24,1.17,False,True,Advancing,Hold / Trend intact
+2026-05-07,SCI.NS,Shipping Corporation Of India Limited,Services,Stage 2,watchlist,44.31,1.16,False,False,Advancing,Hold / Trend intact
+2026-05-07,SENCO.NS,Senco Gold Limited,Consumer Durables,Stage 3,watchlist,25.71,0.56,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SFL.NS,Sheela Foam Limited,Consumer Durables,Stage 3,watchlist,24.44,1.0,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHANTIGEAR.NS,Shanthi Gears Limited,Capital Goods,Stage 3,watchlist,31.74,1.29,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHARDACROP.NS,Sharda Cropchem Limited,Chemicals,Stage 3,watchlist,17.24,0.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHARDAMOTR.NS,Sharda Motor Industries Limited,Automobile and Auto Components,Stage 3,watchlist,22.24,0.75,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHAREINDIA.NS,Share India Securities Limited,Financial Services,Stage 3,watchlist,37.56,0.54,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHILPAMED.NS,Shilpa Medicare Limited,Healthcare,Stage 3,watchlist,49.15,0.65,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHOPERSTOP.NS,Shoppers Stop Limited,Consumer Services,Stage 3,watchlist,5.23,2.63,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHREECEM.NS,SHREE CEMENT LIMITED,Construction Materials,Stage 3,watchlist,15.77,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHRIRAMFIN.NS,Shriram Finance Ltd.,Financial Services,Stage 3,watchlist,16.59,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SHYAMMETL.NS,Shyam Metalics and Energy Limited,Metals & Mining,Stage 3,watchlist,38.13,1.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SIEMENS.NS,Siemens Ltd.,Capital Goods,Stage 2,watchlist,70.02,0.67,True,False,Advancing,Hold / Trend intact
+2026-05-07,SIGNATURE.NS,Signatureglobal (India) Ltd.,Realty,Stage 3,watchlist,13.47,0.67,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SIS.NS,SIS LIMITED,Services,Stage 3,watchlist,11.96,2.59,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SJVN.NS,SJVN Limited,Power,Stage 3,watchlist,46.02,0.77,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SKFINDIA.NS,SKF India Limited,Capital Goods,Stage 3,watchlist,15.46,0.3,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SKIPPER.NS,Skipper Limited,Capital Goods,Stage 3,watchlist,45.39,1.57,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SOBHA.NS,Sobha Limited,Realty,Stage 3,watchlist,9.86,1.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SOLARINDS.NS,Solar Industries India Limited,Chemicals,Stage 3,watchlist,38.43,0.61,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SONACOMS.NS,Sona BLW Precision Forgings Limited,Automobile and Auto Components,Stage 2,watchlist,75.76,1.45,False,False,Advancing,Hold / Trend intact
+2026-05-07,SONATSOFTW.NS,Sonata Software Limited,Information Technology,Stage 4,watchlist,9.59,0.4,True,False,Weak Structure,Exit / Avoid
+2026-05-07,SOUTHBANK.NS,The South Indian Bank Limited,Financial Services,Stage 2,watchlist,45.05,1.06,False,False,Advancing,Hold / Trend intact
+2026-05-07,SPANDANA.NS,Spandana Sphoorty Financial Limited,Financial Services,Stage 3,watchlist,21.37,2.76,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SPARC.NS,Sun Pharma Advanced Research Company Limited,Healthcare,Stage 3,watchlist,34.34,2.16,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SPLPETRO.NS,Supreme Petrochem Limited,Chemicals,Stage 3,watchlist,23.98,1.02,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SRF.NS,SRF Limited,Chemicals,Stage 3,watchlist,12.04,1.17,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SSWL.NS,Steel Strips Wheels Limited,Automobile and Auto Components,Stage 3,watchlist,12.05,1.34,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,STAR.NS,Strides Pharma Science Limited,Healthcare,Stage 2,watchlist,72.87,1.05,False,False,Advancing,Hold / Trend intact
+2026-05-07,STARCEMENT.NS,Star Cement Limited,Construction Materials,Stage 3,watchlist,14.74,0.8,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,STARHEALTH.NS,Star Health and Allied Insurance Company Limited,Financial Services,Stage 2,watchlist,51.59,1.82,False,False,Advancing,Hold / Trend intact
+2026-05-07,STLTECH.NS,Sterlite Technologies Limited,Telecommunication,Stage 2,watchlist,69.41,0.76,True,True,Advancing,Hold / Trend intact
+2026-05-07,SUBROS.NS,Subros Limited,Automobile and Auto Components,Stage 3,watchlist,9.9,0.75,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUDARSCHEM.NS,Sudarshan Chemical Industries Limited,Chemicals,Stage 3,watchlist,11.06,0.82,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SULA.NS,Sula Vineyards Limited,Fast Moving Consumer Goods,Stage 3,watchlist,16.2,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUMICHEM.NS,Sumitomo Chemical India Limited,Chemicals,Stage 3,watchlist,43.11,1.7,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUNDARMFIN.NS,Sundaram Finance Limited,Financial Services,Stage 3,watchlist,25.04,0.74,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUNDRMFAST.NS,Sundram Fasteners Limited,Automobile and Auto Components,Stage 3,watchlist,13.51,0.59,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUNFLAG.NS,Sunflag Iron And Steel Company Limited,Metals & Mining,Stage 3,watchlist,27.07,3.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUNPHARMA.NS,Sun Pharmaceutical Industries Limited,Healthcare,Stage 2,watchlist,52.07,2.02,False,False,Advancing,Hold / Trend intact
+2026-05-07,SUNTECK.NS,Sunteck Realty Limited,Realty,Stage 4,watchlist,3.03,0.42,True,False,Weak Structure,Exit / Avoid
+2026-05-07,SUNTV.NS,Sun TV Network Limited,"Media, Entertainment & Publication",Stage 1,watchlist,32.49,1.3,False,False,Base Building,Watchlist / Early base
+2026-05-07,SUPRAJIT.NS,Suprajit Engineering Limited,Automobile and Auto Components,Stage 3,watchlist,27.64,0.56,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUPREMEIND.NS,Supreme Industries Limited,Capital Goods,Stage 4,watchlist,27.26,1.09,False,False,Weak Structure,Exit / Avoid
+2026-05-07,SURYAROSNI.NS,Surya Roshni Limited,Capital Goods,Stage 3,watchlist,15.31,1.78,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SUZLON.NS,Suzlon Energy Limited,Capital Goods,Stage 3,watchlist,24.66,1.1,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SWANCORP.NS,Swan Corp Ltd.,Chemicals,Stage 4,watchlist,9.62,0.91,False,False,Weak Structure,Exit / Avoid
+2026-05-07,SWIGGY.NS,Swiggy Ltd.,Consumer Services,Stage 4,watchlist,30.25,0.75,True,True,Weak Structure,Exit / Avoid
+2026-05-07,SYMPHONY.NS,Symphony Limited,Consumer Durables,Stage 3,watchlist,7.79,1.13,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SYNGENE.NS,Syngene International Limited,Healthcare,Stage 3,watchlist,13.05,2.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,SYRMA.NS,Syrma SGS Technology Limited,Capital Goods,Stage 2,watchlist,80.39,0.81,True,False,Advancing,Hold / Trend intact
+2026-05-07,TANLA.NS,Tanla Platforms Limited,Information Technology,Stage 3,watchlist,10.53,3.04,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TARC.NS,TARC Limited,Realty,Stage 3,watchlist,8.45,0.79,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TARIL.NS,Transformers And Rectifiers (India) Ltd.,Capital Goods,Stage 3,watchlist,49.42,1.2,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TASTYBITE.NS,Tasty Bite Eatables Limited,Fast Moving Consumer Goods,Stage 3,watchlist,39.43,2.26,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TATACHEM.NS,Tata Chemicals Limited,Chemicals,Stage 3,watchlist,12.84,2.44,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TATACOMM.NS,Tata Communications Limited,Telecommunication,Stage 3,watchlist,28.56,1.12,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TATACONSUM.NS,TATA CONSUMER PRODUCTS LIMITED,Fast Moving Consumer Goods,Stage 3,watchlist,12.99,0.84,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TATAELXSI.NS,Tata Elxsi Limited,Information Technology,Stage 4,watchlist,6.74,0.8,True,False,Weak Structure,Exit / Avoid
+2026-05-07,TATAINVEST.NS,Tata Investment Corporation Ltd.,Financial Services,Stage 3,watchlist,34.37,0.43,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TATAPOWER.NS,Tata Power Company Limited,Power,Stage 2,watchlist,49.29,0.87,False,False,Advancing,Hold / Trend intact
+2026-05-07,TATASTEEL.NS,Tata Steel Limited,Metals & Mining,Stage 2,watchlist,47.38,0.76,True,True,Advancing,Hold / Trend intact
+2026-05-07,TATATECH.NS,Tata Technologies Ltd.,Information Technology,Stage 3,watchlist,11.39,2.56,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TATVA.NS,Tatva Chintan Pharma Chem Limited,Chemicals,Stage 2,watchlist,63.21,0.9,False,False,Advancing,Hold / Trend intact
+2026-05-07,TBOTEK.NS,TBO Tek Ltd.,Consumer Services,Stage 3,watchlist,9.85,0.47,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TCI.NS,Transport Corporation of India Limited,Services,Stage 3,watchlist,10.67,0.87,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TCIEXP.NS,TCI Express Limited,Services,Stage 3,watchlist,17.79,0.9,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TCS.NS,Tata Consultancy Services Limited,Information Technology,Stage 4,watchlist,5.22,0.92,False,False,Weak Structure,Exit / Avoid
+2026-05-07,TDPOWERSYS.NS,TD Power Systems Limited,Capital Goods,Stage 2,watchlist,70.82,1.09,False,False,Advancing,Hold / Trend intact
+2026-05-07,TEAMLEASE.NS,Teamlease Services Limited,Services,Stage 3,watchlist,1.47,0.67,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TECHM.NS,Tech Mahindra Limited,Information Technology,Stage 3,watchlist,8.23,0.75,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TECHNOE.NS,Techno Electric & Engineering Company Limited,Construction,Stage 3,watchlist,38.13,0.91,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TEGA.NS,Tega Industries Limited,Capital Goods,Stage 4,watchlist,26.62,0.3,True,True,Weak Structure,Exit / Avoid
+2026-05-07,TEJASNET.NS,Tejas Networks Limited,Telecommunication,Stage 3,watchlist,55.58,0.57,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TEXRAIL.NS,Texmaco Rail & Engineering Limited,Capital Goods,Stage 3,watchlist,18.0,1.02,False,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,THANGAMAYL.NS,Thangamayil Jewellery Limited,Consumer Durables,Stage 2,watchlist,49.01,0.53,True,True,Advancing,Hold / Trend intact
+2026-05-07,THERMAX.NS,Thermax Limited,Capital Goods,Stage 2,watchlist,80.06,0.73,True,False,Advancing,Hold / Trend intact
+2026-05-07,TI.NS,Tilaknagar Industries Limited,Fast Moving Consumer Goods,Stage 1,watchlist,41.14,0.75,True,False,Base Building,Watchlist / Early base
+2026-05-07,TIIL.NS,Technocraft Industries (India) Limited,Capital Goods,Stage 3,watchlist,37.1,0.55,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TIINDIA.NS,Tube Investments of India Limited,Automobile and Auto Components,Stage 3,watchlist,42.55,0.68,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TIMETECHNO.NS,Time Technoplast Limited,Capital Goods,Stage 3,watchlist,18.02,1.25,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TIMKEN.NS,Timken India Limited,Capital Goods,Stage 2,watchlist,52.94,0.64,True,False,Advancing,Hold / Trend intact
+2026-05-07,TITAGARH.NS,TITAGARH RAIL SYSTEMS LIMITED,Capital Goods,Stage 3,watchlist,23.8,1.65,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TITAN.NS,Titan Company Limited,Consumer Durables,Stage 2,watchlist,45.86,0.81,True,False,Advancing,Hold / Trend intact
+2026-05-07,TMB.NS,Tamilnad Mercantile Bank Limited,Financial Services,Stage 2,watchlist,45.57,2.8,False,False,Advancing,Hold / Trend intact
+2026-05-07,TORNTPHARM.NS,Torrent Pharmaceuticals Limited,Healthcare,Stage 2,watchlist,46.48,0.64,True,True,Advancing,Hold / Trend intact
+2026-05-07,TORNTPOWER.NS,Torrent Power Limited,Power,Stage 2,watchlist,68.33,1.2,False,False,Advancing,Hold / Trend intact
+2026-05-07,TRENT.NS,Trent Limited,Consumer Services,Stage 3,watchlist,11.35,0.68,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TRIDENT.NS,Trident Limited,Textiles,Stage 3,watchlist,8.38,0.5,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TRITURBINE.NS,Triveni Turbine Limited,Capital Goods,Stage 3,watchlist,35.07,0.32,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TRIVENI.NS,Triveni Engineering & Industries Limited,Fast Moving Consumer Goods,Stage 2,watchlist,44.86,0.37,True,True,Advancing,Hold / Trend intact
+2026-05-07,TTKPRESTIG.NS,TTK Prestige Limited,Consumer Durables,Stage 3,watchlist,0.21,0.18,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TTML.NS,Tata Teleservices (Maharashtra) Limited,Telecommunication,Stage 3,watchlist,17.36,0.71,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,TVSHLTD.NS,TVS Holdings Limited,Automobile and Auto Components,Stage 3,watchlist,40.15,0.59,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TVSMOTOR.NS,TVS Motor Company Limited,Automobile and Auto Components,Stage 3,watchlist,12.7,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TVSSCS.NS,TVS Supply Chain Solutions Limited,Services,Stage 3,watchlist,21.23,0.55,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,TVSSRICHAK.NS,TVS Srichakra Limited,Automobile and Auto Components,Stage 3,watchlist,8.53,0.56,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,UBL.NS,United Breweries Limited,Fast Moving Consumer Goods,Stage 4,watchlist,7.58,1.29,False,False,Weak Structure,Exit / Avoid
+2026-05-07,UCOBANK.NS,UCO Bank,Financial Services,Stage 3,watchlist,10.36,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,UJJIVANSFB.NS,Ujjivan Small Finance Bank Limited,Financial Services,Stage 3,watchlist,33.37,0.91,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ULTRACEMCO.NS,UltraTech Cement Limited,Construction Materials,Stage 3,watchlist,14.24,1.07,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,UNIONBANK.NS,Union Bank of India,Financial Services,Stage 3,watchlist,8.39,0.93,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,UNITDSPR.NS,United Spirits Ltd.,Fast Moving Consumer Goods,Stage 3,watchlist,11.27,0.82,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,UNOMINDA.NS,UNO Minda Limited,Automobile and Auto Components,Stage 3,watchlist,13.46,0.67,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,UPL.NS,UPL Limited,Chemicals,Stage 3,watchlist,15.46,0.58,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,USHAMART.NS,Usha Martin Limited,Capital Goods,Stage 2,watchlist,70.78,1.82,False,False,Advancing,Hold / Trend intact
+2026-05-07,UTIAMC.NS,UTI Asset Management Company Limited,Financial Services,Stage 4,watchlist,22.2,1.9,False,False,Weak Structure,Exit / Avoid
+2026-05-07,UTKARSHBNK.NS,Utkarsh Small Finance Bank Limited,Financial Services,Stage 3,watchlist,6.82,0.78,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VAIBHAVGBL.NS,Vaibhav Global Limited,Consumer Durables,Stage 3,watchlist,12.22,0.63,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VARROC.NS,Varroc Engineering Limited,Automobile and Auto Components,Stage 3,watchlist,39.11,0.7,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VBL.NS,Varun Beverages Limited,Fast Moving Consumer Goods,Stage 2,watchlist,36.14,1.38,False,False,Advancing,Hold / Trend intact
+2026-05-07,VEDL.NS,Vedanta Limited,Metals & Mining,Stage 3,watchlist,16.19,2.24,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,VENTIVE.NS,Ventive Hospitality Ltd.,Consumer Services,Stage 3,watchlist,4.3,0.76,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VENUSPIPES.NS,Venus Pipes & Tubes Limited,Capital Goods,Stage 3,watchlist,40.63,0.68,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VESUVIUS.NS,Vesuvius India Limited,Capital Goods,Stage 3,watchlist,18.9,0.24,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VGUARD.NS,V-Guard Industries Limited,Consumer Durables,Stage 3,watchlist,18.36,1.15,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,VIJAYA.NS,Vijaya Diagnostic Centre Limited,Healthcare,Stage 3,watchlist,20.15,1.88,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,VINATIORGA.NS,Vinati Organics Limited,Chemicals,Stage 4,watchlist,18.31,0.96,False,False,Weak Structure,Exit / Avoid
+2026-05-07,VIPIND.NS,VIP Industries Limited,Consumer Durables,Stage 4,watchlist,20.51,2.06,False,False,Weak Structure,Exit / Avoid
+2026-05-07,VMART.NS,V-Mart Retail Limited,Consumer Services,Stage 3,watchlist,38.71,0.16,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VMM.NS,Vishal Mega Mart Ltd.,Consumer Services,Stage 3,watchlist,5.82,0.24,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VOLTAMP.NS,Voltamp Transformers Limited,Capital Goods,Stage 2,watchlist,57.72,2.24,False,False,Advancing,Hold / Trend intact
+2026-05-07,VOLTAS.NS,Voltas Limited,Consumer Durables,Stage 3,watchlist,6.15,0.84,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,VRLLOG.NS,VRL Logistics Limited,Services,Stage 3,watchlist,19.09,0.53,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,VSTIND.NS,VST Industries Limited,Fast Moving Consumer Goods,Stage 3,watchlist,25.73,0.48,True,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,VSTTILLERS.NS,V.S.T Tillers Tractors Limited,Capital Goods,Stage 1,watchlist,19.99,0.52,True,True,Base Building,Watchlist / Early base
+2026-05-07,VTL.NS,Vardhman Textiles Limited,Textiles,Stage 2,watchlist,48.54,1.2,False,False,Advancing,Hold / Trend intact
+2026-05-07,WAAREEENER.NS,Waaree Energies Ltd.,Capital Goods,Stage 3,watchlist,48.86,0.92,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,WABAG.NS,VA Tech Wabag Limited,Utilities,Stage 3,watchlist,47.32,0.87,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,WELCORP.NS,Welspun Corp Limited,Capital Goods,Stage 2,watchlist,57.69,1.09,False,False,Advancing,Hold / Trend intact
+2026-05-07,WELENT.NS,Welspun Enterprises Limited,Construction,Stage 3,watchlist,22.7,2.56,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,WELSPUNLIV.NS,Welspun Living Ltd.,Textiles,Stage 3,watchlist,29.62,0.63,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,WESTLIFE.NS,WESTLIFE FOODWORLD LIMITED,Consumer Services,Stage 3,watchlist,10.08,0.71,True,True,Transition,Reduce / Avoid fresh longs
+2026-05-07,WHIRLPOOL.NS,Whirlpool of India Limited,Consumer Durables,Stage 3,watchlist,33.75,1.15,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,WIPRO.NS,Wipro Limited,Information Technology,Stage 4,watchlist,15.7,0.88,False,False,Weak Structure,Exit / Avoid
+2026-05-07,WOCKPHARMA.NS,Wockhardt Limited,Healthcare,Stage 3,watchlist,18.98,3.27,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,WONDERLA.NS,Wonderla Holidays Limited,Consumer Services,Stage 3,watchlist,34.89,1.93,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,WSTCSTPAPR.NS,West Coast Paper Mills Limited,Forest Materials,Stage 3,watchlist,28.89,1.58,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,YATHARTH.NS,Yatharth Hospital & Trauma Care Services Limited,Healthcare,Stage 3,watchlist,51.16,1.22,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,YESBANK.NS,Yes Bank Limited,Financial Services,Stage 3,watchlist,19.72,1.12,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ZAGGLE.NS,Zaggle Prepaid Ocean Services Limited,Information Technology,Stage 4,watchlist,5.51,0.41,True,True,Weak Structure,Exit / Avoid
+2026-05-07,ZEEL.NS,Zee Entertainment Enterprises Limited,"Media, Entertainment & Publication",Stage 3,watchlist,10.05,0.89,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ZENSARTECH.NS,Zensar Technologies Limited,Information Technology,Stage 4,watchlist,27.45,1.05,False,False,Weak Structure,Exit / Avoid
+2026-05-07,ZENTEC.NS,Zen Technologies Ltd.,Capital Goods,Stage 3,watchlist,39.45,0.99,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ZFCVINDIA.NS,ZF Commercial Vehicle Control Systems India Limited,Automobile and Auto Components,Stage 1,watchlist,15.65,0.75,True,False,Base Building,Watchlist / Early base
+2026-05-07,ZYDUSLIFE.NS,Zydus Lifesciences Limited,Healthcare,Stage 3,watchlist,16.16,1.14,False,False,Transition,Reduce / Avoid fresh longs
+2026-05-07,ZYDUSWELL.NS,Zydus Wellness Limited,Fast Moving Consumer Goods,Stage 3,watchlist,14.27,0.11,True,True,Transition,Reduce / Avoid fresh longs
