@@ -20,8 +20,6 @@ DEFAULT_CONFIG = {
     "min_contraction_days_daily": 5, "min_contraction_days_weekly": 2, "min_contraction_depth_pct_daily": 4.0,
     "min_contraction_depth_pct_weekly": 5.0, "min_base_duration_days": 30, "min_base_duration_weeks": 8,
     "max_latest_contraction_pct": 10.0, "min_weekly_strength_score": 0.45,
-    # Public stage-state memory: avoids flicker and keeps failed Stage 2 visible briefly.
-    "stage2_failed_hold_days": 21,
 }
 
 @dataclass
@@ -56,11 +54,6 @@ class VCPScoreCard:
     ma150: float
     ma200: float
     stage: str
-    stage_raw: str
-    stage_state_reason: str
-    stage_failed_since: str
-    last_stage2_date: str
-    snapshot_date: str
     rs_3m_pct: float
     rs_6m_pct: float
     avg_turnover_inr: float
@@ -625,11 +618,11 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
     Borderline weak names should usually become Stage 3, not Stage 1.
     """
     if len(close) < 260:
-        return "Not Sure"
+        return "Unknown"
 
     c = close.dropna().astype(float)
     if len(c) < 260:
-        return "Not Sure"
+        return "Unknown"
 
     last = float(c.iloc[-1])
 
@@ -864,8 +857,13 @@ def determine_stage(close: pd.Series, ma50: float, ma150: float, ma200: float) -
     if stage3_score >= 5:
         return "Stage 3"
 
-    # No fallback stage: if the evidence is not strong enough, be honest.
-    return "Not Sure"
+    if stage2_score >= 8 and above_150 and not below_50:
+        return "Stage 2"
+    if stage4_score >= 8 and below_200:
+        return "Stage 4"
+    if stage1_score >= 8 and ma200_flat and near_long_term_ma:
+        return "Stage 1"
+    return "Stage 3"
 
 def vcp_quality_label(score: float, base_bars: float, depths: List[float], min_base_bars: int) -> str:
     if len(depths) < 2 or base_bars < min_base_bars:
@@ -984,9 +982,7 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     ma50_series = close.rolling(50).mean()
     ma150_series = close.rolling(150).mean()
     ma200_series = close.rolling(200).mean()
-    stage_raw = determine_stage(close, ma50, ma150, ma200)
-    # Use raw stage for scoring. Public stage-state memory is applied later in build_outputs().
-    stage = stage_raw
+    stage = determine_stage(close, ma50, ma150, ma200)
 
     high_52w = float(close.iloc[-252:].max())
     low_52w = float(close.iloc[-252:].min())
@@ -1189,9 +1185,6 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
     elif stage == "Stage 4":
         daily_score -= 12
         weekly_score -= 10
-    elif stage == "Not Sure":
-        daily_score -= 5
-        weekly_score -= 5
 
     daily_score = round(float(max(0.0, daily_score)), 2)
     weekly_score = round(float(max(0.0, weekly_score)), 2)
@@ -1222,12 +1215,9 @@ def analyze_symbol(ticker: str, df: pd.DataFrame, benchmark_df: pd.DataFrame, re
         notes.append("distribution_risk")
     if stage == "Stage 4":
         notes.append("downtrend")
-    if stage == "Not Sure":
-        notes.append("not_sure")
 
     return VCPScoreCard(
         ticker, round(close_now, 2), round(ma50, 2), round(ma150, 2), round(ma200, 2), stage,
-        stage_raw, "raw_stage_pending_memory", "", "", "",
         round(float(rs_3m), 2) if pd.notna(rs_3m) else np.nan,
         round(float(rs_6m), 2) if pd.notna(rs_6m) else np.nan,
         round(float(avg_turnover_inr), 2) if pd.notna(avg_turnover_inr) else np.nan,
@@ -1575,8 +1565,7 @@ def _clean_stock_snapshot(df: Optional[pd.DataFrame]) -> pd.DataFrame:
         if col not in out.columns:
             out[col] = pd.NA
     keep_cols = [
-        "ticker", "Company Name", "Industry", "stage", "stage_raw", "stage_state_reason", "stage_failed_since", "last_stage2_date", "snapshot_date",
-        "daily_setup_bucket", "weekly_setup_bucket", "combined_bucket",
+        "ticker", "Company Name", "Industry", "stage", "daily_setup_bucket", "weekly_setup_bucket", "combined_bucket",
         "daily_score", "weekly_score", "combined_score", "industry_boost", "final_daily_score", "final_weekly_score",
         "final_combined_score", "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "notes",
     ]
@@ -1651,119 +1640,6 @@ def build_industry_changes(current_df: pd.DataFrame, previous_df: Optional[pd.Da
     df["new_cluster"] = (df["strong_combined"].fillna(0) >= 2) & (df["prev_strong_combined"].fillna(0) < 2)
     return df.sort_values(["current_rank", "avg_combined_score"], ascending=[True, False]).reset_index(drop=True)
 
-
-def _parse_stage_date(value) -> pd.Timestamp:
-    ts = pd.to_datetime(value, errors="coerce")
-    if pd.isna(ts):
-        return pd.NaT
-    return pd.Timestamp(ts).normalize()
-
-
-def _stage_memory_today() -> pd.Timestamp:
-    return pd.Timestamp.today().normalize()
-
-
-def apply_stage_memory(current_df: pd.DataFrame, previous_df: Optional[pd.DataFrame], config: Optional[dict] = None) -> pd.DataFrame:
-    """Apply public stage-state memory after raw chart classification.
-
-    Rules:
-    - `stage_raw` stores today's direct chart classification.
-    - `stage` is the public trust layer shown to users.
-    - A recent Stage 2 that stops qualifying becomes `Stage 2 Failed` for a hold period.
-    - Stage 1 -> Stage 2 -> Stage 1 flicker is treated as failed Stage 2, not a new Stage 1.
-    - Unknown/ambiguous raw stages remain `Not Sure`, except when the Stage 2 failure hold is active.
-    """
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
-    hold_days = int(cfg.get("stage2_failed_hold_days", 21))
-    today = _stage_memory_today()
-    today_s = today.strftime("%Y-%m-%d")
-
-    if current_df is None or current_df.empty:
-        return current_df
-
-    out = current_df.copy()
-    if "stage_raw" not in out.columns:
-        out["stage_raw"] = out.get("stage", "Not Sure")
-    out["stage_raw"] = out["stage_raw"].fillna("Not Sure").astype(str)
-
-    prev_cols = ["ticker", "stage", "stage_raw", "stage_failed_since", "last_stage2_date", "snapshot_date"]
-    if previous_df is not None and not previous_df.empty:
-        prev = previous_df.copy()
-        for col in prev_cols:
-            if col not in prev.columns:
-                prev[col] = pd.NA
-        prev = prev[prev_cols].drop_duplicates(subset=["ticker"]).rename(columns={
-            "stage": "prev_stage",
-            "stage_raw": "prev_stage_raw",
-            "stage_failed_since": "prev_stage_failed_since",
-            "last_stage2_date": "prev_last_stage2_date",
-            "snapshot_date": "prev_snapshot_date",
-        })
-        out = out.merge(prev, on="ticker", how="left")
-    else:
-        for col in ["prev_stage", "prev_stage_raw", "prev_stage_failed_since", "prev_last_stage2_date", "prev_snapshot_date"]:
-            out[col] = pd.NA
-
-    public_stage = []
-    reasons = []
-    failed_since_values = []
-    last_stage2_values = []
-
-    for _, row in out.iterrows():
-        raw = str(row.get("stage_raw") or "Not Sure").strip() or "Not Sure"
-        prev_stage = str(row.get("prev_stage") or "").strip()
-        prev_stage_raw = str(row.get("prev_stage_raw") or "").strip()
-        prev_snapshot = _parse_stage_date(row.get("prev_snapshot_date"))
-        prev_failed_since = _parse_stage_date(row.get("prev_stage_failed_since"))
-        prev_last_stage2 = _parse_stage_date(row.get("prev_last_stage2_date"))
-
-        if pd.isna(prev_last_stage2) and (prev_stage == "Stage 2" or prev_stage_raw == "Stage 2"):
-            prev_last_stage2 = prev_snapshot if pd.notna(prev_snapshot) else today - pd.Timedelta(days=1)
-
-        if raw == "Stage 2":
-            public_stage.append("Stage 2")
-            reasons.append("Raw chart structure still qualifies as Stage 2.")
-            failed_since_values.append("")
-            last_stage2_values.append(today_s)
-            continue
-
-        had_recent_stage2 = False
-        if pd.notna(prev_last_stage2):
-            had_recent_stage2 = (today - prev_last_stage2).days <= hold_days
-        if prev_stage in {"Stage 2", "Stage 2 Failed"} or prev_stage_raw == "Stage 2":
-            had_recent_stage2 = True
-
-        if had_recent_stage2:
-            failed_since = prev_failed_since if pd.notna(prev_failed_since) else today
-            failed_days = max(0, (today - failed_since).days)
-            if failed_days <= hold_days:
-                public_stage.append("Stage 2 Failed")
-                reasons.append(f"Recently stopped qualifying as Stage 2; keeping failure state for {hold_days} days before allowing a new base/stage label.")
-                failed_since_values.append(failed_since.strftime("%Y-%m-%d"))
-                if pd.notna(prev_last_stage2):
-                    last_stage2_values.append(prev_last_stage2.strftime("%Y-%m-%d"))
-                else:
-                    last_stage2_values.append("")
-                continue
-
-        public_stage.append(raw if raw in {"Stage 1", "Stage 2", "Stage 3", "Stage 4", "Not Sure"} else "Not Sure")
-        reasons.append("Raw chart classification used; no active Stage 2 failure memory.")
-        failed_since_values.append("")
-        if pd.notna(prev_last_stage2):
-            last_stage2_values.append(prev_last_stage2.strftime("%Y-%m-%d"))
-        else:
-            last_stage2_values.append("")
-
-    out["stage"] = public_stage
-    out["stage_state_reason"] = reasons
-    out["stage_failed_since"] = failed_since_values
-    out["last_stage2_date"] = last_stage2_values
-    out["snapshot_date"] = today_s
-
-    drop_cols = [c for c in out.columns if c.startswith("prev_")]
-    return out.drop(columns=drop_cols, errors="ignore")
-
-
 def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None, export_all_ticker_charts: bool = True) -> Dict[str, str]:
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -1777,14 +1653,7 @@ def build_outputs(universe_path: str, outdir: str, config: Optional[dict] = None
     industry_df = build_industry_strength_table(final_report)
     final_report = apply_industry_boost(final_report, industry_df, config)
 
-    prev_combined = pd.read_csv(out_path / "vcp_combined_ranked.csv") if (out_path / "vcp_combined_ranked.csv").exists() else None
-    final_report = apply_stage_memory(final_report, prev_combined, config)
-
-    common_cols = [
-        "ticker", "Company Name", "Industry", "stage", "stage_raw", "stage_state_reason",
-        "stage_failed_since", "last_stage2_date", "snapshot_date",
-        "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "notes"
-    ]
+    common_cols = ["ticker", "Company Name", "Industry", "stage", "rs_3m_pct", "rs_6m_pct", "avg_turnover_inr", "notes"]
     daily_cols = common_cols + ["daily_setup_bucket", "daily_score", "final_daily_score", "daily_pivot", "daily_breakout_distance_pct", "daily_contraction_depths_pct", "daily_contraction_durations", "daily_contraction_score", "daily_base_duration_days", "volume_dryup_ratio", "breakout_volume_ratio"]
     weekly_cols = common_cols + ["weekly_setup_bucket", "weekly_score", "final_weekly_score", "weekly_pivot", "weekly_breakout_distance_pct", "weekly_contraction_depths_pct", "weekly_contraction_durations", "weekly_contraction_score", "weekly_base_duration_weeks", "weekly_vcp_quality"]
     combined_cols = common_cols + ["daily_setup_bucket", "weekly_setup_bucket", "combined_bucket", "daily_score", "weekly_score", "combined_score", "industry_boost", "final_combined_score"]
