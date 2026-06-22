@@ -78,8 +78,32 @@ def safe_execute(label: str, fn, fallback=None):
         return fallback
 
 
-@st.cache_data(show_spinner=False, ttl=1800, max_entries=12)
+DASHBOARD_COLUMNS = [
+    "Company Name", "company_name", "Company", "company", "Name", "stock_name", "Stock Name", "Company Name_x", "Company Name_y",
+    "ticker", "Ticker", "symbol", "Symbol", "SYMBOL", "nse_symbol",
+    "Industry", "industry", "Industry Group", "industry_group", "sector", "Sector", "Industry_x", "Industry_y",
+    "stage", "Stage", "current_stage", "Current Stage", "model_stage",
+    "label", "classification", "current_rank", "rank", "rs_rank", "daily_rank", "weekly_rank", "final_rank", "combined_rank", "stock_rank",
+    "final_combined_score", "avg_combined_score", "combined_score", "rank_change",
+    "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct", "rs_3m_pct", "rs_6m_pct",
+    "action", "trade_side", "action_confidence", "long_score", "short_score", "rationale",
+    "entered_stage_2", "new_weekly_breakout", "new_daily_breakout",
+    "F&O", "FNO", "FO", "F&O Stock", "is_fo", "is_fno", "fno", "fo", "FnO",
+    "regime_label", "market_regime", "date", "as_of_date"
+]
+
+
+@st.cache_data(show_spinner=False, ttl=1800, max_entries=24)
 def read_csv_cached(path: str, mtime_ns: int) -> pd.DataFrame:
+    # Fast path: read only columns the dashboard actually displays.
+    # If none match, fall back to the full file so unusual files still work.
+    try:
+        header = pd.read_csv(path, nrows=0)
+        usecols = [c for c in header.columns if c in DASHBOARD_COLUMNS]
+        if usecols:
+            return pd.read_csv(path, usecols=usecols)
+    except Exception:
+        pass
     return pd.read_csv(path)
 
 
@@ -322,14 +346,9 @@ def resolve_chart_path(chart_dir: Path, ticker: str, suffix: str) -> Path | None
         if path.exists():
             return path
 
-    raw_key = re.sub(r"[^A-Za-z0-9]+", "", raw).lower()
-    try:
-        for path in chart_dir.glob(f"*{suffix}"):
-            stem_key = re.sub(r"[^A-Za-z0-9]+", "", path.stem).lower()
-            if raw_key and raw_key in stem_key:
-                return path
-    except Exception:
-        return None
+    # Important: do not scan the whole chart folder here.
+    # Streamlit Cloud becomes slow when hundreds of chart PNGs are globbed on each chart request.
+    # Keep chart names close to: RELIANCE_daily.png / RELIANCE_weekly.png.
     return None
 
 
@@ -386,38 +405,47 @@ def clean_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ============================================================
-# Data loading
+# Lazy data loading
 # ============================================================
 
-with st.spinner("Loading market data..."):
-    combined = normalize_df(safe_read_csv(OUTDIR / "vcp_combined_ranked.csv"))
-    daily_df = normalize_df(safe_read_csv(OUTDIR / "vcp_daily_ranked.csv"))
-    weekly_df = normalize_df(safe_read_csv(OUTDIR / "vcp_weekly_ranked.csv"))
-    industry_df = normalize_df(safe_read_csv(OUTDIR / "industry_strength.csv"))
-    changes_df = normalize_df(safe_read_csv(OUTDIR / "stock_changes.csv"))
-    industry_changes_df = normalize_df(safe_read_csv(OUTDIR / "industry_changes.csv"))
-    moves_df = normalize_df(safe_read_csv(OUTDIR / "stock_price_moves.csv"))
-    top_movers_df = normalize_df(safe_read_csv(OUTDIR / "top_movers.csv"))
-    if top_movers_df.empty:
-        top_movers_df = moves_df.copy()
-    regime_df = safe_read_csv(OUTDIR / "market_regime.csv")
-    fo_symbols = load_fo_symbols()
+DATA_FILES = {
+    "combined": OUTDIR / "vcp_combined_ranked.csv",
+    "daily": OUTDIR / "vcp_daily_ranked.csv",
+    "weekly": OUTDIR / "vcp_weekly_ranked.csv",
+    "industry": OUTDIR / "industry_strength.csv",
+    "changes": OUTDIR / "stock_changes.csv",
+    "industry_changes": OUTDIR / "industry_changes.csv",
+    "moves": OUTDIR / "stock_price_moves.csv",
+    "top_movers": OUTDIR / "top_movers.csv",
+    "regime": OUTDIR / "market_regime.csv",
+}
 
-if combined.empty:
-    st.error("No data found. The app is alive, but `outputs/vcp_combined_ranked.csv` is missing or unreadable.")
-    st.markdown("""
-    <div class="warning-box">
-    Required folder structure:<br>
-    <b>streamlit_app.py</b><br>
-    <b>outputs/vcp_combined_ranked.csv</b><br>
-    <b>outputs/charts/daily/...</b><br>
-    <b>outputs/charts/weekly/...</b>
-    </div>
-    """, unsafe_allow_html=True)
-    st.stop()
 
-# Header controls
-st.markdown(f"<div class='hero-title'>{APP_TITLE}</div><div class='muted'>Stable mode: only the selected page is rendered.</div>", unsafe_allow_html=True)
+def load_named_df(name: str, normalize: bool = True) -> pd.DataFrame:
+    path = DATA_FILES.get(name)
+    if path is None:
+        return pd.DataFrame()
+    df = safe_read_csv(path)
+    return normalize_df(df) if normalize else df
+
+
+@st.cache_data(show_spinner=False, ttl=1800, max_entries=4)
+def load_fo_symbols_cached(_: int = 0) -> set[str]:
+    return load_fo_symbols()
+
+
+def maybe_filter_fo(df: pd.DataFrame, enabled: bool, fo_symbols: set[str]) -> pd.DataFrame:
+    if not enabled or df is None or df.empty:
+        return df
+    return filter_fo(df, fo_symbols)
+
+
+# Header controls are shown before loading heavy data.
+st.markdown(
+    f"<div class='hero-title'>{APP_TITLE}</div>"
+    "<div class='muted'>Fast mode: only the selected page's data is loaded.</div>",
+    unsafe_allow_html=True,
+)
 
 controls = st.columns([1.6, 1.1, 1.1])
 with controls[0]:
@@ -432,14 +460,56 @@ with controls[1]:
 with controls[2]:
     card_limit = st.slider("Cards", min_value=5, max_value=MAX_CARD_ROWS, value=10, step=5)
 
-if show_fo_only:
-    combined = filter_fo(combined, fo_symbols)
-    daily_df = filter_fo(daily_df, fo_symbols)
-    weekly_df = filter_fo(weekly_df, fo_symbols)
-    changes_df = filter_fo(changes_df, fo_symbols)
-    top_movers_df = filter_fo(top_movers_df, fo_symbols)
+# Defaults keep page functions safe even when a dataframe is not needed.
+combined = pd.DataFrame()
+daily_df = pd.DataFrame()
+weekly_df = pd.DataFrame()
+industry_df = pd.DataFrame()
+changes_df = pd.DataFrame()
+industry_changes_df = pd.DataFrame()
+moves_df = pd.DataFrame()
+top_movers_df = pd.DataFrame()
+regime_df = pd.DataFrame()
+fo_symbols: set[str] = set()
+counts = {s: 0 for s in ["Stage 1", "Stage 2", "Stage 3", "Stage 4"]}
 
-counts = stage_counts(combined)
+NEEDS_COMBINED = {"Today", "Explore", "Watchlist", "Charts", "Market", "Mobile Feed"}
+NEEDS_CHANGES = {"Structure Changes"}
+NEEDS_MARKET_EXTRA = {"Market"}
+
+if show_fo_only and page not in {"Learn", "Diagnostics"}:
+    # Load universe only when the user actually switches on F&O filter for a data page.
+    fo_symbols = load_fo_symbols_cached(0)
+
+if page in NEEDS_COMBINED:
+    with st.spinner("Loading core market data..."):
+        combined = maybe_filter_fo(load_named_df("combined"), show_fo_only, fo_symbols)
+
+    if combined.empty:
+        st.error("No data found. The app is alive, but `outputs/vcp_combined_ranked.csv` is missing, unreadable, or empty after the selected filter.")
+        st.markdown("""
+        <div class="warning-box">
+        Required folder structure:<br>
+        <b>streamlit_app.py</b><br>
+        <b>outputs/vcp_combined_ranked.csv</b><br>
+        <b>outputs/charts/daily/...</b><br>
+        <b>outputs/charts/weekly/...</b>
+        </div>
+        """, unsafe_allow_html=True)
+        st.stop()
+
+    counts = stage_counts(combined)
+
+if page in NEEDS_CHANGES:
+    with st.spinner("Loading structure changes..."):
+        changes_df = maybe_filter_fo(load_named_df("changes"), show_fo_only, fo_symbols)
+
+if page in NEEDS_MARKET_EXTRA:
+    with st.spinner("Loading market extras..."):
+        industry_df = maybe_filter_fo(load_named_df("industry"), show_fo_only, fo_symbols)
+        top_movers_df = maybe_filter_fo(load_named_df("top_movers"), show_fo_only, fo_symbols)
+        if top_movers_df.empty:
+            top_movers_df = maybe_filter_fo(load_named_df("moves"), show_fo_only, fo_symbols)
 
 
 def render_today():
@@ -633,23 +703,27 @@ def render_diagnostics():
     chart_rows = []
     for name, path in [("daily", DAILY_CHART_DIR), ("weekly", WEEKLY_CHART_DIR)]:
         if path.exists():
-            files_list = list(path.glob("*.png"))[:1000]
+            files_list = []
+            for idx, p in enumerate(path.glob("*.png")):
+                if idx >= 50:
+                    break
+                files_list.append(p)
             total_mb = sum(p.stat().st_size for p in files_list if p.exists()) / (1024 * 1024)
             chart_rows.append({"chart_dir": name, "exists": True, "sample_files_counted": len(files_list), "sample_total_mb": round(total_mb, 2)})
         else:
             chart_rows.append({"chart_dir": name, "exists": False, "sample_files_counted": 0, "sample_total_mb": 0})
     st.dataframe(pd.DataFrame(chart_rows), use_container_width=True, hide_index=True)
 
-    st.markdown("#### Loaded data shapes")
-    st.json({
-        "combined": list(combined.shape),
-        "daily": list(daily_df.shape),
-        "weekly": list(weekly_df.shape),
-        "industry": list(industry_df.shape),
-        "changes": list(changes_df.shape),
-        "top_movers": list(top_movers_df.shape),
-        "fo_symbols": len(fo_symbols),
-    })
+    st.markdown("#### Data shapes")
+    if st.checkbox("Load CSV shapes", value=False):
+        with st.spinner("Reading CSV headers/shapes..."):
+            shape_payload = {}
+            for key in ["combined", "daily", "weekly", "industry", "changes", "top_movers"]:
+                shape_payload[key] = list(load_named_df(key).shape)
+            shape_payload["fo_symbols"] = len(load_fo_symbols_cached(0))
+        st.json(shape_payload)
+    else:
+        st.caption("CSV shapes are not loaded automatically to keep Diagnostics fast.")
 
 
 PAGES = {
