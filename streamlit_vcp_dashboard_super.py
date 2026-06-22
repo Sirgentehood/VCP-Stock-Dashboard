@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+from contextlib import contextmanager
+import traceback
 import re
 
 st.set_page_config(page_title="Market Structure Radar", layout="wide", initial_sidebar_state="collapsed")
@@ -80,9 +82,9 @@ LABELS = {
     "Weak": {"css": "status-weak"},
     "Cautious": {"css": "status-cautious"},
 }
-MAX_PORTFOLIO_STOCKS = None
+MAX_PORTFOLIO_STOCKS = 60
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=3600, max_entries=16)
 def load_csv(path: str, mtime_ns: int) -> pd.DataFrame:
     return pd.read_csv(path)
 
@@ -96,22 +98,59 @@ def safe_read(path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
-    if df.empty:
-        return df
+    """Normalize common output column names and guarantee the columns the UI expects.
+
+    Streamlit Cloud should not crash because a daily output file missed a column,
+    a merge created *_x/*_y variants, or a CSV schema changed slightly.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame() if df is None else df
     out = df.copy()
+
+    def first_existing(candidates):
+        for c in candidates:
+            if c in out.columns:
+                return c
+        return None
+
+    rename_map = {}
+    company_col = first_existing(["Company Name", "company_name", "Company", "company", "Name", "stock_name", "Stock Name", "Company Name_x", "Company Name_y"])
+    industry_col = first_existing(["Industry", "industry", "Industry Group", "industry_group", "sector", "Sector", "Industry_x", "Industry_y"])
+    ticker_col = first_existing(["ticker", "Ticker", "symbol", "Symbol", "SYMBOL", "nse_symbol"])
+    stage_col = first_existing(["stage", "Stage", "current_stage", "Current Stage", "model_stage"])
+
+    if company_col and company_col != "Company Name":
+        rename_map[company_col] = "Company Name"
+    if industry_col and industry_col != "Industry":
+        rename_map[industry_col] = "Industry"
+    if ticker_col and ticker_col != "ticker":
+        rename_map[ticker_col] = "ticker"
+    if stage_col and stage_col != "stage":
+        rename_map[stage_col] = "stage"
+    if rename_map:
+        out = out.rename(columns=rename_map)
+
+    # If company name is unavailable, fall back to ticker so UI sorting/cards still work.
+    if "ticker" not in out.columns:
+        out["ticker"] = ""
+    out["ticker"] = out["ticker"].astype(str).str.strip()
+
     if "Company Name" not in out.columns:
-        for col in ["Company Name_x", "Company Name_y"]:
-            if col in out.columns:
-                out["Company Name"] = out[col]
-                break
+        out["Company Name"] = out["ticker"].replace("", "Unknown")
+    out["Company Name"] = out["Company Name"].astype(str).str.strip()
+    out.loc[out["Company Name"].eq("") | out["Company Name"].str.lower().eq("nan"), "Company Name"] = out["ticker"]
+
     if "Industry" not in out.columns:
-        for col in ["Industry_x", "Industry_y"]:
-            if col in out.columns:
-                out["Industry"] = out[col]
-                break
+        out["Industry"] = "Unknown"
+    out["Industry"] = out["Industry"].astype(str).str.strip().replace({"": "Unknown", "nan": "Unknown", "None": "Unknown"})
+
+    if "stage" not in out.columns:
+        out["stage"] = "Unknown"
+    out["stage"] = out["stage"].astype(str).str.strip().replace({"": "Unknown", "nan": "Unknown", "None": "Unknown"})
+
     drop_cols = [c for c in ["Company Name_x", "Company Name_y", "Industry_x", "Industry_y", "Ticker"] if c in out.columns]
     if drop_cols:
-        out = out.drop(columns=drop_cols)
+        out = out.drop(columns=drop_cols, errors="ignore")
     return out
 
 def ensure_current_rank(df: pd.DataFrame) -> pd.DataFrame:
@@ -433,6 +472,22 @@ This engine converts rule-based structure data into directional trade actions. I
 </div>
 """, unsafe_allow_html=True)
 
+
+@contextmanager
+def safe_container(container, label: str):
+    """Keep one broken tab/section from taking down the whole Streamlit app."""
+    try:
+        with container:
+            yield
+    except Exception:
+        try:
+            with container:
+                st.error(f"{label} could not be rendered. Other tabs are still available.")
+                with st.expander("Technical details"):
+                    st.code(traceback.format_exc())
+        except Exception:
+            st.error(f"{label} could not be rendered.")
+
 def render_summary_card(title: str, value: str, subtitle: str):
     st.markdown(f"""
 <div class="hero-card">
@@ -451,11 +506,18 @@ def _stage_card_class(stage_raw: str) -> str:
     }.get(stage_raw, "")
 
 def company_choices(df: pd.DataFrame):
-    if df.empty:
+    if df is None or df.empty:
         return {}
-    tmp = df.dropna(subset=["Company Name", "ticker"]).copy()
+    tmp = normalize_columns(df).copy()
+    if "Company Name" not in tmp.columns or "ticker" not in tmp.columns:
+        return {}
+    tmp = tmp.dropna(subset=["Company Name", "ticker"]).copy()
     tmp["Company Name"] = tmp["Company Name"].astype(str).str.strip()
-    tmp = tmp.sort_values(["Company Name", "ticker"], ascending=[True, True])
+    tmp["ticker"] = tmp["ticker"].astype(str).str.strip()
+    tmp = tmp[(tmp["Company Name"] != "") & (tmp["ticker"] != "")]
+    if tmp.empty:
+        return {}
+    tmp = safe_sort_values(tmp, ["Company Name", "ticker"], [True, True])
     tmp = tmp.drop_duplicates(subset=["Company Name"], keep="first")
     return dict(zip(tmp["Company Name"], tmp["ticker"]))
 
@@ -480,14 +542,24 @@ def ensure_rank_column(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def chart_dropdown_options(df: pd.DataFrame):
-    if df.empty:
+    if df is None or df.empty:
         return {}
-    tmp = ensure_rank_column(df.dropna(subset=["Company Name", "ticker"]).copy())
+    tmp = normalize_columns(df).copy()
+    if "Company Name" not in tmp.columns or "ticker" not in tmp.columns:
+        return {}
+    tmp = tmp.dropna(subset=["Company Name", "ticker"]).copy()
+    tmp["ticker"] = tmp["ticker"].astype(str).str.strip()
+    tmp = tmp[tmp["ticker"] != ""]
+    if tmp.empty:
+        return {}
+    tmp = ensure_rank_column(tmp)
     tmp["display_label"] = tmp.apply(stock_display_label, axis=1)
     sort_cols = [c for c in ["current_rank", "display_label"] if c in tmp.columns]
     asc = [True, True][:len(sort_cols)]
-    tmp = tmp.sort_values(sort_cols, ascending=asc, na_position="last").drop_duplicates(subset=["ticker"], keep="first")
+    tmp = safe_sort_values(tmp, sort_cols, asc).drop_duplicates(subset=["ticker"], keep="first")
     return dict(zip(tmp["display_label"], tmp["ticker"]))
+
+@st.cache_data(show_spinner=False, ttl=1800, max_entries=4096)
 
 def resolve_chart_path(charts_dir: str, ticker: str, suffix: str):
     chart_dir = Path(charts_dir)
@@ -520,14 +592,26 @@ def resolve_chart_path(charts_dir: str, ticker: str, suffix: str):
             return path
     return None
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=1800, max_entries=24)
 def load_image_bytes(path: str, mtime_ns: int) -> bytes:
     return Path(path).read_bytes()
 
 def safe_image_bytes(path):
-    if not path or not path.exists():
+    """Read image bytes safely with a small cache.
+
+    Large chart images were a likely reason for Streamlit Cloud crashes. This
+    function refuses unusually large images instead of exhausting memory.
+    """
+    try:
+        if not path or not Path(path).exists():
+            return None
+        p = Path(path)
+        # Keep one chart below ~3.5 MB. If charts are larger, regenerate smaller PNGs.
+        if p.stat().st_size > 3_500_000:
+            return None
+        return load_image_bytes(str(p), p.stat().st_mtime_ns)
+    except Exception:
         return None
-    return load_image_bytes(str(path), path.stat().st_mtime_ns)
 
 def stage_count_summary(combined_df: pd.DataFrame):
     counts = combined_df["stage"].value_counts() if "stage" in combined_df.columns else pd.Series(dtype=int)
@@ -1277,7 +1361,7 @@ FO_COLUMN_CANDIDATES = [
 ]
 
 
-def find_fo_column(df: pd.DataFrame) -> str | None:
+def find_fo_column(df: pd.DataFrame):
     """Return the first F&O marker column found in the dataframe."""
     if df is None or df.empty:
         return None
@@ -1467,8 +1551,14 @@ top_changed_df, changes_summary = build_today_changes(changes, industry_changes)
 alert_candidates = build_alert_candidates(combined, changes)
 stage_counts = stage_count_summary(combined)
 INDUSTRY_PORTFOLIOS = get_industry_portfolio_options(industry, combined, limit=21)
-DECISION_DF = build_decision_engine_table(combined, changes, industry, regime)
-DECISION_DF = backfill_current_rank(DECISION_DF, GLOBAL_RANK_MAP)
+try:
+    DECISION_DF = build_decision_engine_table(combined, changes, industry, regime)
+    DECISION_DF = backfill_current_rank(DECISION_DF, GLOBAL_RANK_MAP)
+except Exception:
+    st.warning("Decision engine failed to build, so the app is showing the base combined dataset instead.")
+    with st.expander("Decision engine technical details"):
+        st.code(traceback.format_exc())
+    DECISION_DF = combined.copy()
 RANK_SOURCE_DF = DECISION_DF if not DECISION_DF.empty else combined
 TOP_MOVER_RANK_MAP = build_simple_rank_map(RANK_SOURCE_DF)
 DECISION_STATS = decision_summary_stats(DECISION_DF)
@@ -1733,7 +1823,7 @@ def render_production_mobile_ui(feed_df: pd.DataFrame, daily_chart_dir: str, wee
             st.markdown(f"<div class='pm-strip'>{chips}</div>", unsafe_allow_html=True)
     mode = st.radio("Mode", ["Feed", "Swipe"], horizontal=True, label_visibility="collapsed")
     filter_choice = st.radio("Filter", ["Top", "Improving", "Stage 2", "Weakening", "New Flags"], horizontal=True, label_visibility="collapsed")
-    max_cards = st.slider("Cards", min_value=5, max_value=60, value=25, step=5, label_visibility="collapsed")
+    max_cards = st.slider("Cards", min_value=5, max_value=30, value=10, step=5, label_visibility="collapsed")
     view = _pm_prepare_view(prepared, filter_choice, max_cards)
     st.markdown("<div class='pm-disclaimer'>This screen is a public-view prototype: structure labels, ranks, sectors and charts only. No buy/sell/short recommendation is shown.</div>", unsafe_allow_html=True)
     if view.empty:
@@ -1811,7 +1901,7 @@ view_mode = st.radio("View mode", ["Execution", "Research"], horizontal=True, in
 tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer", "Mobile"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer", "Mobile"]
 tabs = st.tabs(tab_names)
 
-with tabs[0]:
+with safe_container(tabs[0], "Today"):
     current_market_tone = market_tone(regime, combined)
     current_bias = market_action_bias(stage_counts, regime)
     current_bias_score = market_bias_score(stage_counts, regime)
@@ -1873,7 +1963,7 @@ with tabs[0]:
                 with cols[i % 3]:
                     card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
 
-with tabs[1]:
+with safe_container(tabs[1], "Trade Board"):
     st.markdown("### Trade Board")
     if DECISION_DF.empty:
         st.info("Decision engine table is not available.")
@@ -1913,7 +2003,7 @@ with tabs[1]:
         for _, r in board.head(20).iterrows():
             render_trade_card(r)
 
-with tabs[2]:
+with safe_container(tabs[2], "Explore"):
     st.markdown("### Explore")
     filt1, filt2, filt3 = st.columns(3)
     with filt1:
@@ -1936,7 +2026,7 @@ with tabs[2]:
         card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
     render_disclosure()
 
-with tabs[3]:
+with safe_container(tabs[3], "Movers"):
     st.markdown("### Movers")
     if moves.empty:
         st.info("Price move data not found yet.")
@@ -1945,22 +2035,29 @@ with tabs[3]:
         selected = st.radio("Move window", list(window_map.keys()), horizontal=True, index=0, key="movers_window")
         col = window_map[selected]
         mv = moves.copy()
-        mv[col] = pd.to_numeric(mv[col], errors="coerce")
-        mv = mv.dropna(subset=[col])
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown(f"#### Biggest upward moves • {selected}")
-            for _, r in mv.sort_values([col, "Company Name"], ascending=[False, True]).head(10).iterrows():
-                stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
-        with c2:
-            st.markdown(f"#### Major downward moves • {selected}")
-            for _, r in mv.sort_values([col, "Company Name"], ascending=[True, True]).head(10).iterrows():
-                stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
+        if col not in mv.columns:
+            st.info(f"{col} is not available in stock_price_moves.csv.")
+            mv = pd.DataFrame()
+        else:
+            mv[col] = pd.to_numeric(mv[col], errors="coerce")
+            mv = mv.dropna(subset=[col])
+        if mv.empty:
+            st.info("No mover rows available for this window.")
+        else:
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(f"#### Biggest upward moves • {selected}")
+                for _, r in mv.sort_values([col, "Company Name"], ascending=[False, True]).head(10).iterrows():
+                    stock_rank = get_stock_rank(r["ticker"])
+                    card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
+            with c2:
+                st.markdown(f"#### Major downward moves • {selected}")
+                for _, r in mv.sort_values([col, "Company Name"], ascending=[True, True]).head(10).iterrows():
+                    stock_rank = get_stock_rank(r["ticker"])
+                    card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
     render_disclosure()
 
-with tabs[4]:
+with safe_container(tabs[4], "Watchlist"):
     st.markdown("### Watchlist")
     portfolio_options = [
         "Custom",
@@ -2033,10 +2130,16 @@ with tabs[4]:
             st.dataframe(current[summary_cols], use_container_width=True, hide_index=True, height=260)
 
         portfolio_ordered = current.reset_index(drop=True)
-        if not portfolio_ordered.empty:
+        load_watchlist_charts = st.toggle(
+            "Load watchlist charts",
+            value=False,
+            key="load_watchlist_charts",
+            help="Charts are heavy on Streamlit Cloud. Keep this off unless you are reviewing charts."
+        )
+        if not portfolio_ordered.empty and load_watchlist_charts:
             st.divider()
             st.markdown("### Watchlist charts")
-            chart_limit = min(150, len(portfolio_ordered))
+            chart_limit = min(20, len(portfolio_ordered))
             st.caption(f"Showing charts for the first {chart_limit} watchlist stocks by rank.")
             for idx, (_, prow) in enumerate(portfolio_ordered.head(chart_limit).iterrows(), start=1):
                 pticker_short = str(prow["ticker"]).replace(".NS", "")
@@ -2074,7 +2177,7 @@ with tabs[4]:
             st.rerun()
     render_disclosure()
 
-with tabs[5]:
+with safe_container(tabs[5], "Charts"):
     st.markdown("### Charts")
     ranked_alpha = sort_by_rank(DECISION_DF if not DECISION_DF.empty else combined, descending=False, company_tiebreak=True).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
@@ -2116,13 +2219,17 @@ with tabs[5]:
         if selected_ticker in ticker_list:
             st.session_state["chart_index"] = ticker_list.index(selected_ticker)
 
-    selected_display = st.selectbox(
-        "Select stock",
-        options=options,
-        index=(options.index(st.session_state["charts_selectbox_live"]) if options and st.session_state.get("charts_selectbox_live") in options else 0),
-        placeholder="Type stock name or ticker",
-        key="charts_selectbox_live",
-    )
+    selected_display = None
+    if options:
+        selected_display = st.selectbox(
+            "Select stock",
+            options=options,
+            index=(options.index(st.session_state["charts_selectbox_live"]) if st.session_state.get("charts_selectbox_live") in options else 0),
+            placeholder="Type stock name or ticker",
+            key="charts_selectbox_live",
+        )
+    else:
+        st.info("No chart dropdown options are available because ticker/company columns are missing or empty.")
 
     if selected_display and ticker_list:
         chosen_ticker = chart_choice_map[selected_display]
@@ -2177,7 +2284,7 @@ with tabs[5]:
     render_disclosure()
 tab_offset = 6
 if view_mode == "Research":
-    with tabs[6]:
+    with safe_container(tabs[6], "Market"):
         st.markdown("### Market")
         c1, c2, c3, c4 = st.columns(4)
         with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
@@ -2200,7 +2307,7 @@ if view_mode == "Research":
                 cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in industry_changes.columns]
                 st.dataframe(industry_changes[cols], use_container_width=True, hide_index=True, height=520)
         render_disclosure()
-    with tabs[7]:
+    with safe_container(tabs[7], "Structure Changes"):
         st.markdown("### Structure Changes")
         if alert_candidates.empty:
             st.info("No structure-change rows were found in the latest data.")
@@ -2210,7 +2317,7 @@ if view_mode == "Research":
         render_disclosure()
     tab_offset = 8
 
-with tabs[tab_offset]:
+with safe_container(tabs[tab_offset], "Learn"):
     left, right = st.columns([1.05, 0.95])
     with left:
         st.markdown("""
@@ -2245,12 +2352,15 @@ with tabs[tab_offset]:
             st.markdown('<div class="info-card"><b>Onboarding note</b><br>This tool helps users understand market structure. It does not tell users what to buy.</div>', unsafe_allow_html=True)
     render_disclosure()
 
-with tabs[tab_offset + 1]:
+with safe_container(tabs[tab_offset + 1], "Disclaimer"):
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. It does not rank, recommend, prioritize, or suggest any securities for investment purposes, and it does not provide model portfolios, suitability analysis, or allocation recommendations.")
     render_disclosure()
 
 
 # Production mobile public-view prototype
-with tabs[-1]:
-    render_production_mobile_ui(combined, daily_dir, weekly_dir)
+with safe_container(tabs[-1], "Mobile"):
+    st.info("Mobile feed is chart-heavy. Load it only when needed to avoid Streamlit Cloud memory crashes.")
+    load_mobile = st.toggle("Load mobile feed", value=False, key="load_mobile_feed")
+    if load_mobile:
+        render_production_mobile_ui(combined, daily_dir, weekly_dir)
