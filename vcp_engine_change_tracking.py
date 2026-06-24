@@ -1801,8 +1801,9 @@ def export_chart(
     """
     if df.empty:
         return
-    if skip_existing and outfile.exists() and outfile.stat().st_size > 10_000:
-        return
+    # Always regenerate charts on every run. Existing PNGs are intentionally overwritten
+    # because the Watchlist and Charts search pages must reflect the latest price/state.
+    # The `skip_existing` argument is kept only for backward compatibility and ignored.
 
     target_display_bars = 180 if not is_weekly else 104
     fast_window = 10 if is_weekly else 50
@@ -2820,10 +2821,12 @@ def build_outputs(
     config: Optional[dict] = None,
     export_all_ticker_charts: bool = True,
     wide_price: Optional[str] = None,
-    chart_scope: str = "dashboard",
+    chart_scope: str = "all",
     skip_existing_charts: bool = False,
     chart_dpi: int = 150,
 ) -> Dict[str, str]:
+    # Charts are always regenerated. This keeps Watchlist and Charts-tab search fresh.
+    skip_existing_charts = False
     cfg = {**DEFAULT_CONFIG, **(config or {})}
     out_path = Path(outdir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -3127,8 +3130,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--wide-price", default=None, help="Folder containing wide_open.csv/wide_high.csv/wide_low.csv/wide_close.csv/wide_volume.csv, or yahoo_price_data_wide.xlsx")
     parser.add_argument("--max-price-rows", type=int, default=620, help="Read only the latest N rows from the wide price files. Use 0 to load all rows.")
     parser.add_argument("--no-charts", action="store_true", help="Skip chart generation for fast testing.")
-    parser.add_argument("--chart-scope", choices=["dashboard", "all", "none"], default="dashboard", help="dashboard = generate only charts used by dashboard views; all = every included stock; none = no charts. Default: dashboard.")
-    parser.add_argument("--skip-existing-charts", action="store_true", help="Do not regenerate chart PNGs that already exist. Fastest for reruns after non-price changes.")
+    parser.add_argument("--chart-scope", choices=["dashboard", "all", "none"], default="all", help="all = generate charts for every included stock; dashboard = dashboard-needed charts only; none = no charts. Default: all.")
+    parser.add_argument("--skip-existing-charts", action="store_true", help="Deprecated and ignored. Charts are regenerated every run so Watchlist and Charts search stay current.")
     parser.add_argument("--chart-dpi", type=int, default=150, help="PNG DPI for dashboard charts. 130-160 is usually enough for Streamlit.")
     parser.add_argument("--init-history", action="store_true", help="Backfill historical stage_action_history. Slow; off by default.")
     return parser.parse_args()
@@ -3147,7 +3150,7 @@ def main() -> None:
         export_all_ticker_charts=not args.no_charts,
         wide_price=args.wide_price,
         chart_scope="none" if args.no_charts else args.chart_scope,
-        skip_existing_charts=bool(args.skip_existing_charts),
+        skip_existing_charts=False,
         chart_dpi=int(args.chart_dpi),
     )
     write_engine_run_metadata(Path(args.outdir))

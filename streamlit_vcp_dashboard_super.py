@@ -1856,8 +1856,7 @@ with st.expander("🚀 Private Publishing Controls", expanded=False):
         except Exception as exc:
             st.error(f"Export failed: {exc}")
 
-view_mode = st.radio("View mode", ["Execution", "Research"], horizontal=True, index=0)
-tab_names = ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Learn", "Disclaimer", "Mobile"] if view_mode == "Execution" else ["Today", "Trade Board", "Explore", "Movers", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer", "Mobile"]
+tab_names = ["Today", "Trade Board", "Watchlist", "Charts", "Market", "Structure Changes", "Learn", "Disclaimer"]
 tabs = st.tabs(tab_names)
 
 with tabs[0]:
@@ -1962,59 +1961,8 @@ with tabs[1]:
         for _, r in board.head(20).iterrows():
             render_trade_card(r)
 
+
 with tabs[2]:
-    st.markdown("### Explore")
-    filt1, filt2, filt3, filt4 = st.columns(4)
-    with filt1:
-        stage_filter = st.selectbox("Stage", ["All", "Stage 1", "Stage 2", "Stage 2 Failed", "Stage 3", "Stage 4", "Not Sure"])
-    with filt2:
-        stage_class_options = ["All"] + sorted([x for x in combined.get("stage_classification", pd.Series(dtype=str)).dropna().astype(str).unique().tolist() if x and x.lower() not in {"nan", "none"}])
-        stage_class_filter = st.selectbox("Stage classification", stage_class_options)
-    with filt3:
-        label_filter = st.selectbox("Label", ["All", "Strong", "Developing", "Cautious", "Weak"])
-    with filt4:
-        industry_options = ["All"] + sorted([x for x in combined["Industry"].dropna().astype(str).unique().tolist()])
-        industry_filter = st.selectbox("Industry", industry_options)
-    explore_df = combined.copy()
-    if stage_filter != "All":
-        explore_df = explore_df[explore_df["stage"] == stage_filter]
-    if stage_class_filter != "All" and "stage_classification" in explore_df.columns:
-        explore_df = explore_df[explore_df["stage_classification"].astype(str) == stage_class_filter]
-    if label_filter != "All":
-        explore_df = explore_df[explore_df["label"] == label_filter]
-    if industry_filter != "All":
-        explore_df = explore_df[explore_df["Industry"].astype(str) == industry_filter]
-    explore_df = explore_df.sort_values(["Company Name", "ticker"], ascending=[True, True])
-    st.caption("Alphabetical listing with filters. This is a descriptive dataset view, not a recommendation view.")
-    for _, r in explore_df.head(40).iterrows():
-        card(r, use_stage_color=True, stock_rank=get_stock_rank(r["ticker"]))
-    render_disclosure()
-
-with tabs[3]:
-    st.markdown("### Movers")
-    if moves.empty:
-        st.info("Price move data not found yet.")
-    else:
-        window_map = {"1 Day":"change_1d_pct","1 Week":"change_1w_pct","1 Month":"change_1m_pct","YTD":"change_ytd_pct"}
-        selected = st.radio("Move window", list(window_map.keys()), horizontal=True, index=0, key="movers_window")
-        col = window_map[selected]
-        mv = moves.copy()
-        mv[col] = pd.to_numeric(mv[col], errors="coerce")
-        mv = mv.dropna(subset=[col])
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown(f"#### Biggest upward moves • {selected}")
-            for _, r in mv.sort_values([col, "Company Name"], ascending=[False, True]).head(10).iterrows():
-                stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
-        with c2:
-            st.markdown(f"#### Major downward moves • {selected}")
-            for _, r in mv.sort_values([col, "Company Name"], ascending=[True, True]).head(10).iterrows():
-                stock_rank = get_stock_rank(r["ticker"])
-                card(r, pct=float(r[col]), use_stage_color=True, stock_rank=stock_rank)
-    render_disclosure()
-
-with tabs[4]:
     st.markdown("### Watchlist")
     portfolio_options = [
         "Custom",
@@ -2128,7 +2076,7 @@ with tabs[4]:
             st.rerun()
     render_disclosure()
 
-with tabs[5]:
+with tabs[3]:
     st.markdown("### Charts")
     ranked_alpha = sort_by_rank(DECISION_DF if not DECISION_DF.empty else combined, descending=False, company_tiebreak=True).reset_index(drop=True).copy()
     ticker_list = ranked_alpha["ticker"].dropna().astype(str).tolist()
@@ -2229,47 +2177,44 @@ with tabs[5]:
         card(row, use_stage_color=True, stock_rank=get_stock_rank(row["ticker"]))
         render_stock_detail(row)
     render_disclosure()
-tab_offset = 6
-if view_mode == "Research":
-    with tabs[6]:
-        st.markdown("### Market")
-        c1, c2, c3, c4 = st.columns(4)
-        with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
-        with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Advancing")
-        with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Transition")
-        with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Declining")
-        left, right = st.columns(2)
-        with left:
-            view = industry.copy()
-            if not view.empty and "Industry" in view.columns:
-                stage2 = stage2_count_by_industry(combined)
-                view = view.merge(stage2, on="Industry", how="left")
-                st.dataframe(view[[c for c in ["Industry", "avg_combined_score", "current_rank", "Stage 2 Stocks"] if c in view.columns]], use_container_width=True, hide_index=True, height=520)
-            else:
-                st.info("Industry data not available.")
-        with right:
-            if not combined.empty and "stage_classification" in combined.columns:
-                st.markdown("#### Stage classification mix")
-                class_mix = combined["stage_classification"].fillna("Not Sure").astype(str).value_counts().reset_index()
-                class_mix.columns = ["Stage Classification", "Stocks"]
-                st.dataframe(class_mix, use_container_width=True, hide_index=True, height=230)
-            if industry_changes.empty:
-                st.info("Industry changes data not available.")
-            else:
-                cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in industry_changes.columns]
-                st.dataframe(industry_changes[cols], use_container_width=True, hide_index=True, height=520)
-        render_disclosure()
-    with tabs[7]:
-        st.markdown("### Structure Changes")
-        if alert_candidates.empty:
-            st.info("No structure-change rows were found in the latest data.")
+with tabs[4]:
+    st.markdown("### Market")
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: render_summary_card("Stage 1", str(stage_counts["Stage 1"]), "Base / repair")
+    with c2: render_summary_card("Stage 2", str(stage_counts["Stage 2"]), "Advancing")
+    with c3: render_summary_card("Stage 3", str(stage_counts["Stage 3"]), "Transition")
+    with c4: render_summary_card("Stage 4", str(stage_counts["Stage 4"]), "Declining")
+    left, right = st.columns(2)
+    with left:
+        view = industry.copy()
+        if not view.empty and "Industry" in view.columns:
+            stage2 = stage2_count_by_industry(combined)
+            view = view.merge(stage2, on="Industry", how="left")
+            st.dataframe(view[[c for c in ["Industry", "avg_combined_score", "current_rank", "Stage 2 Stocks"] if c in view.columns]], use_container_width=True, hide_index=True, height=520)
         else:
-            for _, r in alert_candidates.iterrows():
-                card(r, use_stage_color=True, show_change_text=f"{r['alert_type']} • {r['alert_reason']}", stock_rank=get_stock_rank(r["ticker"]))
-        render_disclosure()
-    tab_offset = 8
+            st.info("Industry data not available.")
+    with right:
+        if not combined.empty and "stage_classification" in combined.columns:
+            st.markdown("#### Stage classification mix")
+            class_mix = combined["stage_classification"].fillna("Not Sure").astype(str).value_counts().reset_index()
+            class_mix.columns = ["Stage Classification", "Stocks"]
+            st.dataframe(class_mix, use_container_width=True, hide_index=True, height=230)
+        if industry_changes.empty:
+            st.info("Industry changes data not available.")
+        else:
+            cols = [c for c in ["Industry", "current_rank", "prev_rank", "rank_change"] if c in industry_changes.columns]
+            st.dataframe(industry_changes[cols], use_container_width=True, hide_index=True, height=520)
+    render_disclosure()
+with tabs[5]:
+    st.markdown("### Structure Changes")
+    if alert_candidates.empty:
+        st.info("No structure-change rows were found in the latest data.")
+    else:
+        for _, r in alert_candidates.iterrows():
+            card(r, use_stage_color=True, show_change_text=f"{r['alert_type']} • {r['alert_reason']}", stock_rank=get_stock_rank(r["ticker"]))
+    render_disclosure()
 
-with tabs[tab_offset]:
+with tabs[6]:
     left, right = st.columns([1.05, 0.95])
     with left:
         st.markdown("""
@@ -2277,7 +2222,6 @@ with tabs[tab_offset]:
   <div class="stock-title">How to use this app</div>
   <ul class="list-tight">
     <li>Start with <b>Today</b> to understand the market mode and recent changes.</li>
-    <li>Use <b>Explore</b> to filter the dataset by stage, label, and industry.</li>
     <li>Use <b>Watchlist</b> to track your own basket.</li>
     <li>Use <b>Charts</b> for daily and weekly context.</li>
   </ul>
@@ -2304,12 +2248,8 @@ with tabs[tab_offset]:
             st.markdown('<div class="info-card"><b>Onboarding note</b><br>This tool helps users understand market structure. It does not tell users what to buy.</div>', unsafe_allow_html=True)
     render_disclosure()
 
-with tabs[tab_offset + 1]:
+with tabs[7]:
     st.markdown("### Disclaimer")
     st.write("This tool is for informational purposes only. It presents rule-based stage classifications and market summaries. It does not provide investment advice, recommendations, or opinions on buying, selling, or holding securities. It does not rank, recommend, prioritize, or suggest any securities for investment purposes, and it does not provide model portfolios, suitability analysis, or allocation recommendations.")
     render_disclosure()
 
-
-# Production mobile public-view prototype
-with tabs[-1]:
-    render_production_mobile_ui(combined, daily_dir, weekly_dir)
