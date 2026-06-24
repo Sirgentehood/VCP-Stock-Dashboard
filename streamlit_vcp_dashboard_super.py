@@ -281,6 +281,16 @@ def classify_stock(row: pd.Series) -> str:
 
 def ensure_label(df: pd.DataFrame) -> pd.DataFrame:
     out = ensure_current_rank(normalize_columns(df))
+    if out is None or out.empty:
+        return out
+    if "stage" not in out.columns:
+        out["stage"] = "Not Sure"
+    if "stage_classification" not in out.columns:
+        out["stage_classification"] = out["stage_variant"] if "stage_variant" in out.columns else out["stage"]
+    if "stage_variant" not in out.columns:
+        out["stage_variant"] = out["stage_classification"]
+    if "stage_display" not in out.columns:
+        out["stage_display"] = out.apply(stage_display_text, axis=1)
     numeric_cols = [
         "final_combined_score", "avg_combined_score", "current_rank", "prev_rank", "rank_change",
         "combined_score_change", "change_1d_pct", "change_1w_pct", "change_1m_pct", "change_ytd_pct", "rs_rank"
@@ -350,6 +360,29 @@ def stage_short_description(stage: str) -> str:
         "Stage 3": "Trend slowing or mixed structure.",
         "Stage 4": "Declining structure in this model.",
     }.get(stage, "Mixed structure in this model.")
+
+def stage_classification_text(row: pd.Series) -> str:
+    """Detailed stage label for cards and tables.
+
+    The engine writes `stage_variant` / `stage_classification`, for example:
+    Early Stage 2, Clean Stage 2, Stage 1 - Base/Repair, Failed Stage 2.
+    This fallback keeps the dashboard safe with older output files too.
+    """
+    stage = str(row.get("stage", "Not Sure") or "Not Sure").strip()
+    for col in ["stage_classification", "stage_variant"]:
+        if col in row.index:
+            val = str(row.get(col, "") or "").strip()
+            if val and val.lower() not in {"nan", "none", "unknown"}:
+                return val
+    return stage_primary_label(stage)
+
+
+def stage_display_text(row: pd.Series) -> str:
+    stage = str(row.get("stage", "Not Sure") or "Not Sure").strip()
+    classification = stage_classification_text(row)
+    if not classification or classification == stage:
+        return stage
+    return f"{stage} • {classification}"
 
 def stage_condition_text(row: pd.Series) -> str:
     stage = str(row.get("stage", ""))
@@ -797,8 +830,11 @@ def get_prebuilt_portfolio(name: str, combined: pd.DataFrame, changes: pd.DataFr
     names = []
     if name in {"Buy", "Tactical Buy", "Watch for Long", "Short", "Tactical Short", "Watch for Short", "No Trade"} and "action" in ranked.columns:
         names = ranked.loc[ranked["action"].astype(str) == name, "Company Name"].dropna().tolist()
-    elif name in {"Stage 1", "Stage 2", "Stage 3", "Stage 4"}:
-        names = ranked.loc[ranked["stage"] == name, "Company Name"].dropna().tolist()
+    elif name in {"Stage 1", "Stage 2", "Stage 2 Failed", "Stage 3", "Stage 4", "Not Sure"}:
+        names = ranked.loc[ranked["stage"].astype(str) == name, "Company Name"].dropna().tolist()
+    elif str(name).startswith("Class: ") and "stage_classification" in ranked.columns:
+        cls = str(name).replace("Class: ", "", 1)
+        names = ranked.loc[ranked["stage_classification"].astype(str) == cls, "Company Name"].dropna().tolist()
     elif name in {"Strong", "Developing", "Cautious", "Weak"}:
         names = ranked.loc[ranked["label"] == name, "Company Name"].dropna().tolist()
     elif name in industries:
@@ -1179,9 +1215,11 @@ def render_stock_detail(row):
     stock_name = str(row.get("Company Name", row.get("stock_name", "")) or "")
     ticker = str(row.get("ticker", "") or "")
     stage = str(row.get("stage", "") or "")
+    stage_class = stage_classification_text(row)
+    stage_reason = str(row.get("stage_reason", "") or "").strip()
     st.markdown("#### Stock detail")
     st.markdown(f"**{stock_name} ({ticker})**")
-    st.caption(f"{stage_primary_label(stage)} · {structure_category(row)}")
+    st.caption(f"{stage_display_text(row)} · {structure_category(row)}")
     meta = []
     rank_val = pd.to_numeric(row.get("current_rank"), errors="coerce")
     if pd.notna(rank_val):
@@ -1190,7 +1228,12 @@ def render_stock_detail(row):
     st.write(" • ".join(meta))
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown('<div class="info-card"><b>Current model description</b><br>' + interpretation_line(row) + '</div>', unsafe_allow_html=True)
+        current_desc = interpretation_line(row)
+        if stage_class:
+            current_desc += f"<br><br><b>Stage classification:</b> {stage_class}"
+        if stage_reason:
+            current_desc += f"<br><span class='small-note'>{stage_reason}</span>"
+        st.markdown('<div class="info-card"><b>Current model description</b><br>' + current_desc + '</div>', unsafe_allow_html=True)
     with col2:
         st.markdown('<div class="info-card"><b>Recent structure-change flags</b><br>' + signal_summary(row) + '</div>', unsafe_allow_html=True)
     with col3:
@@ -1201,8 +1244,10 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
     style = LABELS.get(label, LABELS["Developing"])
     stage_raw = str(row.get("stage", "Unknown"))
     stage_label = stage_primary_label(stage_raw)
+    stage_class = stage_classification_text(row)
     stage_desc = stage_short_description(stage_raw)
     stage_condition = stage_condition_text(row)
+    stage_meta = f"{stage_raw} • {stage_class}" if stage_class and stage_class != stage_raw else f"{stage_raw} • {stage_label}"
     display_name = stock_display_label(row)
     structure = structure_category(row)
     score = structure_score(row)
@@ -1253,7 +1298,7 @@ def card(row: pd.Series, pct=None, use_stage_color=False, show_change_text: str 
         f"<div style='display:flex; justify-content:space-between; align-items:flex-start; gap:0.55rem;'>"
         f"<div style='min-width:0;'>"
         f"<div class='stock-title'>{display_name}</div>"
-        f"<div class='meta-line'>{stage_raw} • {stage_label} • {stage_condition}</div>"
+        f"<div class='meta-line'>{stage_meta} • {stage_condition}</div>"
         f"<div class='stock-subtitle'>{interpret}</div>"
         f"{structure_html}"
         f"<div class='small-note'>Higher model score means stronger structure inside this model. It is not a recommendation.</div>"
@@ -1560,6 +1605,9 @@ def _pm_chip_class(row: pd.Series) -> str:
 def _pm_reason(row: pd.Series) -> str:
     parts = []
     stage = str(row.get("stage", ""))
+    stage_class = stage_classification_text(row)
+    if stage_class and stage_class not in {stage, stage_primary_label(stage)}:
+        parts.append(stage_class)
     if stage == "Stage 2":
         parts.append("Advancing structure")
     elif stage == "Stage 3":
@@ -1644,6 +1692,7 @@ def _pm_render_card(row: pd.Series, daily_chart_dir: str, weekly_chart_dir: str,
     company = stock_display_label(row)
     industry_name = str(row.get("Industry", "-") or "-")
     stage = str(row.get("stage", "-") or "-")
+    stage_class = stage_classification_text(row)
     structure = structure_category(row)
     score = structure_score(row)
     chip_class = _pm_chip_class(row)
@@ -1658,7 +1707,7 @@ def _pm_render_card(row: pd.Series, daily_chart_dir: str, weekly_chart_dir: str,
   <div class='pm-row'>
     <div style='min-width:0;'>
       <div class='pm-company'>{company}</div>
-      <div class='pm-meta'>{industry_icon(industry_name)} {industry_name} • {stage} • {stage_primary_label(stage)}</div>
+      <div class='pm-meta'>{industry_icon(industry_name)} {industry_name} • {stage} • {stage_class}</div>
     </div>
     <div class='pm-rank-box'>
       <div class='pm-rank-label'>Rank</div>
@@ -1903,7 +1952,7 @@ with tabs[1]:
         board["dry_up_status"] = board.apply(dry_up_status, axis=1)
         board["mini_signals"] = board.apply(build_mini_signal_text, axis=1)
         show_cols = [c for c in [
-            "Company Name", "ticker", "Industry", "stage", "label", "action", "trade_side",
+            "Company Name", "ticker", "Industry", "stage", "stage_classification", "label", "action", "trade_side",
             "long_score", "short_score", "action_confidence", "industry_score", "industry_view",
             "current_rank", "rank_change", "is_fo_stock", "dry_up_status", "mini_signals", "rationale"
         ] if c in board.columns]
@@ -1915,17 +1964,22 @@ with tabs[1]:
 
 with tabs[2]:
     st.markdown("### Explore")
-    filt1, filt2, filt3 = st.columns(3)
+    filt1, filt2, filt3, filt4 = st.columns(4)
     with filt1:
-        stage_filter = st.selectbox("Stage", ["All", "Stage 1", "Stage 2", "Stage 3", "Stage 4"])
+        stage_filter = st.selectbox("Stage", ["All", "Stage 1", "Stage 2", "Stage 2 Failed", "Stage 3", "Stage 4", "Not Sure"])
     with filt2:
-        label_filter = st.selectbox("Label", ["All", "Strong", "Developing", "Cautious", "Weak"])
+        stage_class_options = ["All"] + sorted([x for x in combined.get("stage_classification", pd.Series(dtype=str)).dropna().astype(str).unique().tolist() if x and x.lower() not in {"nan", "none"}])
+        stage_class_filter = st.selectbox("Stage classification", stage_class_options)
     with filt3:
+        label_filter = st.selectbox("Label", ["All", "Strong", "Developing", "Cautious", "Weak"])
+    with filt4:
         industry_options = ["All"] + sorted([x for x in combined["Industry"].dropna().astype(str).unique().tolist()])
         industry_filter = st.selectbox("Industry", industry_options)
     explore_df = combined.copy()
     if stage_filter != "All":
         explore_df = explore_df[explore_df["stage"] == stage_filter]
+    if stage_class_filter != "All" and "stage_classification" in explore_df.columns:
+        explore_df = explore_df[explore_df["stage_classification"].astype(str) == stage_class_filter]
     if label_filter != "All":
         explore_df = explore_df[explore_df["label"] == label_filter]
     if industry_filter != "All":
@@ -1979,7 +2033,7 @@ with tabs[4]:
         "Stage 2",
         "Stage 3",
         "Stage 4",
-    ] + INDUSTRY_PORTFOLIOS
+    ] + sorted([f"Class: {x}" for x in combined.get("stage_classification", pd.Series(dtype=str)).dropna().astype(str).unique().tolist() if x and x not in {"nan", "None"}]) + INDUSTRY_PORTFOLIOS
     selected_watchlist = st.selectbox("Watchlist view", portfolio_options, key="watchlist_view")
     previous_watchlist = st.session_state.get("watchlist_selection_prev", "Custom")
     if selected_watchlist != previous_watchlist:
@@ -2028,7 +2082,7 @@ with tabs[4]:
         if not current.empty:
             current["portfolio_action"] = current.get("action", "No Trade")
             current["dry_up_status"] = current.apply(dry_up_status, axis=1)
-            summary_cols = [c for c in ["Company Name", "ticker", "stage", "label", "is_fo_stock", "portfolio_action", "dry_up_status", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
+            summary_cols = [c for c in ["Company Name", "ticker", "stage", "stage_classification", "label", "is_fo_stock", "portfolio_action", "dry_up_status", "current_rank", "industry_score", "action_confidence"] if c in current.columns]
             st.markdown("#### Portfolio action table")
             st.dataframe(current[summary_cols], use_container_width=True, hide_index=True, height=260)
 
@@ -2036,8 +2090,8 @@ with tabs[4]:
         if not portfolio_ordered.empty:
             st.divider()
             st.markdown("### Watchlist charts")
-            chart_limit = min(150, len(portfolio_ordered))
-            st.caption(f"Showing charts for the first {chart_limit} watchlist stocks by rank.")
+            chart_limit = min(60, len(portfolio_ordered))
+            st.caption(f"Showing charts for the first {chart_limit} watchlist stocks by rank. Use the Charts tab for the full list.")
             for idx, (_, prow) in enumerate(portfolio_ordered.head(chart_limit).iterrows(), start=1):
                 pticker_short = str(prow["ticker"]).replace(".NS", "")
                 st.markdown(f"#### {idx}. {stock_display_label(prow)} • Dataset Rank {get_stock_rank(prow['ticker'])}")
@@ -2194,6 +2248,11 @@ if view_mode == "Research":
             else:
                 st.info("Industry data not available.")
         with right:
+            if not combined.empty and "stage_classification" in combined.columns:
+                st.markdown("#### Stage classification mix")
+                class_mix = combined["stage_classification"].fillna("Not Sure").astype(str).value_counts().reset_index()
+                class_mix.columns = ["Stage Classification", "Stocks"]
+                st.dataframe(class_mix, use_container_width=True, hide_index=True, height=230)
             if industry_changes.empty:
                 st.info("Industry changes data not available.")
             else:
